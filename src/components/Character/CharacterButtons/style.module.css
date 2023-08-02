@@ -1,0 +1,51 @@
+@import '~@fortawesome/fontawesome-free/css/all.css';
+
+.main_container {
+    display: flex;
+    align-items: center;
+}
+
+.change {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    margin-right: 8px;
+    cursor: pointer;box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Ajout de cette ligne */
+    transform: perspective(1px) scale(1.02); /* Ajout de cette ligne */
+    transition: transform 0.3s ease; /* Ajout de cette ligne */
+}
+
+.change:hover {
+    transform: perspective(1px) scale(1.05); /* Ajout de cette ligne */
+}
+
+
+.button {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 8px;
+    border-radius: 4px;
+    margin-right: 8px;
+    user-select: none;
+    cursor: pointer;box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+    transform: perspective(1px) scale(1.02); 
+    transition: transform 0.3s ease; 
+}
+
+.button:hover {
+    transform: perspective(1px) scale(1.05); 
+}
+
+.button_name {
+    font-weight: bold;
+    margin-right: 4px;
+}
+
+.button_value {
+    font-weight: bold;
+}
