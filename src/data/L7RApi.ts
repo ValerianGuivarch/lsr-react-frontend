@@ -3,6 +3,9 @@ import config from '../config/config';
 import {CharacterRaw} from "./CharacterRaw";
 import {CharacterPreviewRaw} from "./CharacterPreviewRaw";
 import {Character} from "../domain/models/Character";
+import {CharacterUpdateRequest} from "./CharacterUpdateRequest";
+import {Roll} from "../domain/models/Roll";
+import {RollRaw} from "./RollRaw";
 
 export class L7RApi {
     static async getPJs(): Promise<CharacterPreviewRaw[]> {
@@ -14,12 +17,29 @@ export class L7RApi {
         return new Character(response.data);
     }
 
-    static async updateCharacter(character: Character) {
-        console.log("updateCharacter");
-        console.log(character);
-        // character as JSON
-        console.log(JSON.stringify(character));
-        const response = await axios.put(`${config.BASE_URL}/characters/`+character.name, character);
+    static async updateCharacter(characterUpdateRequest: CharacterUpdateRequest) {
+        const response = await axios.put(`${config.BASE_URL}/characters/`+characterUpdateRequest.name, characterUpdateRequest);
         return new Character(response.data);
+    }
+
+    static async getRolls() {
+        const response = await axios.get(`${config.BASE_URL}/rolls`);
+        return response.data.map((roll: RollRaw) => {
+            return new Roll(roll);
+        });
+    }
+
+    static async sendRoll(skillName: string, characterName: string) {
+        const response = await axios.post(`${config.BASE_URL}/rolls`, {
+            skillName: skillName,
+            rollerName:characterName,
+            focus: false,
+            power: false,
+            proficiency: false,
+            secret: false,
+            bonus: 0,
+            malus: 0
+        });
+        return new Roll(response.data);
     }
 }

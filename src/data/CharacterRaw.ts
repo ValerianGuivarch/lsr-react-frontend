@@ -1,11 +1,25 @@
+import {SkillRaw} from "./SkillRaw";
 
 export interface CharacterRaw {
     name: string
-    classe: string
-    bloodline: string
+    classe: {
+        name: string,
+        display: string
+    }
+    bloodline: {
+        name: string,
+        display: string
+    }
+    arcaneList: {
+        name: string
+        type: string
+        use: string
+    }[]
     chair: number
     esprit: number
     essence: number
+    bonus: number
+    malus: number
     pv: number
     pvMax: number
     pf: number
@@ -33,4 +47,5 @@ export interface CharacterRaw {
     buttonColor?: string
     textColor?: string
     battleState: string
+    skills: SkillRaw[]
 }

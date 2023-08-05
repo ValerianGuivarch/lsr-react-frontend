@@ -3,7 +3,6 @@ import React from 'react';
 import s from './style.module.css';
 
 export interface CharacterNotesProps {
-    
 }
 export default function CharacterNotes(props: CharacterNotesProps) {
     return <div className={s.container}>

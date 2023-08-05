@@ -1,25 +1,9 @@
-export enum Bloodline {
-  LUMIERE = 'LUMIERE',
-  TENEBRE = 'TENEBRE',
-  EAU = 'EAU',
-  FEU = 'FEU',
-  VENT = 'VENT',
-  TERRE = 'TERRE',
-  FOUDRE = 'FOUDRE',
-  GLACE = 'GLACE',
-  NAGA = 'NAGA',
-  TROGLODYTE = 'TROGLODYTE',
-  LYCAN = 'LYCAN',
-  GOULE = 'GOULE',
-  SUCCUBE = 'SUCCUBE',
-  ILLITHIDE = 'ILLITHIDE',
-  ARBRE = 'ARBRE',
-  TERREUR = 'TERREUR',
-  COLLECTIONNEUR = 'COLLECTIONNEUR',
-  GORGONNE = 'GORGONNE',
-  NECROMANCIE = 'NECROMANCIE',
-  VOYAGEUR = 'VOYAGEUR',
-  JUGE = 'JUGE',
-  VOLEUR = 'VOLEUR',
-  AUCUN = 'AUCUN'
+export class Bloodline {
+  name: string
+  display: string
+
+  constructor(p: Bloodline) {
+    this.name = p.name
+    this.display = p.display
+  }
 }

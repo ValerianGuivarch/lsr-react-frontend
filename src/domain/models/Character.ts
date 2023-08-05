@@ -1,17 +1,30 @@
 import {CharacterRaw} from "../../data/CharacterRaw";
-import { Bloodline } from "./Bloodline";
-import {Classe} from "./Classe";
-import { Genre } from "./Genre";
+import {Genre} from "./Genre";
 import {BattleState} from "./BattleState";
+import {Skill} from "./Skill";
+import {SkillCategory} from "./SkillCategory";
 
 export class Character {
     [key: string]: any
     name: string
-    classe: Classe
-    bloodline: Bloodline
+    classe: {
+        name: string,
+        display: string
+    }
+    bloodline: {
+        name: string,
+        display: string
+    }
+    arcaneList: {
+        name: string
+        type: string
+        use: string
+    }[]
     chair: number
     esprit: number
     essence: number
+    bonus: number
+    malus: number
     pv: number
     pvMax: number
     pf: number
@@ -39,14 +52,18 @@ export class Character {
     buttonColor?: string
     textColor?: string
     battleState: BattleState
+    skills: Skill[]
 
     constructor(p: CharacterRaw) {
+        this.skills = p.skills.map(s => new Skill(s))
         this.name = p.name
-        this.classe = Classe[p.classe  as keyof typeof Classe]
-        this.bloodline = Bloodline[p.bloodline  as keyof typeof Bloodline]
+        this.classe = p.classe
+        this.bloodline = p.bloodline
         this.chair = p.chair
         this.esprit = p.esprit
         this.essence = p.essence
+        this.bonus = p.bonus
+        this.malus = p.malus
         this.pv = p.pv
         this.pvMax = p.pvMax
         this.pf = p.pf
@@ -56,6 +73,7 @@ export class Character {
         this.dettes = p.dettes
         this.arcanes = p.arcanes
         this.arcanesMax = p.arcanesMax
+        this.arcaneList = p.arcaneList
         this.niveau = p.niveau
         this.lux = p.lux
         this.umbra = p.umbra
@@ -83,11 +101,15 @@ export class Character {
             .join(' ');
     }
 
-    getDisplayNameAndDescription(): string {
-        return this.getDisplayName() + ", " + this.getDescription() + " "
-             + this.getBloodlineDescription() + ", niveau " + this.niveau;
+    getArcaniqueSkills(): Skill[] {
+        return this.skills.filter((skill) => skill.category === SkillCategory.ARCANES);
     }
-    getBloodlineDescription(): string {
+
+    getDisplayNameAndDescription(): string {
+        return this.getDisplayName() + ", " + this.classe.display + " "
+             + this.bloodline.display + ", niveau " + this.niveau;
+    }
+    /*getBloodlineDescription(): string {
         switch (this.bloodline) {
             case Bloodline.EAU:
                 return "de l'Eau";
@@ -138,8 +160,8 @@ export class Character {
             default:
                 return "";
         }
-    }
-    getDescription() {
+    }*/
+    /*getDescription() {
         switch (this.classe) {
             case Classe.CHAMPION:
                 return this.genre === Genre.HOMME
@@ -206,7 +228,7 @@ export class Character {
             default:
                 return "";
         }
-    }
+    }*/
 
     getNumberValueByFieldName(fieldName: string): number {
         return this[fieldName] as number

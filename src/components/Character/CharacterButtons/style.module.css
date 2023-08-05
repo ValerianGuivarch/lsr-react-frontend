@@ -32,6 +32,7 @@
     border-radius: 4px;
     margin-right: 8px;
     user-select: none;
+    width: 100%;
     cursor: pointer;box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
     transform: perspective(1px) scale(1.02); 
     transition: transform 0.3s ease; 
@@ -48,4 +49,21 @@
 
 .button_value {
     font-weight: bold;
+}
+
+.button_selectable {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    padding: 8px;
+    border-radius: 4px;
+    margin-right: 8px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+
+.button_selected {
+    background-color: #ccc;
 }
