@@ -14,8 +14,9 @@ import RollCard from "../../components/RollCard/RollCard";
 import {Roll} from "../../domain/models/Roll";
 import {Character} from "../../domain/models/Character";
 import {Skill} from "../../domain/models/Skill";
-import {SelectableCharacterButton} from "../../components/Character/CharacterButtons/SelectableCharacterButton";
 import {CharacterState} from "../../domain/models/CharacterState";
+import {useSSERolls} from "../../data/useSSERolls";
+import {useSSECharacterByName} from "../../data/useSSECharacterByName";
 
 export function CharacterSheet() {
     const dispatch = useDispatch();
@@ -38,6 +39,12 @@ export function CharacterSheet() {
         });
     }, []);
 
+    useSSERolls();
+    console.log("characterName", characterName);
+    useSSECharacterByName({
+        name: characterName ? characterName : 'viktor',
+    });
+
     const loadingCharacter: boolean = useSelector((store) =>
         // @ts-ignore
         store.CHARACTER.loading
@@ -56,7 +63,16 @@ export function CharacterSheet() {
     );
 
     function sendRoll(skillName: string) {
-        L7RApi.sendRoll(skillName, currentCharacter.name).then((response) => {
+        L7RApi.sendRoll({
+            characterName: currentCharacter.name,
+            skillName: skillName,
+            focus: state.focusActivated,
+            power: state.powerActivated,
+            proficiency: false,
+            secret: false,
+            bonus: state.bonus,
+            malus: state.malus
+        }).then((response) => {
             console.log(response);
         })
     }
@@ -71,6 +87,8 @@ export function CharacterSheet() {
         );
     }
 
+    console.log("currentCharacter", currentCharacter);
+    console.log("currentCharacterSkill", currentCharacter ? currentCharacter.getArcaniqueSkills() : 'pouet');
     return (
         <>
             {loadingCharacter ? (
@@ -117,13 +135,15 @@ export function CharacterSheet() {
                                         L7RApi.updateCharacter({
                                             ...currentCharacter,
                                             pv: currentCharacter.pv + 1
-                                        }).then(r => {})
+                                        }).then(r => {
+                                        })
                                     }}
                                     onClickDecr={() => {
                                         L7RApi.updateCharacter({
                                             ...currentCharacter,
                                             pv: currentCharacter.pv - 1
-                                        }).then(r => {})
+                                        }).then(r => {
+                                        })
                                     }}
                                     onClickBtn={() => {
                                         // jet de sauv vs la mort si 0
@@ -137,13 +157,15 @@ export function CharacterSheet() {
                                         L7RApi.updateCharacter({
                                             ...currentCharacter,
                                             pf: currentCharacter.pf + 1
-                                        }).then(r => {})
+                                        }).then(r => {
+                                        })
                                     }}
                                     onClickDecr={() => {
                                         L7RApi.updateCharacter({
                                             ...currentCharacter,
                                             pf: currentCharacter.pf - 1
-                                        }).then(r => {})
+                                        }).then(r => {
+                                        })
                                     }}
                                     onClickBtn={() => {
                                         if (currentCharacter.pf > 0) {
@@ -160,13 +182,15 @@ export function CharacterSheet() {
                                         L7RApi.updateCharacter({
                                             ...currentCharacter,
                                             pp: currentCharacter.pp + 1
-                                        }).then(r => {})
+                                        }).then(r => {
+                                        })
                                     }}
                                     onClickDecr={() => {
                                         L7RApi.updateCharacter({
                                             ...currentCharacter,
                                             pp: currentCharacter.pp - 1
-                                        }).then(r => {})
+                                        }).then(r => {
+                                        })
                                     }}
                                     onClickBtn={() => {
                                         if (currentCharacter.pp > 0) {
@@ -193,10 +217,10 @@ export function CharacterSheet() {
                                     selected={false}
                                     value={state.malus}
                                     onClickIncr={() => {
-                                        dispatch(setState({...state, bonus: state.malus + 1}));
+                                        dispatch(setState({...state, malus: state.malus + 1}));
                                     }}
                                     onClickDecr={() => {
-                                        dispatch(setState({...state, bonus: state.malus - 1}));
+                                        dispatch(setState({...state, malus: state.malus - 1}));
                                     }}/>
                                 <MutableCharacterButton
                                     name={"dettes"}
@@ -206,24 +230,26 @@ export function CharacterSheet() {
                                         L7RApi.updateCharacter({
                                             ...currentCharacter,
                                             dettes: currentCharacter.dettes + 1
-                                        }).then(r => {})
+                                        }).then(r => {
+                                        })
                                     }}
                                     onClickDecr={() => {
                                         L7RApi.updateCharacter({
                                             ...currentCharacter,
                                             dettes: currentCharacter.dettes - 1
-                                        }).then(r => {})
+                                        }).then(r => {
+                                        })
                                     }}/>
                             </div>
                         </div>
                     </div>
                     <div className={s.characterBlocks}>
-                        {currentCharacter && currentCharacter.getArcaniqueSkills().length > 0 && (currentCharacter.getArcaniqueSkills().map((skill: Skill) => (
-                            <div className={s.main_container_buttons} key={skill.name}>
+                        {currentCharacter && currentCharacter.getMagicalSkills().length > 0 && (
+                            <div>
                                 <Separator
-                                    text={"Arcanes " + currentCharacter.arcanes + " / " + currentCharacter.arcanesMax}/>
-                                <div className={s.column}>
-                                    <div className={s.buttons_row}>
+                                    text={"Magie"}/>
+                                {currentCharacter.getMagicalSkills().map((skill: Skill) => (
+                                    <div className={s.buttons_row} key={skill.name}>
                                         <UnmutableCharacterButton
                                             name={skill.name}
                                             onClick={() => {
@@ -231,14 +257,32 @@ export function CharacterSheet() {
                                             }}
                                         />
                                     </div>
-                                </div>
+                                ))}
                             </div>
-                        )))}
+                        )}
+                    </div>
+                    <div className={s.characterBlocks}>
+                        {currentCharacter && currentCharacter.getArcaniqueSkills().length > 0 && (
+                            <div>
+                                <Separator
+                                    text={"Arcanes " + currentCharacter.arcanes + " / " + currentCharacter.arcanesMax}/>
+                                {currentCharacter.getArcaniqueSkills().map((skill: Skill) => (
+                                    <div className={s.buttons_row} key={skill.name}>
+                                        <UnmutableCharacterButton
+                                            name={skill.name}
+                                            onClick={() => {
+                                                sendRoll(skill.name);
+                                            }}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                     <div className={s.rolls}>
                         {rolls.map((roll: Roll) => (
                             <div key={roll.id}>
-                            <RollCard roll={roll}/>
+                                <RollCard roll={roll}/>
                             </div>
                         ))}
                     </div>

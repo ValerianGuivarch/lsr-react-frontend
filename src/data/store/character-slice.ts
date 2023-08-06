@@ -19,11 +19,11 @@ export const characterSlice = createSlice({
   initialState,
   reducers: {
     setCharacter: (currentSlice, action) => {
+      currentSlice.character = new Character(action.payload);
       currentSlice.loading = false;
-      currentSlice.character = action.payload;
     },
     setState: (currentSlice, action) => {
-        currentSlice.state = action.payload;
+        currentSlice.state = new CharacterState(action.payload);
     }
   },
 });

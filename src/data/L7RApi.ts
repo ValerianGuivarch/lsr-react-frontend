@@ -29,16 +29,27 @@ export class L7RApi {
         });
     }
 
-    static async sendRoll(skillName: string, characterName: string) {
+    static async sendRoll(p:
+        {
+            skillName: string,
+            characterName: string,
+            focus: boolean,
+            power: boolean,
+            proficiency: boolean,
+            secret: boolean,
+            bonus: number,
+            malus: number
+        }
+        ) {
         const response = await axios.post(`${config.BASE_URL}/rolls`, {
-            skillName: skillName,
-            rollerName:characterName,
-            focus: false,
-            power: false,
-            proficiency: false,
-            secret: false,
-            bonus: 0,
-            malus: 0
+            skillName: p.skillName,
+            rollerName:p.characterName,
+            focus: p.focus,
+            power: p.power,
+            proficiency: p.proficiency,
+            secret: p.secret,
+            bonus: p.bonus,
+            malus: p.malus
         });
         return new Roll(response.data);
     }

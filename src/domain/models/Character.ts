@@ -100,6 +100,10 @@ export class Character {
         return this.skills.filter((skill) => skill.category === SkillCategory.ARCANES);
     }
 
+    getMagicalSkills(): Skill[] {
+        return this.skills.filter((skill) => skill.category !== SkillCategory.STATS && skill.category !== SkillCategory.ARCANES);
+    }
+
     getDisplayNameAndDescription(): string {
         return this.getDisplayName() + ", " + this.classe.display + " "
              + this.bloodline.display + ", niveau " + this.niveau;
