@@ -51,6 +51,7 @@ function getRollEffectText(roll: Roll) {
 
 export default function RollCard(props: RollCardProps) {
     const roll = props.roll
+    const displayParts = roll.display.split('*');
     return <div className={s.container}>
         <img className={s.avatar} src={props.roll.picture} alt={props.roll.rollerName}/>
         <div className={s.rollDisplay}>
@@ -60,14 +61,20 @@ export default function RollCard(props: RollCardProps) {
                 .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                 .join(' ')} </b></span>
             <span>
-      {' fait un '}
-                <em>{roll.display}</em>
+                {displayParts.map((part, index) => {
+                    if (index % 2 === 1) {
+                        // Met en gras le texte entre les astérisques
+                        return <em key={index}>{part}</em>;
+                    } else {
+                        return <span key={index}>{part}</span>;
+                    }
+                })}
     </span>
             <span>
                 {getRollEffectText(roll)}
             </span>
             {
-                roll.success ? <span>
+                roll.success !== undefined ? <span>
                         {' et obtient '}
                         <em>{roll.success}</em>
 

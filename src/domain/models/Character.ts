@@ -5,7 +5,6 @@ import {Skill} from "./Skill";
 import {SkillCategory} from "./SkillCategory";
 
 export class Character {
-    [key: string]: any
     name: string
     classe: {
         name: string,
@@ -23,8 +22,6 @@ export class Character {
     chair: number
     esprit: number
     essence: number
-    bonus: number
-    malus: number
     pv: number
     pvMax: number
     pf: number
@@ -62,8 +59,6 @@ export class Character {
         this.chair = p.chair
         this.esprit = p.esprit
         this.essence = p.essence
-        this.bonus = p.bonus
-        this.malus = p.malus
         this.pv = p.pv
         this.pvMax = p.pvMax
         this.pf = p.pf
@@ -229,12 +224,4 @@ export class Character {
                 return "";
         }
     }*/
-
-    getNumberValueByFieldName(fieldName: string): number {
-        return this[fieldName] as number
-    }
-
-    updateNumberValueByFieldName(fieldName: string, value: number) {
-        this[fieldName] = value
-    }
 }
