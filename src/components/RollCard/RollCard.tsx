@@ -2,23 +2,17 @@ import React from 'react';
 // @ts-ignore
 import s from './style.module.css';
 import {Roll} from "../../domain/models/Roll";
-import {
-    FaDiceD6,
-    FaDiceFive,
-    FaDiceFour,
-    FaDiceOne,
-    FaDiceSix,
-    FaDiceThree,
-    FaDiceTwo
-} from 'react-icons/fa6';
+import {FaDiceFive, FaDiceFour, FaDiceOne, FaDiceSix, FaDiceThree, FaDiceTwo} from 'react-icons/fa6';
+import {SkillStat} from "../../domain/models/SkillStat";
 
 function Dice(props: { value: number }) {
-    const DiceIcon = [FaDiceOne, FaDiceTwo, FaDiceThree, FaDiceFour, FaDiceFive, FaDiceSix][props.value-1];
+    const DiceIcon = [FaDiceOne, FaDiceTwo, FaDiceThree, FaDiceFour, FaDiceFive, FaDiceSix][props.value - 1];
 
     return (
-        <DiceIcon size="2em" />
+        <DiceIcon size="2em"/>
     );
 }
+
 export interface RollCardProps {
     roll: Roll
 }
@@ -56,11 +50,11 @@ export default function RollCard(props: RollCardProps) {
         <img className={s.avatar} src={props.roll.picture} alt={props.roll.rollerName}/>
         <div className={s.rollDisplay}>
             <div className={s.textPartOne}>
-            <span>{roll.secret ? '(secret) ' : ''} </span>
-            <span><b>{roll.rollerName.split(' ')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ')} </b></span>
-            <span>
+                <span>{roll.secret ? '(secret) ' : ''} </span>
+                <span><b>{roll.rollerName.split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ')} </b></span>
+                <span>
                 {displayParts.map((part, index) => {
                     if (index % 2 === 1) {
                         // Met en gras le texte entre les astérisques
@@ -70,28 +64,30 @@ export default function RollCard(props: RollCardProps) {
                     }
                 })}
     </span>
-            <span>
+                <span>
                 {getRollEffectText(roll)}
             </span>
-            {
-                roll.success !== undefined ? <span>
+                {
+                    roll.success !== null ? <span>
                         {' et obtient '}
                         <em>{roll.success}</em>
 
-                    {' succès '}
-                    </span> : ''
-        }
-        </div>
-        <div className={s.dicesDisplay}>
-            {roll.result.map((dice, index) => {
-                return dice.toString() + ' '
-            })}
+                        {' succès.'}
+                    </span> : '.'
+                }
+            </div>
             {
-                roll.result.map((dice, index) => {
-                    return <Dice value={dice} key={index} />
-                })
+                roll.displayDices && <div className={s.dicesDisplay}>
+                    {
+                        roll.result.map((dice, index) => {
+                            if(roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)
+                                return <Dice value={dice} key={index}/>
+                            else if(roll.stat === SkillStat.EMPIRIQUE)
+                                return <span key={index}>[{dice}]</span>
+                        })
+                    }
+                </div>
             }
-        </div>
         </div>
 
     </div>

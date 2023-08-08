@@ -1,4 +1,5 @@
 import {SkillRaw} from "./SkillRaw";
+import {ProficiencyRaw} from "./ProficiencyRaw";
 
 export interface CharacterRaw {
     name: string
@@ -46,4 +47,5 @@ export interface CharacterRaw {
     textColor?: string
     battleState: string
     skills: SkillRaw[]
+    proficiencies: ProficiencyRaw[]
 }

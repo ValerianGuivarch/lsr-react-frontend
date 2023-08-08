@@ -2,7 +2,8 @@ import {CharacterRaw} from "../../data/CharacterRaw";
 import {Genre} from "./Genre";
 import {BattleState} from "./BattleState";
 import {Skill} from "./Skill";
-import {SkillCategory} from "./SkillCategory";
+import {DisplayCategory} from "./DisplayCategory";
+import {Proficiency} from "./Proficiency";
 
 export class Character {
     name: string
@@ -50,9 +51,11 @@ export class Character {
     textColor?: string
     battleState: BattleState
     skills: Skill[]
+    proficiencies: Proficiency[]
 
     constructor(p: CharacterRaw) {
         this.skills = p.skills.map(s => new Skill(s))
+        this.proficiencies = p.proficiencies.map(s => new Proficiency(s))
         this.name = p.name
         this.classe = p.classe
         this.bloodline = p.bloodline
@@ -89,24 +92,29 @@ export class Character {
         this.battleState = BattleState[p.battleState  as keyof typeof BattleState]
     }
 
-    getDisplayName() : string {
-        return this.name
+    static getDisplayName(character: Character): string {
+        return character.name
             .split(' ')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ');
     }
 
-    getArcaniqueSkills(): Skill[] {
-        return this.skills.filter((skill) => skill.category === SkillCategory.ARCANES);
+    static hasDisplayCategory(character: Character, displayCategory: DisplayCategory): boolean {
+        return character.skills.some((skill) => skill.displayCategory === displayCategory) || character.proficiencies.some((proficiency) => proficiency.displayCategory === displayCategory);
     }
 
-    getMagicalSkills(): Skill[] {
-        return this.skills.filter((skill) => skill.category !== SkillCategory.STATS && skill.category !== SkillCategory.ARCANES);
+    static getSkills(character: Character, displayCategory: DisplayCategory): Skill[] {
+        return character.skills.filter((skill) => skill.displayCategory === displayCategory);
     }
 
-    getDisplayNameAndDescription(): string {
-        return this.getDisplayName() + ", " + this.classe.display + " "
-             + this.bloodline.display + ", niveau " + this.niveau;
+    static getProficiencies(character: Character, displayCategory: DisplayCategory): Skill[] {
+        return character.proficiencies.filter((skill) => skill.displayCategory === displayCategory);
+    }
+
+
+    static getDisplayNameAndDescription(character: Character): string {
+        return Character.getDisplayName(character) + ", " + character.classe.display + " "
+            + character.bloodline.display + ", niveau " + character.niveau;
     }
     /*getBloodlineDescription(): string {
         switch (this.bloodline) {

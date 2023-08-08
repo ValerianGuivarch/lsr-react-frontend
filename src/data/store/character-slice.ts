@@ -19,11 +19,13 @@ export const characterSlice = createSlice({
   initialState,
   reducers: {
     setCharacter: (currentSlice, action) => {
+      console.log('setCharacter 1')
       currentSlice.character = new Character(action.payload);
+        console.log('setCharacter 2')
       currentSlice.loading = false;
     },
     setState: (currentSlice, action) => {
-        currentSlice.state = new CharacterState(action.payload);
+        currentSlice.state = new CharacterState(action.payload, currentSlice.character)
     }
   },
 });

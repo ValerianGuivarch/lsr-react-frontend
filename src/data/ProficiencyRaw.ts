@@ -1,4 +1,4 @@
-export interface SkillRaw {
+export interface ProficiencyRaw {
     name: string
     displayCategory: string
 }

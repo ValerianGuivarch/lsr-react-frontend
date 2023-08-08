@@ -14,7 +14,7 @@ const CharacterBanner: React.FC = () => {
             <div className={s.characterBanner}>
                 <img src={character.picture} alt="Avatar" className={s.characterAvatar}/>
                 <div className={s.characterListInfo}>
-                   <div className={s.characterName}>{character.getDisplayNameAndDescription()}</div>
+                   <div className={s.characterName}>{Character.getDisplayNameAndDescription(character)}</div>
                    <div className={s.characterInfo}>Lux: {character.lux}</div>
                    <div className={s.characterInfo}>Umbra: {character.umbra}</div>
                    <div className={s.characterInfo}>Secunda: {character.secunda}</div>

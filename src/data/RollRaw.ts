@@ -17,6 +17,6 @@ export interface RollRaw {
     picture?: string;
     data?: string;
     empirique?: string;
-    apotheose?: string;
     display: string;
+    stat: string;
 }

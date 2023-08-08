@@ -1,9 +1,8 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 // @ts-ignore
 import s from './style.module.css';
 import {useDispatch, useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
-import {L7RApi} from "../../data/L7RApi";
 import {setCharacter, setState} from "../../data/store/character-slice";
 import CharacterBanner from "../../components/Character/CharacterBanner/CharacterBanner";
 import CharacterNotes from "../../components/Character/CharacterNotes/CharacterNotes";
@@ -17,30 +16,43 @@ import {Skill} from "../../domain/models/Skill";
 import {CharacterState} from "../../domain/models/CharacterState";
 import {useSSERolls} from "../../data/useSSERolls";
 import {useSSECharacterByName} from "../../data/useSSECharacterByName";
+import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
+import {DisplayCategory} from "../../domain/models/DisplayCategory";
 
 export function CharacterSheet() {
     const dispatch = useDispatch();
     const {characterName} = useParams();
+    const [empiriqueDialogOpen, setEmpiriqueDialogOpen] = useState(false);
+    const [empiriqueValue, setEmpiriqueValue] = useState('');
 
     async function fetchCurrentCharacter() {
-        const currentCharacter = await L7RApi.getCharacterByName(characterName ? characterName : '');
+        const currentCharacter = await ApiL7RProvider.getCharacterByName(characterName ? characterName : '');
         dispatch(setCharacter(currentCharacter));
     }
 
     async function fetchRolls() {
-        const rolls = await L7RApi.getRolls();
+        const rolls = await ApiL7RProvider.getRolls();
         dispatch(setRolls(rolls));
     }
+    const handleEmpiriqueClick = () => {
+        setEmpiriqueDialogOpen(true);
+    };
+    const handleEmpiriqueDialogClose = () => {
+        setEmpiriqueDialogOpen(false);
+    };
+    const handleEmpiriqueDialogConfirm = () => {
+        setEmpiriqueDialogOpen(false);
+        sendRoll('empirique', empiriqueValue);
+    };
 
     useEffect(() => {
-        fetchCurrentCharacter().then(r => {
+        fetchCurrentCharacter().then(() => {
         });
-        fetchRolls().then(r => {
+        fetchRolls().then(() => {
         });
     }, []);
 
     useSSERolls();
-    console.log("characterName", characterName);
     useSSECharacterByName({
         name: characterName ? characterName : 'viktor',
     });
@@ -62,16 +74,20 @@ export function CharacterSheet() {
         store.ROLLS.rolls
     );
 
-    function sendRoll(skillName: string) {
-        L7RApi.sendRoll({
+    function sendRoll(skillName: string, empiriqueRoll?: string) {
+        const bonus = state.bonus + (state.lux ? 1 : 0) + (state.secunda ? 1 : 0);
+        const malus = state.malus + (state.umbra ? 1 : 0);
+        const hasProficiency = Array.from(state.proficiencies.values()).some((value) => value);
+        ApiL7RProvider.sendRoll({
             characterName: currentCharacter.name,
             skillName: skillName,
             focus: state.focusActivated,
             power: state.powerActivated,
-            proficiency: false,
-            secret: false,
-            bonus: state.bonus,
-            malus: state.malus
+            proficiency: hasProficiency,
+            secret: state.secret,
+            bonus: bonus,
+            malus: malus,
+            empiriqueRoll: empiriqueRoll
         }).then((response) => {
             console.log(response);
         })
@@ -87,8 +103,6 @@ export function CharacterSheet() {
         );
     }
 
-    console.log("currentCharacter", currentCharacter);
-    console.log("currentCharacterSkill", currentCharacter ? currentCharacter.getArcaniqueSkills() : 'pouet');
     return (
         <>
             {loadingCharacter ? (
@@ -101,7 +115,8 @@ export function CharacterSheet() {
                         <Separator text={"Stats"}/>
                         <div className={s.column}>
                             <div className={s.buttons_row}>
-                                <UnmutableCharacterButton
+                                <
+                                    UnmutableCharacterButton
                                     name={"chair"}
                                     value={currentCharacter.chair}
                                     onClick={() => {
@@ -126,23 +141,51 @@ export function CharacterSheet() {
                         </div>
                         <div className={s.column}>
                             <div className={s.buttons_row}>
+                                <
+                                    UnmutableCharacterButton
+                                    name={"lux"}
+                                    selected={state.lux}
+                                    onClick={() => {
+                                        dispatch(setState({...state, lux: !state.lux}));
+                                    }}
+                                />
+                                <
+                                    UnmutableCharacterButton
+                                    name={"umbra"}
+                                    selected={state.umbra}
+                                    onClick={() => {
+                                        dispatch(setState({...state, umbra: !state.umbra}));
+                                    }}
+                                /><
+                                UnmutableCharacterButton
+                                name={"secunda"}
+                                selected={state.secunda}
+                                onClick={() => {
+                                    dispatch(setState({...state, secunda: !state.secunda}));
+                                }}
+                            />
+                            </div>
+                        </div>
+                        <div className={s.column}>
+                            <div className={s.buttons_row}>
                                 <MutableCharacterButton
                                     name={"pv"}
                                     selected={false}
                                     value={currentCharacter.pv}
                                     maxValue={currentCharacter.pvMax}
                                     onClickIncr={() => {
-                                        L7RApi.updateCharacter({
-                                            ...currentCharacter,
-                                            pv: currentCharacter.pv + 1
-                                        }).then(r => {
+                                        ApiL7RProvider.updateCharacter( {
+                                                ...currentCharacter,
+                                                pv: currentCharacter.pv + 1
+
+                                        }).then(() => {
                                         })
                                     }}
                                     onClickDecr={() => {
-                                        L7RApi.updateCharacter({
+                                        ApiL7RProvider.updateCharacter({
                                             ...currentCharacter,
                                             pv: currentCharacter.pv - 1
-                                        }).then(r => {
+                                        }).then(() => {
                                         })
                                     }}
                                     onClickBtn={() => {
@@ -154,17 +197,17 @@ export function CharacterSheet() {
                                     value={currentCharacter.pf}
                                     maxValue={currentCharacter.pfMax}
                                     onClickIncr={() => {
-                                        L7RApi.updateCharacter({
+                                        ApiL7RProvider.updateCharacter({
                                             ...currentCharacter,
                                             pf: currentCharacter.pf + 1
-                                        }).then(r => {
+                                        }).then(() => {
                                         })
                                     }}
                                     onClickDecr={() => {
-                                        L7RApi.updateCharacter({
+                                        ApiL7RProvider.updateCharacter({
                                             ...currentCharacter,
                                             pf: currentCharacter.pf - 1
-                                        }).then(r => {
+                                        }).then(() => {
                                         })
                                     }}
                                     onClickBtn={() => {
@@ -179,17 +222,17 @@ export function CharacterSheet() {
                                     value={currentCharacter.pp}
                                     maxValue={currentCharacter.ppMax}
                                     onClickIncr={() => {
-                                        L7RApi.updateCharacter({
+                                        ApiL7RProvider.updateCharacter({
                                             ...currentCharacter,
                                             pp: currentCharacter.pp + 1
-                                        }).then(r => {
+                                        }).then(() => {
                                         })
                                     }}
                                     onClickDecr={() => {
-                                        L7RApi.updateCharacter({
+                                        ApiL7RProvider.updateCharacter({
                                             ...currentCharacter,
                                             pp: currentCharacter.pp - 1
-                                        }).then(r => {
+                                        }).then(() => {
                                         })
                                     }}
                                     onClickBtn={() => {
@@ -227,55 +270,116 @@ export function CharacterSheet() {
                                     selected={false}
                                     value={currentCharacter.dettes}
                                     onClickIncr={() => {
-                                        L7RApi.updateCharacter({
+                                        ApiL7RProvider.updateCharacter({
                                             ...currentCharacter,
                                             dettes: currentCharacter.dettes + 1
-                                        }).then(r => {
+                                        }).then(() => {
                                         })
                                     }}
                                     onClickDecr={() => {
-                                        L7RApi.updateCharacter({
+                                        ApiL7RProvider.updateCharacter({
                                             ...currentCharacter,
                                             dettes: currentCharacter.dettes - 1
-                                        }).then(r => {
+                                        }).then(() => {
                                         })
                                     }}/>
                             </div>
                         </div>
+                        <div className={s.column}>
+                            <div className={s.buttons_row}>
+                                <
+                                    UnmutableCharacterButton
+                                    name={"empirique"}
+                                    onClick={ empiriqueDialogOpen ? handleEmpiriqueDialogClose : handleEmpiriqueClick}
+                                />
+                                <
+                                    UnmutableCharacterButton
+                                    name={"secret"}
+                                    selected={state.secret}
+                                    onClick={() => {
+                                        dispatch(setState({...state, secret: !state.secret}));
+                                    }}
+                                />
+                                <
+                                    UnmutableCharacterButton
+                                    name={"repos"}
+                                    onClick={() => {
+
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className={s.empirique}>
+                            {empiriqueDialogOpen && (
+                                <div className={s.dialog}>
+                                    <input
+                                        type="text"
+                                        value={empiriqueValue}
+                                        onChange={(e) => setEmpiriqueValue(e.target.value)}
+                                    />
+                                    <button onClick={handleEmpiriqueDialogConfirm}>Valider</button>
+                                    <button onClick={handleEmpiriqueDialogClose}>Annuler</button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <div className={s.characterBlocks}>
-                        {currentCharacter && currentCharacter.getMagicalSkills().length > 0 && (
+                        {currentCharacter && Character.hasDisplayCategory(currentCharacter, DisplayCategory.MAGIE) && (
                             <div>
                                 <Separator
                                     text={"Magie"}/>
-                                {currentCharacter.getMagicalSkills().map((skill: Skill) => (
-                                    <div className={s.buttons_row} key={skill.name}>
+                                <div className={s.buttons_row}>
+                                    {Character.getSkills(currentCharacter, DisplayCategory.MAGIE).map((skill: Skill) => (
                                         <UnmutableCharacterButton
+                                            key={skill.name}
                                             name={skill.name}
                                             onClick={() => {
                                                 sendRoll(skill.name);
                                             }}
                                         />
-                                    </div>
-                                ))}
+                                    ))}
+                                    {Character.getProficiencies(currentCharacter, DisplayCategory.MAGIE).map((skill: Skill) => (
+
+                                        <UnmutableCharacterButton
+                                            selected={state.proficiencies.get(skill.name)}
+                                            key={skill.name}
+                                            name={skill.name}
+                                            onClick={() => {
+                                                dispatch(setState({...state, proficiencies: state.proficiencies.set(skill.name, !state.proficiencies.get(skill.name))}));
+                                            }}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
                     <div className={s.characterBlocks}>
-                        {currentCharacter && currentCharacter.getArcaniqueSkills().length > 0 && (
+                        {currentCharacter && Character.hasDisplayCategory(currentCharacter, DisplayCategory.ARCANES) && (
                             <div>
                                 <Separator
                                     text={"Arcanes " + currentCharacter.arcanes + " / " + currentCharacter.arcanesMax}/>
-                                {currentCharacter.getArcaniqueSkills().map((skill: Skill) => (
-                                    <div className={s.buttons_row} key={skill.name}>
+                                <div className={s.buttons_row} >
+                                    {Character.getSkills(currentCharacter, DisplayCategory.ARCANES).map((skill: Skill) => (
+
                                         <UnmutableCharacterButton
+                                            key={skill.name}
                                             name={skill.name}
                                             onClick={() => {
                                                 sendRoll(skill.name);
                                             }}
                                         />
-                                    </div>
                                 ))}
+                                    {Character.getProficiencies(currentCharacter, DisplayCategory.ARCANES).map((skill: Skill) => (
+                                        <UnmutableCharacterButton
+                                            key={skill.name}
+                                            selected={state.proficiencies.get(skill.name)}
+                                            name={skill.name}
+                                            onClick={() => {
+                                                dispatch(setState({...state, proficiencies: state.proficiencies.set(skill.name, !state.proficiencies.get(skill.name))}));
+                                            }}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>

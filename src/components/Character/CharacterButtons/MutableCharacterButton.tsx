@@ -1,14 +1,12 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 // @ts-ignore
 import s from './style.module.css';
-import {useDispatch, useSelector} from "react-redux";
-import {Character} from "../../../domain/models/Character";
 import { FaMinus, FaPlus } from 'react-icons/fa';
 
 
 interface MutableCharacterButtonProps {
     name: string
-    selected: boolean
+    selected?: boolean
     value?: number
     maxValue?: number
     onClickDecr: (()=> void)
@@ -24,17 +22,6 @@ export function MutableCharacterButton(props: MutableCharacterButtonProps) {
     }
     const handleClickBtn = () => {
         props.onClickBtn && props.onClickBtn();
-    }
-    const updateCharacter = (incr: boolean) => {
-        console.log("updateCharacter");
-        /*let value = character.getNumberValueByFieldName(props.name);
-        if(incr) {
-            value=value+1
-        } else {
-            value=value-1
-        }
-        character.updateNumberValueByFieldName(props.name, value);
-        L7RApi.updateCharacter(character).then((response) => {})*/
     }
 
     return(

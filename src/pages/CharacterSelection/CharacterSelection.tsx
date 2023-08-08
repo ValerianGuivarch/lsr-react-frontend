@@ -3,6 +3,7 @@ import React from 'react';
 import s from './style.module.css';
 import { useSelector } from "react-redux";
 import {useNavigate} from "react-router-dom";
+import {CharacterPreview} from "../../domain/models/CharacterPreview";
 
 export interface CharacterSelectionProps {
 
@@ -14,10 +15,10 @@ export default function CharacterSelection(props: CharacterSelectionProps) {
     const [selectedPlayerName, setSelectedPlayerName] = React.useState<string>("");
     const [selectedName, setSelectedName] = React.useState<string>("");
     const navigate = useNavigate();
-
+    const playerNames: string[] = Array.from(new Set(pjsList.map((item: CharacterPreview) => item.playerName)));
     const handlePlayerNameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedPlayerName(event.target.value);
-        setSelectedName(""); // Réinitialiser la valeur du deuxième sélecteur lorsque le premier sélecteur change
+        setSelectedName("");
     };
 
     const handleNameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -31,9 +32,9 @@ export default function CharacterSelection(props: CharacterSelectionProps) {
                     Player Name:
                     <select value={selectedPlayerName} onChange={handlePlayerNameChange}>
                         <option value="">Select Player Name</option>
-                        {pjsList.map((item: any, index: number) => (
-                            <option key={index} value={item.playerName}>
-                                {item.playerName}
+                        {playerNames.map((playerName: string, index: number) => (
+                            <option key={index} value={playerName}>
+                                {playerName}
                             </option>
                         ))}
                     </select>

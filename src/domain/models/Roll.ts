@@ -1,4 +1,5 @@
 import {RollRaw} from "../../data/RollRaw";
+import {SkillStat} from "./SkillStat";
 
 export class Roll {
   id: string;
@@ -19,7 +20,7 @@ export class Roll {
   picture?: string;
   data?: string;
   empirique?: string;
-  apotheose?: string;
+  stat?: SkillStat;
   display: string;
 
   constructor(p: RollRaw) {
@@ -41,7 +42,7 @@ export class Roll {
     this.picture = p.picture;
     this.data = p.data;
     this.empirique = p.empirique;
-    this.apotheose = p.apotheose;
     this.display = p.display;
+    this.stat = SkillStat[p.stat  as keyof typeof SkillStat];
   }
 }

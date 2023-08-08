@@ -1,4 +1,6 @@
-export interface CharacterUpdateRequest {
+import {Character} from "../domain/models/Character";
+
+export class CharacterUpdateRequest {
     name: string
     chair: number
     esprit: number
@@ -21,4 +23,29 @@ export interface CharacterUpdateRequest {
     apotheoseImprovement?: string
     apotheoseImprovementList: string[]
     relance: number
+
+    constructor(character: Character) {
+        this.name = character.name
+        this.chair = character.chair
+        this.esprit = character.esprit
+        this.essence = character.essence
+        this.pv = character.pv
+        this.pvMax = character.pvMax
+        this.pf = character.pf
+        this.pfMax = character.pfMax
+        this.pp = character.pp
+        this.ppMax = character.ppMax
+        this.dettes = character.dettes
+        this.arcanes = character.arcanes
+        this.arcanesMax = character.arcanesMax
+        this.niveau = character.niveau
+        this.lux = character.lux
+        this.umbra = character.umbra
+        this.secunda = character.secunda
+        this.notes = character.notes
+        this.apotheose = character.apotheose
+        this.apotheoseImprovement = character.apotheoseImprovement
+        this.apotheoseImprovementList = character.apotheoseImprovementList
+        this.relance = character.relance
+    }
 }
