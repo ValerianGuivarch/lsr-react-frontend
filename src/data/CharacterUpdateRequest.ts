@@ -1,7 +1,6 @@
 import {Character} from "../domain/models/Character";
 
 export class CharacterUpdateRequest {
-    name: string
     chair: number
     esprit: number
     essence: number
@@ -25,7 +24,6 @@ export class CharacterUpdateRequest {
     relance: number
 
     constructor(character: Character) {
-        this.name = character.name
         this.chair = character.chair
         this.esprit = character.esprit
         this.essence = character.essence

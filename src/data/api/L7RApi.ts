@@ -16,8 +16,8 @@ export class L7RApi {
         return response.data;
     }
 
-    static async updateCharacter(characterUpdateRequest: CharacterUpdateRequest) {
-        const response = await axios.put(`${config.BASE_URL}/characters/`+characterUpdateRequest.name, characterUpdateRequest);
+    static async updateCharacter(characterName: string, characterUpdateRequest: CharacterUpdateRequest) {
+        const response = await axios.put(`${config.BASE_URL}/characters/`+characterName, characterUpdateRequest);
         return new Character(response.data);
     }
 

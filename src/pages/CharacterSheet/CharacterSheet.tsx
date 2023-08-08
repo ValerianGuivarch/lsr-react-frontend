@@ -18,12 +18,13 @@ import {useSSERolls} from "../../data/useSSERolls";
 import {useSSECharacterByName} from "../../data/useSSECharacterByName";
 import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
 import {DisplayCategory} from "../../domain/models/DisplayCategory";
+import ReactModal from 'react-modal';
 
 export function CharacterSheet() {
     const dispatch = useDispatch();
     const {characterName} = useParams();
-    const [empiriqueDialogOpen, setEmpiriqueDialogOpen] = useState(false);
     const [empiriqueValue, setEmpiriqueValue] = useState('');
+    const [isEmpiriqueModalOpen, setIsEmpiriqueModalOpen] = useState(false);
 
     async function fetchCurrentCharacter() {
         const currentCharacter = await ApiL7RProvider.getCharacterByName(characterName ? characterName : '');
@@ -35,15 +36,15 @@ export function CharacterSheet() {
         dispatch(setRolls(rolls));
     }
     const handleEmpiriqueClick = () => {
-        setEmpiriqueDialogOpen(true);
+        setIsEmpiriqueModalOpen(true);
     };
     const handleEmpiriqueDialogClose = () => {
-        setEmpiriqueDialogOpen(false);
+        setIsEmpiriqueModalOpen(false);
     };
     const handleEmpiriqueDialogConfirm = () => {
-        setEmpiriqueDialogOpen(false);
+        setIsEmpiriqueModalOpen(false);
         sendRoll('empirique', empiriqueValue);
-    };
+    }
 
     useEffect(() => {
         fetchCurrentCharacter().then(() => {
@@ -290,7 +291,7 @@ export function CharacterSheet() {
                                 <
                                     UnmutableCharacterButton
                                     name={"empirique"}
-                                    onClick={ empiriqueDialogOpen ? handleEmpiriqueDialogClose : handleEmpiriqueClick}
+                                    onClick={handleEmpiriqueClick}
                                 />
                                 <
                                     UnmutableCharacterButton
@@ -309,19 +310,7 @@ export function CharacterSheet() {
                                 />
                             </div>
                         </div>
-                        <div className={s.empirique}>
-                            {empiriqueDialogOpen && (
-                                <div className={s.dialog}>
-                                    <input
-                                        type="text"
-                                        value={empiriqueValue}
-                                        onChange={(e) => setEmpiriqueValue(e.target.value)}
-                                    />
-                                    <button onClick={handleEmpiriqueDialogConfirm}>Valider</button>
-                                    <button onClick={handleEmpiriqueDialogClose}>Annuler</button>
-                                </div>
-                            )}
-                        </div>
+
                     </div>
                     <div className={s.characterBlocks}>
                         {currentCharacter && Character.hasDisplayCategory(currentCharacter, DisplayCategory.MAGIE) && (
@@ -390,7 +379,23 @@ export function CharacterSheet() {
                             </div>
                         ))}
                     </div>
+                    <ReactModal
+                        className={s.modalEmpirique}
+                        isOpen={isEmpiriqueModalOpen}
+                        onRequestClose={handleEmpiriqueDialogClose}
+                        contentLabel="Jet Empirique"
+                    >
+                            <div className={s.modalEmpiriqueTitle}>Jet Empirique</div>
+                            <input
+                                type="text"
+                                value={empiriqueValue}
+                                onChange={(e) => setEmpiriqueValue(e.target.value)}
+                            />
+                            <div className={s.modalEmpiriqueButtonValidation} onClick={handleEmpiriqueDialogConfirm}>Valider</div>
+                            <div className={s.modalEmpiriqueButtonCancel} onClick={handleEmpiriqueDialogClose}>Annuler</div>
+                    </ReactModal>
                 </div>
+
             )}
         </>
     );

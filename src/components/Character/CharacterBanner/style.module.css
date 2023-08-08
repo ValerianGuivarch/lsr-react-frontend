@@ -28,6 +28,16 @@
   border: 5px solid #fff;
 }
 
+.editCharacter {
+    position: absolute;
+    top: 0;
+    right: 0;
+  margin: 1rem 3rem 0 0;
+  padding: 0.5rem;
+    border-radius: 0.5rem;
+    background-color: #ccc;
+}
+
 .characterListInfo {
   display: flex;
   flex-direction: column;

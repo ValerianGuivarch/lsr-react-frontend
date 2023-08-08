@@ -48,7 +48,7 @@ export class ApiL7RProvider {
 
     static async updateCharacter(character: Character): Promise<Character> {
         const characterUpdateRequest = new CharacterUpdateRequest(character);
-        const response = await L7RApi.updateCharacter(characterUpdateRequest);
+        const response = await L7RApi.updateCharacter(character.name, characterUpdateRequest);
         return new Character(response);
     }
 }
