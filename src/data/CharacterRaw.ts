@@ -1,5 +1,6 @@
 import {SkillRaw} from "./SkillRaw";
 import {ProficiencyRaw} from "./ProficiencyRaw";
+import {ApotheoseRaw} from "./ApotheoseRaw";
 
 export interface CharacterRaw {
     name: string
@@ -36,7 +37,7 @@ export interface CharacterRaw {
     secunda: string
     notes: string
     category: string
-    apotheose: string
+    apotheoseName: string
     apotheoseImprovement?: string
     apotheoseImprovementList: string[]
     genre: string
@@ -50,4 +51,5 @@ export interface CharacterRaw {
     battleState: string
     skills: SkillRaw[]
     proficiencies: ProficiencyRaw[]
+    apotheoses: ApotheoseRaw[]
 }

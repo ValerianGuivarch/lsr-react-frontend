@@ -18,7 +18,7 @@ export class CharacterUpdateRequest {
     umbra: string
     secunda: string
     notes: string
-    apotheose: string
+    apotheoseName: string
     apotheoseImprovement?: string
     apotheoseImprovementList: string[]
     relance: number
@@ -41,7 +41,7 @@ export class CharacterUpdateRequest {
         this.umbra = character.umbra
         this.secunda = character.secunda
         this.notes = character.notes
-        this.apotheose = character.apotheose
+        this.apotheoseName = character.apotheoseName
         this.apotheoseImprovement = character.apotheoseImprovement
         this.apotheoseImprovementList = character.apotheoseImprovementList
         this.relance = character.relance

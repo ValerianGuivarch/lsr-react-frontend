@@ -19,23 +19,27 @@ import {useSSECharacterByName} from "../../data/useSSECharacterByName";
 import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
 import {DisplayCategory} from "../../domain/models/DisplayCategory";
 import ReactModal from 'react-modal';
+import {Apotheose} from "../../domain/models/Apotheose";
+import {UtilsString} from "../../utils/UtilsString";
 
 export function CharacterSheet() {
     const dispatch = useDispatch();
     const {characterName} = useParams();
-    const [empiriqueValue, setEmpiriqueValue] = useState('');
+    const [empiriqueValue, setEmpiriqueValue] = useState('1d6');
     const [restValue, setRestValue] = useState<number>(0);
     const [longRestValue, setLongRestValue] = useState<number>(0);
+    const [apotheoseValue, setApotheoseValue] = useState<number>(0);
     const [isEmpiriqueModalOpen, setIsEmpiriqueModalOpen] = useState(false);
     const [isRestModalOpen, setIsRestModalOpen] = useState(false);
     const [isLongRestModalOpen, setIsLongRestModalOpen] = useState(false);
+    const [isApotheoseModalOpen, setIsApotheoseModalOpen] = useState(false);
 
     async function fetchCurrentCharacter() {
         const currentCharacter = await ApiL7RProvider.getCharacterByName(characterName ? characterName : '');
         dispatch(setCharacter(currentCharacter));
     }
 
-    async function fetchRolls() {
+    async function fetchRolls(): Promise<void> {
         const rolls = await ApiL7RProvider.getRolls();
         dispatch(setRolls(rolls));
     }
@@ -56,6 +60,14 @@ export function CharacterSheet() {
     };
     const handleRestDialogConfirm = () => {
         setIsRestModalOpen(false);
+    }
+
+    async function handleApotheoseClick(apotheoseName: string): Promise<void> {
+        ApiL7RProvider.updateCharacter( {
+            ...currentCharacter,
+            apotheoseName: apotheoseName
+        }).then(() => {
+        })
     }
     const handleLongRestClick = () => {
         ApiL7RProvider.updateCharacter({
@@ -138,6 +150,11 @@ export function CharacterSheet() {
                 <div className={s.main_container}>
                     <CharacterBanner/>
                     <CharacterNotes/>
+                    {currentCharacter.apotheoseName && (
+                    <div className={s.characterApotheose}>
+                        {UtilsString.capitalize(currentCharacter.apotheoseName)}
+                    </div>
+                        )}
                     <div className={s.characterBlocks}>
                         <Separator text={"Stats"}/>
                         <div className={s.column}>
@@ -357,7 +374,6 @@ export function CharacterSheet() {
                                         />
                                     ))}
                                     {Character.getProficiencies(currentCharacter, DisplayCategory.MAGIE).map((skill: Skill) => (
-
                                         <UnmutableCharacterButton
                                             selected={state.proficiencies.get(skill.name)}
                                             key={skill.name}
@@ -365,6 +381,14 @@ export function CharacterSheet() {
                                             onClick={() => {
                                                 dispatch(setState({...state, proficiencies: state.proficiencies.set(skill.name, !state.proficiencies.get(skill.name))}));
                                             }}
+                                        />
+                                    ))}
+                                    {Character.getApotheoses(currentCharacter, DisplayCategory.MAGIE).map((apotheose: Apotheose) => (
+                                        <UnmutableCharacterButton
+                                            selected={currentCharacter.apotheoseName === apotheose.name}
+                                            key={apotheose.name}
+                                            name={apotheose.name}
+                                            onClick={() => handleApotheoseClick(apotheose.name)}
                                         />
                                     ))}
                                 </div>
@@ -500,6 +524,45 @@ export function CharacterSheet() {
                             }
                         }}>PP : {currentCharacter.pp} / {currentCharacter.ppMax}</button>
                         <div className={s.modalEmpiriqueButtonValidation} onClick={handleLongRestDialogConfirm}>Valider</div>
+                    </ReactModal>
+                    <ReactModal
+                        className={s.modalEmpirique}
+                        isOpen={isApotheoseModalOpen}
+                        onRequestClose={() => {}}
+                        contentLabel="Apotheose"
+                    >
+                        <div className={s.modalEmpiriqueTitle}>Repos : {apotheoseValue}</div>
+                        <button onClick={() => {
+                            if(currentCharacter.pv < currentCharacter.pvMax && apotheoseValue > 0) {
+                                setApotheoseValue(apotheoseValue - 1);
+                                ApiL7RProvider.updateCharacter({
+                                    ...currentCharacter,
+                                    pv: currentCharacter.pv + 1
+                                }).then(() => {
+                                })
+                            }
+                        }}>PV : {currentCharacter.pv} / {currentCharacter.pvMax}</button>
+                        <button onClick={() => {
+                            if(currentCharacter.pf < currentCharacter.pfMax && apotheoseValue > 0) {
+                                setApotheoseValue(apotheoseValue - 1);
+                                ApiL7RProvider.updateCharacter({
+                                    ...currentCharacter,
+                                    pf: currentCharacter.pf + 1
+                                }).then(() => {
+                                })
+                            }
+                        }}>PF : {currentCharacter.pf} / {currentCharacter.pfMax}</button>
+                        <button onClick={() => {
+                            if(currentCharacter.pp < currentCharacter.ppMax && apotheoseValue > 0) {
+                                setApotheoseValue(apotheoseValue - 1);
+                                ApiL7RProvider.updateCharacter({
+                                    ...currentCharacter,
+                                    pp: currentCharacter.pp + 1
+                                }).then(() => {
+                                })
+                            }
+                        }}>PP : {currentCharacter.pp} / {currentCharacter.ppMax}</button>
+                        <div className={s.modalEmpiriqueButtonValidation} onClick={() => {}}>Valider</div>
                     </ReactModal>
                 </div>
 

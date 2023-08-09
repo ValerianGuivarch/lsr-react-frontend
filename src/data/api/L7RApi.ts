@@ -21,6 +21,11 @@ export class L7RApi {
         return new Character(response.data);
     }
 
+    static async getSessionCharacter (): Promise<CharacterRaw[]> {
+        const response = await axios.get(`${config.BASE_URL}/mj/characters`);
+        return response.data;
+    }
+
     static async getRolls(): Promise<RollRaw[]> {
         const response = await axios.get(`${config.BASE_URL}/rolls`);
         return response.data as RollRaw[];

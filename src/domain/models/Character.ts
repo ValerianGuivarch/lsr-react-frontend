@@ -4,6 +4,8 @@ import {BattleState} from "./BattleState";
 import {Skill} from "./Skill";
 import {DisplayCategory} from "./DisplayCategory";
 import {Proficiency} from "./Proficiency";
+import {Apotheose} from "./Apotheose";
+import {UtilsString} from "../../utils/UtilsString";
 
 export class Character {
     name: string
@@ -38,7 +40,7 @@ export class Character {
     secunda: string
     notes: string
     category: string
-    apotheose: string
+    apotheoseName: string
     apotheoseImprovement?: string
     apotheoseImprovementList: string[]
     genre: Genre
@@ -52,12 +54,15 @@ export class Character {
     battleState: BattleState
     skills: Skill[]
     proficiencies: Proficiency[]
+    apotheoses: Apotheose[]
     rest: number
     longRest: number
 
     constructor(p: CharacterRaw) {
         this.skills = p.skills.map(s => new Skill(s))
         this.proficiencies = p.proficiencies.map(s => new Proficiency(s))
+        this.apotheoses = p.apotheoses.map(s => new Apotheose(s))
+        this.apotheoseName = p.apotheoseName
         this.name = p.name
         this.classe = p.classe
         this.bloodline = p.bloodline
@@ -82,7 +87,6 @@ export class Character {
         this.secunda = p.secunda
         this.notes = p.notes
         this.category = p.category
-        this.apotheose = p.apotheose
         this.apotheoseImprovement = p.apotheoseImprovement
         this.apotheoseImprovementList = p.apotheoseImprovementList
         this.genre = Genre[p.genre  as keyof typeof Genre]
@@ -97,10 +101,7 @@ export class Character {
     }
 
     static getDisplayName(character: Character): string {
-        return character.name
-            .split(' ')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
+        return UtilsString.capitalize(character.name);
     }
 
     static hasDisplayCategory(character: Character, displayCategory: DisplayCategory): boolean {
@@ -113,6 +114,10 @@ export class Character {
 
     static getProficiencies(character: Character, displayCategory: DisplayCategory): Skill[] {
         return character.proficiencies.filter((skill) => skill.displayCategory === displayCategory);
+    }
+
+    static getApotheoses(character: Character, displayCategory: DisplayCategory): Apotheose[] {
+        return character.apotheoses.filter((apotheose) => apotheose.displayCategory === displayCategory);
     }
 
 
