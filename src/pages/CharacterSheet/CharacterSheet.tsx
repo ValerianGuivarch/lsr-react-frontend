@@ -24,7 +24,11 @@ export function CharacterSheet() {
     const dispatch = useDispatch();
     const {characterName} = useParams();
     const [empiriqueValue, setEmpiriqueValue] = useState('');
+    const [restValue, setRestValue] = useState<number>(0);
+    const [longRestValue, setLongRestValue] = useState<number>(0);
     const [isEmpiriqueModalOpen, setIsEmpiriqueModalOpen] = useState(false);
+    const [isRestModalOpen, setIsRestModalOpen] = useState(false);
+    const [isLongRestModalOpen, setIsLongRestModalOpen] = useState(false);
 
     async function fetchCurrentCharacter() {
         const currentCharacter = await ApiL7RProvider.getCharacterByName(characterName ? characterName : '');
@@ -44,6 +48,28 @@ export function CharacterSheet() {
     const handleEmpiriqueDialogConfirm = () => {
         setIsEmpiriqueModalOpen(false);
         sendRoll('empirique', empiriqueValue);
+    }
+
+    const handleRestClick = () => {
+        setRestValue(currentCharacter.rest);
+        setIsRestModalOpen(true);
+    };
+    const handleRestDialogConfirm = () => {
+        setIsRestModalOpen(false);
+    }
+    const handleLongRestClick = () => {
+        ApiL7RProvider.updateCharacter({
+            ...currentCharacter,
+            pv: currentCharacter.pvMax,
+            pf: currentCharacter.pfMax,
+            pp: currentCharacter.ppMax
+        }).then(() => {
+        })
+        setLongRestValue(currentCharacter.longRest);
+        setIsLongRestModalOpen(true);
+    };
+    const handleLongRestDialogConfirm = () => {
+        setIsLongRestModalOpen(false);
     }
 
     useEffect(() => {
@@ -304,9 +330,12 @@ export function CharacterSheet() {
                                 <
                                     UnmutableCharacterButton
                                     name={"repos"}
-                                    onClick={() => {
-
-                                    }}
+                                    onClick={handleRestClick}
+                                />
+                                <
+                                    UnmutableCharacterButton
+                                    name={"repos long"}
+                                    onClick={handleLongRestClick}
                                 />
                             </div>
                         </div>
@@ -385,14 +414,92 @@ export function CharacterSheet() {
                         onRequestClose={handleEmpiriqueDialogClose}
                         contentLabel="Jet Empirique"
                     >
-                            <div className={s.modalEmpiriqueTitle}>Jet Empirique</div>
-                            <input
-                                type="text"
-                                value={empiriqueValue}
-                                onChange={(e) => setEmpiriqueValue(e.target.value)}
-                            />
-                            <div className={s.modalEmpiriqueButtonValidation} onClick={handleEmpiriqueDialogConfirm}>Valider</div>
-                            <div className={s.modalEmpiriqueButtonCancel} onClick={handleEmpiriqueDialogClose}>Annuler</div>
+                        <div className={s.modalEmpiriqueTitle}>Jet Empirique</div>
+                        <input
+                            type="text"
+                            value={empiriqueValue}
+                            onChange={(e) => setEmpiriqueValue(e.target.value)}
+                        />
+                        <div className={s.modalEmpiriqueButtonValidation} onClick={handleEmpiriqueDialogConfirm}>Valider</div>
+                        <div className={s.modalEmpiriqueButtonCancel} onClick={handleEmpiriqueDialogClose}>Annuler</div>
+                    </ReactModal>
+                    <ReactModal
+                        className={s.modalEmpirique}
+                        isOpen={isRestModalOpen}
+                        onRequestClose={handleRestDialogConfirm}
+                        contentLabel="Repos"
+                    >
+                        <div className={s.modalEmpiriqueTitle}>Repos : {restValue} / {currentCharacter.rest}</div>
+                        <button onClick={() => {
+                            if(currentCharacter.pv < currentCharacter.pvMax && restValue > 0) {
+                                setRestValue(restValue - 1);
+                                ApiL7RProvider.updateCharacter({
+                                    ...currentCharacter,
+                                    pv: currentCharacter.pv + 1
+                                }).then(() => {
+                                })
+                            }
+                        }}>PV : {currentCharacter.pv} / {currentCharacter.pvMax}</button>
+                        <button onClick={() => {
+                            if(currentCharacter.pf < currentCharacter.pfMax && restValue > 0) {
+                                setRestValue(restValue - 1);
+                                ApiL7RProvider.updateCharacter({
+                                    ...currentCharacter,
+                                    pf: currentCharacter.pf + 1
+                                }).then(() => {
+                                })
+                            }
+                        }}>PF : {currentCharacter.pf} / {currentCharacter.pfMax}</button>
+                        <button onClick={() => {
+                            if(currentCharacter.pp < currentCharacter.ppMax && restValue > 0) {
+                                setRestValue(restValue - 1);
+                                ApiL7RProvider.updateCharacter({
+                                    ...currentCharacter,
+                                    pp: currentCharacter.pp + 1
+                                }).then(() => {
+                                })
+                            }
+                        }}>PP : {currentCharacter.pp} / {currentCharacter.ppMax}</button>
+                        <div className={s.modalEmpiriqueButtonValidation} onClick={handleRestDialogConfirm}>Valider</div>
+                    </ReactModal>
+                    <ReactModal
+                        className={s.modalEmpirique}
+                        isOpen={isLongRestModalOpen}
+                        onRequestClose={handleLongRestDialogConfirm}
+                        contentLabel="Repos Long"
+                    >
+                        <div className={s.modalEmpiriqueTitle}>Repos : {longRestValue} / {currentCharacter.longRest}</div>
+                        <button onClick={() => {
+                            if(currentCharacter.pv > 0 && longRestValue > 0) {
+                                setLongRestValue(longRestValue - 1);
+                                ApiL7RProvider.updateCharacter({
+                                    ...currentCharacter,
+                                    pv: currentCharacter.pv - 1
+                                }).then(() => {
+                                })
+                            }
+                        }}>PV : {currentCharacter.pv} / {currentCharacter.pvMax}</button>
+                        <button onClick={() => {
+                            if(currentCharacter.pf > 0 && longRestValue > 0) {
+                                setLongRestValue(longRestValue - 1);
+                                ApiL7RProvider.updateCharacter({
+                                    ...currentCharacter,
+                                    pf: currentCharacter.pf - 1
+                                }).then(() => {
+                                })
+                            }
+                        }}>PF : {currentCharacter.pf} / {currentCharacter.pfMax}</button>
+                        <button onClick={() => {
+                            if(currentCharacter.pp > 0 && longRestValue > 0) {
+                                setLongRestValue(longRestValue - 1);
+                                ApiL7RProvider.updateCharacter({
+                                    ...currentCharacter,
+                                    pp: currentCharacter.pp - 1
+                                }).then(() => {
+                                })
+                            }
+                        }}>PP : {currentCharacter.pp} / {currentCharacter.ppMax}</button>
+                        <div className={s.modalEmpiriqueButtonValidation} onClick={handleLongRestDialogConfirm}>Valider</div>
                     </ReactModal>
                 </div>
 

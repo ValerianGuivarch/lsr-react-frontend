@@ -28,7 +28,11 @@ const CharacterBanner: React.FC = () => {
                      onMouseEnter={handleMouseEnter}
                      onMouseLeave={handleMouseLeave}>
                     {isEditButtonVisible && (
-                        <FaPenToSquare className={s.editCharacter}/>
+                        <FaPenToSquare className={s.editCharacter} onClick={
+                            () => {
+                                window.location.href = `/characters/${character.name}/edit`;
+                            }
+                        }/>
                     )}
                    <div className={s.characterName}>{Character.getDisplayNameAndDescription(character)}</div>
                    <div className={s.characterInfo}>Lux: {character.lux}</div>

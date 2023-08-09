@@ -52,6 +52,8 @@ export class Character {
     battleState: BattleState
     skills: Skill[]
     proficiencies: Proficiency[]
+    rest: number
+    longRest: number
 
     constructor(p: CharacterRaw) {
         this.skills = p.skills.map(s => new Skill(s))
@@ -59,6 +61,8 @@ export class Character {
         this.name = p.name
         this.classe = p.classe
         this.bloodline = p.bloodline
+        this.rest = p.rest
+        this.longRest = p.longRest
         this.chair = p.chair
         this.esprit = p.esprit
         this.essence = p.essence

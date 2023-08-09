@@ -16,6 +16,8 @@ export interface CharacterRaw {
         type: string
         use: string
     }[]
+    rest: number
+    longRest: number
     chair: number
     esprit: number
     essence: number
