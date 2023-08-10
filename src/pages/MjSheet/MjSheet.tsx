@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 // @ts-ignore
 import s from './style.module.css';
 import {useDispatch, useSelector} from "react-redux";
-import {useParams} from "react-router-dom";
 import {setCharacter, setState} from "../../data/store/character-slice";
 import CharacterBanner from "../../components/Character/CharacterBanner/CharacterBanner";
 import CharacterNotes from "../../components/Character/CharacterNotes/CharacterNotes";
@@ -13,14 +12,12 @@ import {Character} from "../../domain/models/Character";
 import {useSSERolls} from "../../data/useSSERolls";
 import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
 import { CharacterPanel } from '../../components/Character/CharacterPanel/CharacterPanel';
-import {useSSECharacterByName} from "../../data/useSSECharacterByName";
 
-export function CharacterSheet() {
+export function MjSheet() {
     const dispatch = useDispatch();
-    const {characterName} = useParams();
 
     async function fetchCurrentCharacter() {
-        const currentCharacter = await ApiL7RProvider.getCharacterByName(characterName ? characterName : '');
+        const currentCharacter = await ApiL7RProvider.getCharacterByName('jonathan');
         dispatch(setCharacter(currentCharacter));
     }
 
@@ -36,11 +33,7 @@ export function CharacterSheet() {
         });
     }, []);
 
-    useSSECharacterByName({
-        name: characterName || ''
-    });
     useSSERolls();
-
 
     const loadingCharacter: boolean = useSelector((store) =>
         // @ts-ignore
@@ -64,9 +57,8 @@ export function CharacterSheet() {
                 <p>Loading...</p>
             ) : (
                 <div className={s.main_container}>
-                    <CharacterBanner/>
-                    <CharacterNotes/>
-                    <CharacterPanel mj={false}/>
+                    <div className={s.character_name}>{currentCharacter.name}</div>
+                    <CharacterPanel mj={true}/>
 
                     <div className={s.rolls}>
                         {rolls.map((roll: Roll) => (

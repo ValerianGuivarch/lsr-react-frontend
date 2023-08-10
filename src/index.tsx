@@ -8,6 +8,7 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 import CharacterSelection from "./pages/CharacterSelection/CharacterSelection";
 import {CharacterSheet} from "./pages/CharacterSheet/CharacterSheet";
 import {CharacterEdition} from "./pages/CharacterEdition/CharacterEdition";
+import {MjSheet} from "./pages/MjSheet/MjSheet";
 
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -19,6 +20,7 @@ root.render(
                 <Route path="/" element={<App />}>
                     <Route path="/" element={<CharacterSelection />} />
                     <Route path="/characters/:characterName" element={<CharacterSheet />} />
+                    <Route path="/mj" element={<MjSheet/>} />
                     <Route path="/characters/:characterName/edit" element={<CharacterEdition />} />
                 </Route>
             </Routes>

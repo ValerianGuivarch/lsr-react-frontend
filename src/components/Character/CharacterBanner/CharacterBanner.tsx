@@ -5,8 +5,6 @@ import React, { useState } from "react";
 import {Character} from "../../../domain/models/Character";
 import {FaPenToSquare} from 'react-icons/fa6';
 
-
-
 const CharacterBanner: React.FC = () => {
     const [isEditButtonVisible, setIsEditButtonVisible] = useState(false);
 
