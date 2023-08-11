@@ -1,13 +1,15 @@
 import styled from 'styled-components';
 import React from "react";
 
-export function Separator(props: { text: string }) {
+export function Separator(props: { text: string, display: boolean }) {
     return (
-        <StyledSeparator>
-            <Line />
-            <Text>{props.text}</Text>
-            <Line />
-        </StyledSeparator>
+        <>
+            {props.display && <StyledSeparator>
+                <Line />
+                <Text>{props.text}</Text>
+                <Line />
+            </StyledSeparator>}
+        </>
     );
 }
 

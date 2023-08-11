@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { FaMinus, FaPlus } from 'react-icons/fa';
 
 interface CharacterButtonProps {
+    cardDisplay: boolean;
+    column?: boolean;
     name: string;
     selected?: boolean;
     value?: number;
@@ -12,38 +14,30 @@ interface CharacterButtonProps {
     onClickIncr?: () => void;
 }
 
-export const CharacterButton: React.FC<CharacterButtonProps> = (
-    {
-       name,
-       selected,
-       value,
-       maxValue,
-       onClickDecr,
-       onClickBtn,
-       onClickIncr
-    }) => {
-
+export function CharacterButton(props: CharacterButtonProps) {
     return (
         <MainContainer>
-            {onClickDecr && (
-                <Change onClick={onClickDecr}>
+            {props.onClickDecr && (
+                <Change cardDisplay={props.cardDisplay} left={true} onClick={props.onClickDecr}>
                     <FaMinus />
                 </Change>
             )}
             <ButtonSelectable
-                selected={selected}
-                onClick={onClickBtn}
+                columnDisplay={props.column || false}
+                cardDisplay={props.cardDisplay}
+                selected={props.selected}
+                onClick={props.onClickBtn}
             >
-                <ButtonName>{name}</ButtonName>
-                {value && (
+                <ButtonName>{props.name}&nbsp; </ButtonName>
+                {props.value && (
                     <div>
-                        {value}
-                        {maxValue && ` / ${maxValue}`}
+                        {props.value}
+                        {props.maxValue && ` / ${props.maxValue}`}
                     </div>
                 )}
             </ButtonSelectable>
-            {onClickIncr && (
-                <Change onClick={onClickIncr}>
+            {props.onClickIncr && (
+                <Change cardDisplay={props.cardDisplay} left={false} onClick={props.onClickIncr}>
                     <FaPlus />
                 </Change>
             )}
@@ -57,33 +51,38 @@ const MainContainer = styled.div`
   align-items: center;
 `;
 
-const Change = styled.div`
+const Change = styled.div<{ cardDisplay: boolean, left: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 24px;
-  height: 24px;
+  width: ${(props) => (props.cardDisplay ? '8px' : '24px')};
+  height: ${(props) => (props.cardDisplay ? '8px' : '24px')};
   border-radius: 50%;
   background-color: #f0f0f0;
-  margin-right: 8px;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transform: perspective(1px) scale(1.02);
   transition: transform 0.3s ease;
+  margin-right: ${(props) => (props.cardDisplay ? (props.left ? '0px' : '4px') : (props.left ? '4px' : '8px'))};
+  margin-left: ${(props) => (props.cardDisplay ? (props.left ? '4px' : '0px') : (props.left ? '8px' : '4px'))};
 
   &:hover {
     transform: perspective(1px) scale(1.05);
   }
 `;
 
-const ButtonSelectable = styled.div<{ selected?: boolean }>`
+
+
+
+const ButtonSelectable = styled.div<{ cardDisplay: boolean, columnDisplay: boolean, selected?: boolean }>`
   display: flex;
+  flex-direction: ${(props) => (props.cardDisplay && props.columnDisplay ? 'column' : 'row')};
   align-items: center;
   justify-content: center;
   background-color: #f0f0f0;
-  padding: 8px;
+  padding: ${(props) => (props.cardDisplay ? '2px' : '8px')};
   border-radius: 4px;
-  margin-right: 8px;
+  margin: 4px;
   cursor: pointer;
   border: none;
   outline: none;
@@ -100,5 +99,5 @@ const ButtonSelectable = styled.div<{ selected?: boolean }>`
 
 const ButtonName = styled.div`
   font-weight: bold;
-  margin-right: 4px;
+  margin: 2px 0 2px 0;
 `;

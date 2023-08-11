@@ -14,8 +14,11 @@ import {Separator} from "./Separator";
 import {CharacterButton} from "../CharacterButtons/CharacterButton";
 import {EmpiriqueRollModal} from "./EmpiriqueRollModal";
 import styled from "styled-components";
+import {Proficiency} from "../../../domain/models/Proficiency";
 
-export function CharacterPanel() {
+export function CharacterPanel(props: {
+    cardDisplay: boolean
+}) {
     const dispatch = useDispatch();
     const [isRestModalOpen, setIsRestModalOpen] = useState(false);
     const [isLongRestModalOpen, setIsLongRestModalOpen] = useState(false);
@@ -47,8 +50,64 @@ export function CharacterPanel() {
         })
     }
 
+    function CharacterBlockBtn(props: {
+        cardDisplay: boolean,
+        displayCategory: DisplayCategory,
+        displayCategoryName: string
+    }) {
+        const skills = Character.getSkills(currentCharacter, props.displayCategory);
+        const proficiencies = Character.getProficiencies(currentCharacter, props.displayCategory);
+        const apotheoses = Character.getApotheoses(currentCharacter, props.displayCategory);
+        return (
+            <CharacterBlocks>
+                <Separator text={props.displayCategoryName} display={!props.cardDisplay && (skills.length>0 || proficiencies.length>0 || apotheoses.length>0)}/>
+                <ButtonsRow cardDisplay={props.cardDisplay}>
+                    {skills.map((skill: Skill) => (
+                        <CharacterButton
+                            cardDisplay={props.cardDisplay}
+                            key={skill.name}
+                            name={props.cardDisplay ? skill.shortName : skill.name}
+                            onClickBtn={() => {
+                                sendRoll(skill.name);
+                            }}
+                        />
+                    ))}
+                    {proficiencies.map((proficiency: Proficiency) => (
+                        <CharacterButton
+                            cardDisplay={props.cardDisplay}
+                            selected={state.proficiencies.get(proficiency.name)}
+                            key={proficiency.name}
+                            name={props.cardDisplay ? proficiency.shortName :proficiency.name}
+                            onClickBtn={() => {
+                                dispatch(setState({
+                                    ...state,
+                                    proficiencies: state.proficiencies.set(proficiency.name, !state.proficiencies.get(proficiency.name))
+                                }));
+                            }}
+                        />
+                    ))}
+                    {apotheoses.map((apotheose: Apotheose) => (
+                        <CharacterButton
+                            cardDisplay={props.cardDisplay}
+                            selected={currentCharacter.apotheoseName === apotheose.name}
+                            key={apotheose.name}
+                            name={props.cardDisplay ? apotheose.shortName :apotheose.name}
+                            onClickBtn={() => {
+                                ApiL7RProvider.updateCharacter({
+                                    ...currentCharacter,
+                                    apotheoseName: apotheose.name
+                                }).then(() => {
+                                })
+                            }}
+                        />
+                    ))}
+                </ButtonsRow>
+            </CharacterBlocks>
+        )
+    }
+
     return (
-        <MainContainerButtons>
+        <MainContainerButtons cardDisplay={props.cardDisplay}>
             <div>
                 {currentCharacter.apotheoseName && (
                     <CharacterApotheose>
@@ -57,18 +116,21 @@ export function CharacterPanel() {
                 )}
             </div>
             <CharacterBlocks>
-                <Separator text={"Stats"}/>
-                <ButtonsRow>
+                <Separator text={"Stats"} display={!props.cardDisplay}/>
+                <ButtonsRow cardDisplay={props.cardDisplay}>
                     <
                         CharacterButton
-                        name={"chair"}
+                        cardDisplay={props.cardDisplay}
+                        name={props.cardDisplay ? "ch" : "chair"}
                         value={currentCharacter.chair}
                         onClickBtn={() => {
                             sendRoll("chair");
                         }}
                     />
                     <CharacterButton
+                        cardDisplay={props.cardDisplay}
                         name={"pv"}
+                        column={true}
                         selected={false}
                         value={currentCharacter.pv}
                         maxValue={currentCharacter.pvMax}
@@ -91,7 +153,8 @@ export function CharacterPanel() {
                             // TODO jet de sauv vs la mort si 0
                         }}/>
                     <CharacterButton
-                        name={"bonus"}
+                        cardDisplay={props.cardDisplay}
+                        name={props.cardDisplay ? "bn" : "bonus"}
                         selected={false}
                         value={state.bonus}
                         onClickIncr={() => {
@@ -101,15 +164,17 @@ export function CharacterPanel() {
                             dispatch(setState({...state, bonus: state.bonus - 1}));
                         }}/>
                 </ButtonsRow>
-                <ButtonsRow>
+                <ButtonsRow cardDisplay={props.cardDisplay}>
                     <CharacterButton
-                        name={"esprit"}
+                        cardDisplay={props.cardDisplay}
+                        name={props.cardDisplay ? "sp" : "esprit"}
                         value={currentCharacter.esprit}
                         onClickBtn={() => {
                             sendRoll("esprit");
                         }}
                     />
                     <CharacterButton
+                        cardDisplay={props.cardDisplay}
                         name={"pf"}
                         selected={state.focusActivated}
                         value={currentCharacter.pf}
@@ -136,7 +201,8 @@ export function CharacterPanel() {
                     />
 
                     <CharacterButton
-                        name={"malus"}
+                        cardDisplay={props.cardDisplay}
+                        name={props.cardDisplay ? "ml" : "malus"}
                         selected={false}
                         value={state.malus}
                         onClickIncr={() => {
@@ -146,9 +212,10 @@ export function CharacterPanel() {
                             dispatch(setState({...state, malus: state.malus - 1}));
                         }}/>
                 </ButtonsRow>
-                <ButtonsRow>
+                <ButtonsRow cardDisplay={props.cardDisplay}>
                     <CharacterButton
-                        name={"essence"}
+                        cardDisplay={props.cardDisplay}
+                        name={props.cardDisplay ? "es" : "essence"}
                         value={currentCharacter.essence}
                         onClickBtn={() => {
                             sendRoll("essence");
@@ -156,6 +223,7 @@ export function CharacterPanel() {
                     />
 
                     <CharacterButton
+                        cardDisplay={props.cardDisplay}
                         name={"pp"}
                         selected={state.powerActivated}
                         value={currentCharacter.pp}
@@ -181,7 +249,8 @@ export function CharacterPanel() {
                         }}
                     />
                     <CharacterButton
-                        name={"dettes"}
+                        cardDisplay={props.cardDisplay}
+                        name={props.cardDisplay ? "dt" : "dettes"}
                         selected={false}
                         value={currentCharacter.dettes}
                         onClickIncr={() => {
@@ -199,9 +268,11 @@ export function CharacterPanel() {
                             })
                         }}/>
                 </ButtonsRow>
-                <ButtonsRow>
+                {!props.cardDisplay && (
+                    <ButtonsRow cardDisplay={props.cardDisplay}>
                     <
                         CharacterButton
+                        cardDisplay={props.cardDisplay}
                         name={"lux"}
                         selected={state.lux}
                         onClickBtn={() => {
@@ -210,6 +281,7 @@ export function CharacterPanel() {
                     />
                     <
                         CharacterButton
+                        cardDisplay={props.cardDisplay}
                         name={"umbra"}
                         selected={state.umbra}
                         onClickBtn={() => {
@@ -217,6 +289,7 @@ export function CharacterPanel() {
                         }}
                     /><
                     CharacterButton
+                        cardDisplay={props.cardDisplay}
                     name={"secunda"}
                     selected={state.secunda}
                     onClickBtn={() => {
@@ -224,17 +297,20 @@ export function CharacterPanel() {
                     }}
                 />
                 </ButtonsRow>
-                <ButtonsRow>
+                )}
+                <ButtonsRow cardDisplay={props.cardDisplay}>
                     <
                         CharacterButton
-                        name={"empirique"}
+                        cardDisplay={props.cardDisplay}
+                        name={props.cardDisplay ? "emp" : "empirique"}
                         onClickBtn={() => {
                             setIsEmpiriqueRollModalOpen(true);
                         }}
                     />
                     <
                         CharacterButton
-                        name={"secret"}
+                        cardDisplay={props.cardDisplay}
+                        name={props.cardDisplay ? "sc" : "secret"}
                         selected={state.secret}
                         onClickBtn={() => {
                             dispatch(setState({...state, secret: !state.secret}));
@@ -242,13 +318,16 @@ export function CharacterPanel() {
                     />
                     <
                         CharacterButton
-                        name={"repos"}
+                        cardDisplay={props.cardDisplay}
+                        name={props.cardDisplay ? "rp" : "repos"}
                         onClickBtn={() => {
                             setIsRestModalOpen(true);
                         }}
                     />
-                    <
+                    {props.cardDisplay && (
+                        <
                         CharacterButton
+                            cardDisplay={props.cardDisplay}
                         name={"repos long"}
                         onClickBtn={() => {
                             ApiL7RProvider.updateCharacter({
@@ -261,80 +340,33 @@ export function CharacterPanel() {
                             setIsLongRestModalOpen(true);
                         }}
                     />
+                        )}
                 </ButtonsRow>
             </CharacterBlocks>
 
             {Character.hasDisplayCategory(currentCharacter, DisplayCategory.MAGIE) && (
-                <CharacterBlocks>
-                        <Separator text={"Magie"}/>
-                    <ButtonsRow>
-                        {Character.getSkills(currentCharacter, DisplayCategory.MAGIE).map((skill: Skill) => (
-                            <CharacterButton
-                                key={skill.name}
-                                name={skill.name}
-                                onClickBtn={() => {
-                                    sendRoll(skill.name);
-                                }}
-                            />
-                        ))}
-                        {Character.getProficiencies(currentCharacter, DisplayCategory.MAGIE).map((skill: Skill) => (
-                            <CharacterButton
-                                selected={state.proficiencies.get(skill.name)}
-                                key={skill.name}
-                                name={skill.name}
-                                onClickBtn={() => {
-                                    dispatch(setState({
-                                        ...state,
-                                        proficiencies: state.proficiencies.set(skill.name, !state.proficiencies.get(skill.name))
-                                    }));
-                                }}
-                            />
-                        ))}
-                        {Character.getApotheoses(currentCharacter, DisplayCategory.MAGIE).map((apotheose: Apotheose) => (
-                            <CharacterButton
-                                selected={currentCharacter.apotheoseName === apotheose.name}
-                                key={apotheose.name}
-                                name={apotheose.name}
-                                onClickBtn={() => {
-                                    ApiL7RProvider.updateCharacter({
-                                        ...currentCharacter,
-                                        apotheoseName: apotheose.name
-                                    }).then(() => {
-                                    })
-                                }}
-                            />
-                        ))}
-                    </ButtonsRow>
-                </CharacterBlocks>
+                <CharacterBlockBtn
+                    displayCategory={DisplayCategory.MAGIE}
+                    displayCategoryName={"Magie"}
+                    cardDisplay={props.cardDisplay}/>
             )}
             {Character.hasDisplayCategory(currentCharacter, DisplayCategory.ARCANES) && (
-                <CharacterBlocks>
-                        <Separator text={"Arcanes " + currentCharacter.arcanes + " / " + currentCharacter.arcanesMax}/>
-                    <ButtonsRow>
-                        {Character.getSkills(currentCharacter, DisplayCategory.ARCANES).map((skill: Skill) => (
-                            <CharacterButton
-                                key={skill.name}
-                                name={skill.name}
-                                onClickBtn={() => {
-                                    sendRoll(skill.name);
-                                }}
-                            />
-                        ))}
-                        {Character.getProficiencies(currentCharacter, DisplayCategory.ARCANES).map((skill: Skill) => (
-                            <CharacterButton
-                                key={skill.name}
-                                selected={state.proficiencies.get(skill.name)}
-                                name={skill.name}
-                                onClickBtn={() => {
-                                    dispatch(setState({
-                                        ...state,
-                                        proficiencies: state.proficiencies.set(skill.name, !state.proficiencies.get(skill.name))
-                                    }));
-                                }}
-                            />
-                        ))}
-                    </ButtonsRow>
-                </CharacterBlocks>
+                <CharacterBlockBtn
+                    displayCategory={DisplayCategory.ARCANES}
+                    displayCategoryName={"Arcanes"}
+                    cardDisplay={props.cardDisplay}/>
+            )}
+            {Character.hasDisplayCategory(currentCharacter, DisplayCategory.PACIFICATEURS) && (
+                <CharacterBlockBtn
+                    displayCategory={DisplayCategory.PACIFICATEURS}
+                    displayCategoryName={"Pacification"}
+                    cardDisplay={props.cardDisplay}/>
+            )}
+            {Character.hasDisplayCategory(currentCharacter, DisplayCategory.SOLDATS) && (
+                <CharacterBlockBtn
+                    displayCategory={DisplayCategory.SOLDATS}
+                    displayCategoryName={"Soldat"}
+                    cardDisplay={props.cardDisplay}/>
             )}
             <RestModal
                 currentCharacter={currentCharacter}
@@ -360,12 +392,13 @@ export function CharacterPanel() {
 }
 
 
-const MainContainerButtons = styled.div`
+const MainContainerButtons = styled.div<{ cardDisplay: boolean }>`
     display: flex;
     flex-direction: column;
     justify-content: center;
     flex-wrap: wrap;
-    max-width: 800px;
+    max-width: ${(props) => (props.cardDisplay ? '200px' : '800px')};
+    font-size: ${(props) => (props.cardDisplay ? '0.7em' : '1em')};
 `;
 
 const CharacterApotheose = styled.div`
@@ -374,13 +407,13 @@ const CharacterApotheose = styled.div`
     text-align: center;
 `;
 
-const ButtonsRow = styled.div`
-    display: flex;
+const ButtonsRow = styled.div<{ cardDisplay: boolean }>`
+    display: ${(props) => (props.cardDisplay ? 'inline-flex' : 'flex')};
     flex-direction: row;
     justify-content: center;
-    margin-bottom: 8px;
+    margin-bottom: ${(props) => (props.cardDisplay ? '0px' : '4px')};
 `;
 
 const CharacterBlocks = styled.div`
-    /* Add any required styling for this div */
+   
 `;

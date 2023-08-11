@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import {useDispatch, useSelector} from "react-redux";
 import {Character} from "../../domain/models/Character";
@@ -10,41 +10,43 @@ export function CharacterCard(props : {
     const dispatch = useDispatch();
     // @ts-ignore
     const currentCharacter: Character = useSelector((store) => store.CHARACTER.character);
-    const [pv, setPv] = useState(0);
 
-    const handlePvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPv(Number(e.target.value));
-    };
     return (
         <CardContainer>
-            <Title>{props.characterName}</Title>
-            <CharacterPanel/>
+            <TitleContainer>
+                <ProfilePicture src={currentCharacter.picture} alt="Profile Picture" />
+                <CharacterName>{currentCharacter.name}</CharacterName>
+            </TitleContainer>
+            <CharacterPanel cardDisplay={true}/>
         </CardContainer>
 )
 }
 
 
 const CardContainer = styled.div`
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 16px;
-  margin-bottom: 16px;
+  border: 1px solid #333;
+  border-radius: 20px;
+  padding: 4px;
+  margin: 4px;
+  max-width: 200px;
 `;
 
-const Title = styled.div`
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 8px;
+const TitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #333;
 `;
 
-const InputContainer = styled.div`
-  display: inline-block;
-`;
-
-const Label = styled.label`
+const ProfilePicture = styled.img`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
   margin-right: 8px;
 `;
 
-const Input = styled.input`
-  width: 50px;
+const CharacterName = styled.div`
+  font-size: 18px;
+  font-weight: bold;
 `;

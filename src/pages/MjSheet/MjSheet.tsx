@@ -1,6 +1,4 @@
 import React, {useEffect} from 'react';
-// @ts-ignore
-import s from './style.module.css';
 import {useDispatch, useSelector} from "react-redux";
 import {setCharacter} from "../../data/store/character-slice";
 import {setRolls} from "../../data/store/rolls-slice";
@@ -54,10 +52,10 @@ export function MjSheet() {
             {loadingCharacter ? (
                 <p>Loading...</p>
             ) : (
-                <div className={s.main_container}>
+                <div>
                     <CharacterCard characterName={'jonathan'}/>
 
-                    <div className={s.rolls}>
+                    <div>
                         {rolls.map((roll: Roll) => (
                             <div key={roll.id}>
                                 <RollCard roll={roll}/>

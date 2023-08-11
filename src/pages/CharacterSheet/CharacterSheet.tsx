@@ -58,7 +58,7 @@ export function CharacterSheet() {
                 <div className={s.main_container}>
                     <CharacterBanner/>
                     <CharacterNotes/>
-                    <CharacterPanel/>
+                    <CharacterPanel cardDisplay={false}/>
 
                     <div className={s.rolls}>
                         {rolls.map((roll: Roll) => (
