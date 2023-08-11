@@ -1,45 +1,115 @@
-// @ts-ignore
-import s from './style.module.css';
-import { useSelector } from "react-redux";
-import React, { useState } from "react";
-import {Character} from "../../../domain/models/Character";
-import {FaPenToSquare} from 'react-icons/fa6';
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import {useSelector} from 'react-redux';
+import { FaPenToSquare } from 'react-icons/fa6';
+import { Character } from '../../../domain/models/Character';
 
-const CharacterBanner: React.FC = () => {
+export function CharacterBanner() {
     const [isEditButtonVisible, setIsEditButtonVisible] = useState(false);
+    const character: Character = useSelector(
+        // @ts-ignore
+        (store) => store.CHARACTER.character
+    );
 
     const handleMouseEnter = () => {
         setIsEditButtonVisible(true);
     };
+
     const handleMouseLeave = () => {
         setIsEditButtonVisible(false);
     };
-        // @ts-ignore
-    const character: Character = useSelector((store) => store.CHARACTER.character);
-    return (
-        <div className={s.characterBannerBox}>
 
-            <img src={character.background} alt="Background" className={s.characterBackground}/>
-            <div className={s.characterBanner}>
-                <img src={character.picture} alt="Avatar" className={s.characterAvatar}/>
-                <div className={s.characterListInfo}
-                     onMouseEnter={handleMouseEnter}
-                     onMouseLeave={handleMouseLeave}>
+    return (
+        <CharacterBannerBox>
+            <CharacterBackground src={character.background} alt="Background" />
+            <CharacterBannerContainer>
+                {character.apotheoseName ? (
+                    <CharacterAvatar src={character.pictureApotheose} alt="Avatar" />
+                ) : (
+                    <CharacterAvatar src={character.picture} alt="Avatar" />
+                )}
+                <CharacterListInfo
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                >
                     {isEditButtonVisible && (
-                        <FaPenToSquare className={s.editCharacter} onClick={
-                            () => {
+                        <EditCharacterIcon
+                            onClick={() => {
                                 window.location.href = `/characters/${character.name}/edit`;
-                            }
-                        }/>
+                            }}
+                        />
                     )}
-                   <div className={s.characterName}>{Character.getDisplayNameAndDescription(character)}</div>
-                   <div className={s.characterInfo}>Lux: {character.lux}</div>
-                   <div className={s.characterInfo}>Umbra: {character.umbra}</div>
-                   <div className={s.characterInfo}>Secunda: {character.secunda}</div>
-                </div>
-            </div>
-        </div>
+                    <CharacterName>
+                        {Character.getDisplayNameAndDescription(character)}
+                    </CharacterName>
+                    <CharacterInfo>Lux: {character.lux}</CharacterInfo>
+                    <CharacterInfo>Umbra: {character.umbra}</CharacterInfo>
+                    <CharacterInfo>Secunda: {character.secunda}</CharacterInfo>
+                </CharacterListInfo>
+            </CharacterBannerContainer>
+        </CharacterBannerBox>
     );
 };
 
-export default CharacterBanner;
+
+const CharacterBannerBox = styled.div`
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    max-width: 800px;
+    height: auto;
+`;
+
+const CharacterBackground = styled.img`
+  width: 100%;
+  height: 8rem;
+  object-fit: cover;
+`;
+
+const CharacterBannerContainer = styled.div`
+  width: 100%;
+  height: 4rem;
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+`;
+
+const CharacterAvatar = styled.img`
+  width: 6rem;
+  height: 6rem;
+  margin: 1rem;
+  border-radius: 50%;
+  border: 3px solid #fff;
+`;
+
+const CharacterListInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem;
+  padding: 1rem;
+  width: 100%;
+  height: 100%;
+  background-color: #fffa;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0.5rem 0.25rem rgba(0, 0, 0, 0.25);
+`;
+
+const EditCharacterIcon = styled(FaPenToSquare)`
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 1rem 3rem 0 0;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #ccc;
+`;
+
+const CharacterName = styled.div`
+  font-weight: bold;
+`;
+
+const CharacterInfo = styled.div`
+  /* Ajoutez les styles CSS nécessaires */
+`;

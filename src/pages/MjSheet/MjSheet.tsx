@@ -1,10 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 // @ts-ignore
 import s from './style.module.css';
 import {useDispatch, useSelector} from "react-redux";
-import {setCharacter, setState} from "../../data/store/character-slice";
-import CharacterBanner from "../../components/Character/CharacterBanner/CharacterBanner";
-import CharacterNotes from "../../components/Character/CharacterNotes/CharacterNotes";
+import {setCharacter} from "../../data/store/character-slice";
 import {setRolls} from "../../data/store/rolls-slice";
 import RollCard from "../../components/RollCard/RollCard";
 import {Roll} from "../../domain/models/Roll";
@@ -12,6 +10,8 @@ import {Character} from "../../domain/models/Character";
 import {useSSERolls} from "../../data/useSSERolls";
 import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
 import { CharacterPanel } from '../../components/Character/CharacterPanel/CharacterPanel';
+import {CharacterCard} from "../../components/Mj/CharacterCard";
+import {useSSECharacterByName} from "../../data/useSSECharacterByName";
 
 export function MjSheet() {
     const dispatch = useDispatch();
@@ -33,6 +33,7 @@ export function MjSheet() {
         });
     }, []);
 
+    useSSECharacterByName({name: 'jonathan'})
     useSSERolls();
 
     const loadingCharacter: boolean = useSelector((store) =>
@@ -48,17 +49,13 @@ export function MjSheet() {
         store.ROLLS.rolls
     );
 
-
-
-
     return (
         <>
             {loadingCharacter ? (
                 <p>Loading...</p>
             ) : (
                 <div className={s.main_container}>
-                    <div className={s.character_name}>{currentCharacter.name}</div>
-                    <CharacterPanel mj={true}/>
+                    <CharacterCard characterName={'jonathan'}/>
 
                     <div className={s.rolls}>
                         {rolls.map((roll: Roll) => (

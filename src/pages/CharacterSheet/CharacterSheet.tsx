@@ -1,19 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 // @ts-ignore
 import s from './style.module.css';
 import {useDispatch, useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
-import {setCharacter, setState} from "../../data/store/character-slice";
-import CharacterBanner from "../../components/Character/CharacterBanner/CharacterBanner";
-import CharacterNotes from "../../components/Character/CharacterNotes/CharacterNotes";
+import {setCharacter} from "../../data/store/character-slice";
 import {setRolls} from "../../data/store/rolls-slice";
 import RollCard from "../../components/RollCard/RollCard";
 import {Roll} from "../../domain/models/Roll";
-import {Character} from "../../domain/models/Character";
 import {useSSERolls} from "../../data/useSSERolls";
 import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
 import { CharacterPanel } from '../../components/Character/CharacterPanel/CharacterPanel';
 import {useSSECharacterByName} from "../../data/useSSECharacterByName";
+import {CharacterBanner} from "../../components/Character/CharacterBanner/CharacterBanner";
+import {CharacterNotes} from "../../components/Character/CharacterNotes/CharacterNotes";
 
 export function CharacterSheet() {
     const dispatch = useDispatch();
@@ -46,17 +45,10 @@ export function CharacterSheet() {
         // @ts-ignore
         store.CHARACTER.loading
     );
-    const currentCharacter: Character = useSelector((store) =>
-        // @ts-ignore
-        store.CHARACTER.character
-    );
     const rolls: Roll[] = useSelector((store) =>
         // @ts-ignore
         store.ROLLS.rolls
     );
-
-
-
 
     return (
         <>
@@ -66,7 +58,7 @@ export function CharacterSheet() {
                 <div className={s.main_container}>
                     <CharacterBanner/>
                     <CharacterNotes/>
-                    <CharacterPanel mj={false}/>
+                    <CharacterPanel/>
 
                     <div className={s.rolls}>
                         {rolls.map((roll: Roll) => (
@@ -80,5 +72,4 @@ export function CharacterSheet() {
             )}
         </>
     );
-
 }

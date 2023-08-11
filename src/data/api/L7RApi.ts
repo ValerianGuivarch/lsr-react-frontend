@@ -44,9 +44,11 @@ export class L7RApi {
             empiriqueRoll?: string
         }
         ): Promise<void> {
+        console.log("lul1")
+        try {
             await axios.post(`${config.BASE_URL}/rolls`, {
                 skillName: p.skillName,
-                rollerName:p.characterName,
+                rollerName: p.characterName,
                 focus: p.focus,
                 power: p.power,
                 proficiency: p.proficiency,
@@ -55,5 +57,11 @@ export class L7RApi {
                 malus: p.malus,
                 empiriqueRoll: p.empiriqueRoll
             });
+        } catch (e: any) {
+            console.log('error')
+            console.log(e)
+        }
+
+        console.log("lul2")
     }
 }

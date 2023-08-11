@@ -1,35 +1,52 @@
-import React, {useState} from "react";
-// @ts-ignore
-import s from './style.module.css';
-import {ApiL7RProvider} from "../../../data/api/ApiL7RProvider";
-import ReactModal from "react-modal";
-import {Character} from "../../../domain/models/Character";
+import React, { useState } from 'react';
+import ReactModal from 'react-modal';
+import { Character } from '../../../domain/models/Character';
+import {
+    ModalEmpirique,
+    ModalEmpiriqueButtonCancel,
+    ModalEmpiriqueButtonValidation,
+    ModalEmpiriqueTitle
+} from "./ModalStyle";
 
-export function EmpiriqueRollModal (props : {
-    currentCharacter: Character,
-    isOpen: boolean,
-    onRequestClose: () => void,
-    sendRoll: (skillName: string, empiriqueRoll?: string) => void
-}) {
+export interface EmpiriqueRollModalProps {
+    currentCharacter: Character;
+    isOpen: boolean;
+    onRequestClose: () => void;
+    sendRoll: (skillName: string, empiriqueRoll?: string) => void;
+}
+
+export function EmpiriqueRollModal(props: EmpiriqueRollModalProps) {
     const [empiriqueValue, setEmpiriqueValue] = useState<string>('1d6');
+
+    const handleEmpiriqueValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEmpiriqueValue(e.target.value);
+    };
+
+    const handleValidationClick = () => {
+        props.sendRoll('empirique', empiriqueValue);
+        props.onRequestClose();
+    };
+
     return (
         <ReactModal
-            className={s.modalEmpirique}
             isOpen={props.isOpen}
             onRequestClose={props.onRequestClose}
             contentLabel="Jet Empirique"
         >
-            <div className={s.modalEmpiriqueTitle}>Jet Empirique</div>
-            <input
-                type="text"
-                value={empiriqueValue}
-                onChange={(e) => setEmpiriqueValue(e.target.value)}
-            />
-            <div className={s.modalEmpiriqueButtonValidation} onClick={() => {
-                props.sendRoll('empirique', empiriqueValue);
-                props.onRequestClose();
-            }}>Valider</div>
-            <div className={s.modalEmpiriqueButtonCancel} onClick={props.onRequestClose}>Annuler</div>
+            <ModalEmpirique>
+                <ModalEmpiriqueTitle>Jet Empirique</ModalEmpiriqueTitle>
+                <input
+                    type="text"
+                    value={empiriqueValue}
+                    onChange={handleEmpiriqueValueChange}
+                />
+                <ModalEmpiriqueButtonValidation onClick={handleValidationClick}>
+                    Valider
+                </ModalEmpiriqueButtonValidation>
+                <ModalEmpiriqueButtonCancel onClick={props.onRequestClose}>
+                    Annuler
+                </ModalEmpiriqueButtonCancel>
+            </ModalEmpirique>
         </ReactModal>
-    )
-}
+    );
+};

@@ -1,9 +1,8 @@
 import React, {useState} from "react";
-// @ts-ignore
-import s from './style.module.css';
 import {ApiL7RProvider} from "../../../data/api/ApiL7RProvider";
 import ReactModal from "react-modal";
 import {Character} from "../../../domain/models/Character";
+import {ModalEmpirique, ModalEmpiriqueButtonValidation, ModalEmpiriqueTitle} from "./ModalStyle";
 
 export function RestModal (props : {
     currentCharacter: Character,
@@ -17,12 +16,12 @@ export function RestModal (props : {
     }
     return (
         <ReactModal
-            className={s.modalEmpirique}
             isOpen={props.isOpen}
             onRequestClose={closing}
             contentLabel="Repos"
         >
-            <div className={s.modalEmpiriqueTitle}>Repos : {restValue} / {props.currentCharacter.rest}</div>
+            <ModalEmpirique>
+            <ModalEmpiriqueTitle>Repos : {restValue} / {props.currentCharacter.rest}</ModalEmpiriqueTitle>
             <button onClick={() => {
                 if(props.currentCharacter.pv < props.currentCharacter.pvMax && restValue > 0) {
                     setRestValue(restValue - 1);
@@ -53,7 +52,8 @@ export function RestModal (props : {
                     })
                 }
             }}>PP : {props.currentCharacter.pp} / {props.currentCharacter.ppMax}</button>
-            <div className={s.modalEmpiriqueButtonValidation} onClick={closing}>Valider</div>
+            <ModalEmpiriqueButtonValidation onClick={closing}>Valider</ModalEmpiriqueButtonValidation>
+            </ModalEmpirique>
         </ReactModal>
     )
 }

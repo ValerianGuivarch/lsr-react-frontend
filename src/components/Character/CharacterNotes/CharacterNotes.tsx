@@ -1,11 +1,31 @@
 import React from 'react';
-// @ts-ignore
-import s from './style.module.css';
+import styled from 'styled-components';
 
-export interface CharacterNotesProps {
-}
-export default function CharacterNotes(props: CharacterNotesProps) {
-    return <div className={s.container}>
-        <input type="text" className={s.notes}/>
-    </div>
-}
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 750px;
+  margin: 10px;
+`;
+
+const NotesInput = styled.input`
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+`;
+
+export interface CharacterNotesProps {}
+
+export function CharacterNotes(props: CharacterNotesProps) {
+    const [notes, setNotes] = React.useState<string>('');
+    const handleNotesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNotes(e.target.value);
+    };
+
+    return (
+        <Container>
+            <NotesInput type="text" />
+        </Container>
+    );
+};

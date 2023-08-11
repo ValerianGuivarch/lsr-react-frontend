@@ -23,7 +23,10 @@ export class ApiL7RProvider {
         }
         ) {
         try {
+            console.log('lol3')
             await L7RApi.sendRoll(p);
+            console.log('lol2')
+
         } catch (e: any) {
             alert(e.response.data.message);
         }

@@ -1,14 +1,8 @@
 import React, {useState} from 'react';
-// @ts-ignore
-import style_classic from './style.module.css';
-// @ts-ignore
-import style_mj from './style_mj.module.css';
 import {Character} from "../../../domain/models/Character";
 import {useDispatch, useSelector} from "react-redux";
 import {UtilsString} from "../../../utils/UtilsString";
-import {UnmutableCharacterButton} from "../CharacterButtons/UnmutableCharacterButton";
 import {setState} from "../../../data/store/character-slice";
-import {MutableCharacterButton} from "../CharacterButtons/MutableCharacterButton";
 import {ApiL7RProvider} from "../../../data/api/ApiL7RProvider";
 import {CharacterState} from "../../../domain/models/CharacterState";
 import {DisplayCategory} from "../../../domain/models/DisplayCategory";
@@ -16,13 +10,12 @@ import {Skill} from "../../../domain/models/Skill";
 import {Apotheose} from "../../../domain/models/Apotheose";
 import {RestModal} from "./RestModal";
 import {LongRestModal} from "./LongRestModal";
-import {EmpiriqueRollModal} from "./EmpiriqueRollModal";
 import {Separator} from "./Separator";
+import {CharacterButton} from "../CharacterButtons/CharacterButton";
+import {EmpiriqueRollModal} from "./EmpiriqueRollModal";
+import styled from "styled-components";
 
-export function CharacterPanel(props : {
-    mj: boolean
-}) {
-    const s = props.mj ? style_mj : style_classic;
+export function CharacterPanel() {
     const dispatch = useDispatch();
     const [isRestModalOpen, setIsRestModalOpen] = useState(false);
     const [isLongRestModalOpen, setIsLongRestModalOpen] = useState(false);
@@ -55,67 +48,26 @@ export function CharacterPanel(props : {
     }
 
     return (
-        <div className={s.main_container_buttons}>
+        <MainContainerButtons>
             <div>
                 {currentCharacter.apotheoseName && (
-                    <div className={s.characterApotheose}>
+                    <CharacterApotheose>
                         {UtilsString.capitalize(currentCharacter.apotheoseName)}
-                    </div>
+                    </CharacterApotheose>
                 )}
             </div>
-            <div className={s.characterBlocks}>
-                    <Separator text={"Stats"}/>
-                <div className={s.buttons_row}>
+            <CharacterBlocks>
+                <Separator text={"Stats"}/>
+                <ButtonsRow>
                     <
-                        UnmutableCharacterButton
+                        CharacterButton
                         name={"chair"}
                         value={currentCharacter.chair}
-                        onClick={() => {
+                        onClickBtn={() => {
                             sendRoll("chair");
                         }}
                     />
-                    <UnmutableCharacterButton
-                        name={"esprit"}
-                        value={currentCharacter.esprit}
-                        onClick={() => {
-                            sendRoll("esprit");
-                        }}
-                    />
-                    <UnmutableCharacterButton
-                        name={"essence"}
-                        value={currentCharacter.essence}
-                        onClick={() => {
-                            sendRoll("essence");
-                        }}
-                    />
-                </div>
-                <div className={s.buttons_row}>
-                    <
-                        UnmutableCharacterButton
-                        name={"lux"}
-                        selected={state.lux}
-                        onClick={() => {
-                            dispatch(setState({...state, lux: !state.lux}));
-                        }}
-                    />
-                    <
-                        UnmutableCharacterButton
-                        name={"umbra"}
-                        selected={state.umbra}
-                        onClick={() => {
-                            dispatch(setState({...state, umbra: !state.umbra}));
-                        }}
-                    /><
-                    UnmutableCharacterButton
-                    name={"secunda"}
-                    selected={state.secunda}
-                    onClick={() => {
-                        dispatch(setState({...state, secunda: !state.secunda}));
-                    }}
-                />
-                </div>
-                <div className={s.buttons_row}>
-                    <MutableCharacterButton
+                    <CharacterButton
                         name={"pv"}
                         selected={false}
                         value={currentCharacter.pv}
@@ -138,7 +90,26 @@ export function CharacterPanel(props : {
                         onClickBtn={() => {
                             // TODO jet de sauv vs la mort si 0
                         }}/>
-                    <MutableCharacterButton
+                    <CharacterButton
+                        name={"bonus"}
+                        selected={false}
+                        value={state.bonus}
+                        onClickIncr={() => {
+                            dispatch(setState({...state, bonus: state.bonus + 1}));
+                        }}
+                        onClickDecr={() => {
+                            dispatch(setState({...state, bonus: state.bonus - 1}));
+                        }}/>
+                </ButtonsRow>
+                <ButtonsRow>
+                    <CharacterButton
+                        name={"esprit"}
+                        value={currentCharacter.esprit}
+                        onClickBtn={() => {
+                            sendRoll("esprit");
+                        }}
+                    />
+                    <CharacterButton
                         name={"pf"}
                         selected={state.focusActivated}
                         value={currentCharacter.pf}
@@ -163,7 +134,28 @@ export function CharacterPanel(props : {
                             }
                         }}
                     />
-                    <MutableCharacterButton
+
+                    <CharacterButton
+                        name={"malus"}
+                        selected={false}
+                        value={state.malus}
+                        onClickIncr={() => {
+                            dispatch(setState({...state, malus: state.malus + 1}));
+                        }}
+                        onClickDecr={() => {
+                            dispatch(setState({...state, malus: state.malus - 1}));
+                        }}/>
+                </ButtonsRow>
+                <ButtonsRow>
+                    <CharacterButton
+                        name={"essence"}
+                        value={currentCharacter.essence}
+                        onClickBtn={() => {
+                            sendRoll("essence");
+                        }}
+                    />
+
+                    <CharacterButton
                         name={"pp"}
                         selected={state.powerActivated}
                         value={currentCharacter.pp}
@@ -188,29 +180,7 @@ export function CharacterPanel(props : {
                             }
                         }}
                     />
-                </div>
-                <div className={s.buttons_row}>
-                    <MutableCharacterButton
-                        name={"bonus"}
-                        selected={false}
-                        value={state.bonus}
-                        onClickIncr={() => {
-                            dispatch(setState({...state, bonus: state.bonus + 1}));
-                        }}
-                        onClickDecr={() => {
-                            dispatch(setState({...state, bonus: state.bonus - 1}));
-                        }}/>
-                    <MutableCharacterButton
-                        name={"malus"}
-                        selected={false}
-                        value={state.malus}
-                        onClickIncr={() => {
-                            dispatch(setState({...state, malus: state.malus + 1}));
-                        }}
-                        onClickDecr={() => {
-                            dispatch(setState({...state, malus: state.malus - 1}));
-                        }}/>
-                    <MutableCharacterButton
+                    <CharacterButton
                         name={"dettes"}
                         selected={false}
                         value={currentCharacter.dettes}
@@ -228,34 +198,59 @@ export function CharacterPanel(props : {
                             }).then(() => {
                             })
                         }}/>
-                </div>
-                <div className={s.buttons_row}>
+                </ButtonsRow>
+                <ButtonsRow>
                     <
-                        UnmutableCharacterButton
+                        CharacterButton
+                        name={"lux"}
+                        selected={state.lux}
+                        onClickBtn={() => {
+                            dispatch(setState({...state, lux: !state.lux}));
+                        }}
+                    />
+                    <
+                        CharacterButton
+                        name={"umbra"}
+                        selected={state.umbra}
+                        onClickBtn={() => {
+                            dispatch(setState({...state, umbra: !state.umbra}));
+                        }}
+                    /><
+                    CharacterButton
+                    name={"secunda"}
+                    selected={state.secunda}
+                    onClickBtn={() => {
+                        dispatch(setState({...state, secunda: !state.secunda}));
+                    }}
+                />
+                </ButtonsRow>
+                <ButtonsRow>
+                    <
+                        CharacterButton
                         name={"empirique"}
-                        onClick={() => {
+                        onClickBtn={() => {
                             setIsEmpiriqueRollModalOpen(true);
                         }}
                     />
                     <
-                        UnmutableCharacterButton
+                        CharacterButton
                         name={"secret"}
                         selected={state.secret}
-                        onClick={() => {
+                        onClickBtn={() => {
                             dispatch(setState({...state, secret: !state.secret}));
                         }}
                     />
                     <
-                        UnmutableCharacterButton
+                        CharacterButton
                         name={"repos"}
-                        onClick={() => {
+                        onClickBtn={() => {
                             setIsRestModalOpen(true);
                         }}
                     />
                     <
-                        UnmutableCharacterButton
+                        CharacterButton
                         name={"repos long"}
-                        onClick={() => {
+                        onClickBtn={() => {
                             ApiL7RProvider.updateCharacter({
                                 ...currentCharacter,
                                 pv: currentCharacter.pvMax,
@@ -266,28 +261,28 @@ export function CharacterPanel(props : {
                             setIsLongRestModalOpen(true);
                         }}
                     />
-                </div>
-            </div>
+                </ButtonsRow>
+            </CharacterBlocks>
 
             {Character.hasDisplayCategory(currentCharacter, DisplayCategory.MAGIE) && (
-                <div className={s.characterBlocks}>
+                <CharacterBlocks>
                         <Separator text={"Magie"}/>
-                    <div className={s.buttons_row}>
+                    <ButtonsRow>
                         {Character.getSkills(currentCharacter, DisplayCategory.MAGIE).map((skill: Skill) => (
-                            <UnmutableCharacterButton
+                            <CharacterButton
                                 key={skill.name}
                                 name={skill.name}
-                                onClick={() => {
+                                onClickBtn={() => {
                                     sendRoll(skill.name);
                                 }}
                             />
                         ))}
                         {Character.getProficiencies(currentCharacter, DisplayCategory.MAGIE).map((skill: Skill) => (
-                            <UnmutableCharacterButton
+                            <CharacterButton
                                 selected={state.proficiencies.get(skill.name)}
                                 key={skill.name}
                                 name={skill.name}
-                                onClick={() => {
+                                onClickBtn={() => {
                                     dispatch(setState({
                                         ...state,
                                         proficiencies: state.proficiencies.set(skill.name, !state.proficiencies.get(skill.name))
@@ -296,11 +291,11 @@ export function CharacterPanel(props : {
                             />
                         ))}
                         {Character.getApotheoses(currentCharacter, DisplayCategory.MAGIE).map((apotheose: Apotheose) => (
-                            <UnmutableCharacterButton
+                            <CharacterButton
                                 selected={currentCharacter.apotheoseName === apotheose.name}
                                 key={apotheose.name}
                                 name={apotheose.name}
-                                onClick={() => {
+                                onClickBtn={() => {
                                     ApiL7RProvider.updateCharacter({
                                         ...currentCharacter,
                                         apotheoseName: apotheose.name
@@ -309,28 +304,28 @@ export function CharacterPanel(props : {
                                 }}
                             />
                         ))}
-                    </div>
-                </div>
+                    </ButtonsRow>
+                </CharacterBlocks>
             )}
             {Character.hasDisplayCategory(currentCharacter, DisplayCategory.ARCANES) && (
-                <div className={s.characterBlocks}>
+                <CharacterBlocks>
                         <Separator text={"Arcanes " + currentCharacter.arcanes + " / " + currentCharacter.arcanesMax}/>
-                    <div className={s.buttons_row}>
+                    <ButtonsRow>
                         {Character.getSkills(currentCharacter, DisplayCategory.ARCANES).map((skill: Skill) => (
-                            <UnmutableCharacterButton
+                            <CharacterButton
                                 key={skill.name}
                                 name={skill.name}
-                                onClick={() => {
+                                onClickBtn={() => {
                                     sendRoll(skill.name);
                                 }}
                             />
                         ))}
                         {Character.getProficiencies(currentCharacter, DisplayCategory.ARCANES).map((skill: Skill) => (
-                            <UnmutableCharacterButton
+                            <CharacterButton
                                 key={skill.name}
                                 selected={state.proficiencies.get(skill.name)}
                                 name={skill.name}
-                                onClick={() => {
+                                onClickBtn={() => {
                                     dispatch(setState({
                                         ...state,
                                         proficiencies: state.proficiencies.set(skill.name, !state.proficiencies.get(skill.name))
@@ -338,8 +333,8 @@ export function CharacterPanel(props : {
                                 }}
                             />
                         ))}
-                    </div>
-                </div>
+                    </ButtonsRow>
+                </CharacterBlocks>
             )}
             <RestModal
                 currentCharacter={currentCharacter}
@@ -360,6 +355,32 @@ export function CharacterPanel(props : {
                 onRequestClose={() => {
                     setIsEmpiriqueRollModalOpen(false);
                 }}/>
-        </div>
+        </MainContainerButtons>
     )
 }
+
+
+const MainContainerButtons = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 800px;
+`;
+
+const CharacterApotheose = styled.div`
+    color: #f00;
+    font-weight: bold;
+    text-align: center;
+`;
+
+const ButtonsRow = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 8px;
+`;
+
+const CharacterBlocks = styled.div`
+    /* Add any required styling for this div */
+`;
