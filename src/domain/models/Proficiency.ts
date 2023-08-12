@@ -1,5 +1,5 @@
 import {DisplayCategory} from "./DisplayCategory";
-import {ProficiencyRaw} from "../../data/ProficiencyRaw";
+import {ProficiencyRaw} from "../../data/api/ProficiencyRaw";
 
 export class Proficiency {
     name: string

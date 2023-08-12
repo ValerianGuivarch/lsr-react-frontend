@@ -1,4 +1,4 @@
-import {SkillRaw} from "../../data/SkillRaw";
+import {SkillRaw} from "../../data/api/SkillRaw";
 import {DisplayCategory} from "./DisplayCategory";
 
 export class Skill {

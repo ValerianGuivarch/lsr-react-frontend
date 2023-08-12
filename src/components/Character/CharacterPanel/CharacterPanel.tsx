@@ -17,7 +17,8 @@ import styled from "styled-components";
 import {Proficiency} from "../../../domain/models/Proficiency";
 
 export function CharacterPanel(props: {
-    cardDisplay: boolean
+    cardDisplay: boolean,
+    currentCharacter: Character,
 }) {
     const dispatch = useDispatch();
     const [isRestModalOpen, setIsRestModalOpen] = useState(false);
@@ -28,15 +29,12 @@ export function CharacterPanel(props: {
         // @ts-ignore
         store.CHARACTER.state
     );
-    // @ts-ignore
-    const currentCharacter: Character = useSelector((store) => store.CHARACTER.character);
-
     function sendRoll(skillName: string, empiriqueRoll?: string) {
         const bonus = state.bonus + (state.lux ? 1 : 0) + (state.secunda ? 1 : 0);
         const malus = state.malus + (state.umbra ? 1 : 0);
         const hasProficiency = Array.from(state.proficiencies.values()).some((value) => value);
         ApiL7RProvider.sendRoll({
-            characterName: currentCharacter.name,
+            characterName: props.currentCharacter.name,
             skillName: skillName,
             focus: state.focusActivated,
             power: state.powerActivated,
@@ -51,13 +49,14 @@ export function CharacterPanel(props: {
     }
 
     function CharacterBlockBtn(props: {
+        currentCharacter: Character,
         cardDisplay: boolean,
         displayCategory: DisplayCategory,
         displayCategoryName: string
     }) {
-        const skills = Character.getSkills(currentCharacter, props.displayCategory);
-        const proficiencies = Character.getProficiencies(currentCharacter, props.displayCategory);
-        const apotheoses = Character.getApotheoses(currentCharacter, props.displayCategory);
+        const skills = Character.getSkills(props.currentCharacter, props.displayCategory);
+        const proficiencies = Character.getProficiencies(props.currentCharacter, props.displayCategory);
+        const apotheoses = Character.getApotheoses(props.currentCharacter, props.displayCategory);
         return (
             <CharacterBlocks>
                 <Separator text={props.displayCategoryName} display={!props.cardDisplay && (skills.length>0 || proficiencies.length>0 || apotheoses.length>0)}/>
@@ -89,12 +88,12 @@ export function CharacterPanel(props: {
                     {apotheoses.map((apotheose: Apotheose) => (
                         <CharacterButton
                             cardDisplay={props.cardDisplay}
-                            selected={currentCharacter.apotheoseName === apotheose.name}
+                            selected={props.currentCharacter.apotheoseName === apotheose.name}
                             key={apotheose.name}
                             name={props.cardDisplay ? apotheose.shortName :apotheose.name}
                             onClickBtn={() => {
                                 ApiL7RProvider.updateCharacter({
-                                    ...currentCharacter,
+                                    ...props.currentCharacter,
                                     apotheoseName: apotheose.name
                                 }).then(() => {
                                 })
@@ -109,9 +108,9 @@ export function CharacterPanel(props: {
     return (
         <MainContainerButtons cardDisplay={props.cardDisplay}>
             <div>
-                {currentCharacter.apotheoseName && (
+                {props.currentCharacter.apotheoseName && (
                     <CharacterApotheose>
-                        {UtilsString.capitalize(currentCharacter.apotheoseName)}
+                        {UtilsString.capitalize(props.currentCharacter.apotheoseName)}
                     </CharacterApotheose>
                 )}
             </div>
@@ -122,7 +121,7 @@ export function CharacterPanel(props: {
                         CharacterButton
                         cardDisplay={props.cardDisplay}
                         name={props.cardDisplay ? "ch" : "chair"}
-                        value={currentCharacter.chair}
+                        value={props.currentCharacter.chair}
                         onClickBtn={() => {
                             sendRoll("chair");
                         }}
@@ -132,20 +131,20 @@ export function CharacterPanel(props: {
                         name={"pv"}
                         column={true}
                         selected={false}
-                        value={currentCharacter.pv}
-                        maxValue={currentCharacter.pvMax}
+                        value={props.currentCharacter.pv}
+                        maxValue={props.currentCharacter.pvMax}
                         onClickIncr={() => {
                             ApiL7RProvider.updateCharacter({
-                                ...currentCharacter,
-                                pv: currentCharacter.pv + 1
+                                ...props.currentCharacter,
+                                pv: props.currentCharacter.pv + 1
 
                             }).then(() => {
                             })
                         }}
                         onClickDecr={() => {
                             ApiL7RProvider.updateCharacter({
-                                ...currentCharacter,
-                                pv: currentCharacter.pv - 1
+                                ...props.currentCharacter,
+                                pv: props.currentCharacter.pv - 1
                             }).then(() => {
                             })
                         }}
@@ -168,7 +167,7 @@ export function CharacterPanel(props: {
                     <CharacterButton
                         cardDisplay={props.cardDisplay}
                         name={props.cardDisplay ? "sp" : "esprit"}
-                        value={currentCharacter.esprit}
+                        value={props.currentCharacter.esprit}
                         onClickBtn={() => {
                             sendRoll("esprit");
                         }}
@@ -177,24 +176,24 @@ export function CharacterPanel(props: {
                         cardDisplay={props.cardDisplay}
                         name={"pf"}
                         selected={state.focusActivated}
-                        value={currentCharacter.pf}
-                        maxValue={currentCharacter.pfMax}
+                        value={props.currentCharacter.pf}
+                        maxValue={props.currentCharacter.pfMax}
                         onClickIncr={() => {
                             ApiL7RProvider.updateCharacter({
-                                ...currentCharacter,
-                                pf: currentCharacter.pf + 1
+                                ...props.currentCharacter,
+                                pf: props.currentCharacter.pf + 1
                             }).then(() => {
                             })
                         }}
                         onClickDecr={() => {
                             ApiL7RProvider.updateCharacter({
-                                ...currentCharacter,
-                                pf: currentCharacter.pf - 1
+                                ...props.currentCharacter,
+                                pf: props.currentCharacter.pf - 1
                             }).then(() => {
                             })
                         }}
                         onClickBtn={() => {
-                            if (currentCharacter.pf > 0) {
+                            if (props.currentCharacter.pf > 0) {
                                 dispatch(setState({...state, focusActivated: !state.focusActivated}));
                             }
                         }}
@@ -216,7 +215,7 @@ export function CharacterPanel(props: {
                     <CharacterButton
                         cardDisplay={props.cardDisplay}
                         name={props.cardDisplay ? "es" : "essence"}
-                        value={currentCharacter.essence}
+                        value={props.currentCharacter.essence}
                         onClickBtn={() => {
                             sendRoll("essence");
                         }}
@@ -226,24 +225,24 @@ export function CharacterPanel(props: {
                         cardDisplay={props.cardDisplay}
                         name={"pp"}
                         selected={state.powerActivated}
-                        value={currentCharacter.pp}
-                        maxValue={currentCharacter.ppMax}
+                        value={props.currentCharacter.pp}
+                        maxValue={props.currentCharacter.ppMax}
                         onClickIncr={() => {
                             ApiL7RProvider.updateCharacter({
-                                ...currentCharacter,
-                                pp: currentCharacter.pp + 1
+                                ...props.currentCharacter,
+                                pp: props.currentCharacter.pp + 1
                             }).then(() => {
                             })
                         }}
                         onClickDecr={() => {
                             ApiL7RProvider.updateCharacter({
-                                ...currentCharacter,
-                                pp: currentCharacter.pp - 1
+                                ...props.currentCharacter,
+                                pp: props.currentCharacter.pp - 1
                             }).then(() => {
                             })
                         }}
                         onClickBtn={() => {
-                            if (currentCharacter.pp > 0) {
+                            if (props.currentCharacter.pp > 0) {
                                 dispatch(setState({...state, powerActivated: !state.powerActivated}));
                             }
                         }}
@@ -252,18 +251,18 @@ export function CharacterPanel(props: {
                         cardDisplay={props.cardDisplay}
                         name={props.cardDisplay ? "dt" : "dettes"}
                         selected={false}
-                        value={currentCharacter.dettes}
+                        value={props.currentCharacter.dettes}
                         onClickIncr={() => {
                             ApiL7RProvider.updateCharacter({
-                                ...currentCharacter,
-                                dettes: currentCharacter.dettes + 1
+                                ...props.currentCharacter,
+                                dettes: props.currentCharacter.dettes + 1
                             }).then(() => {
                             })
                         }}
                         onClickDecr={() => {
                             ApiL7RProvider.updateCharacter({
-                                ...currentCharacter,
-                                dettes: currentCharacter.dettes - 1
+                                ...props.currentCharacter,
+                                dettes: props.currentCharacter.dettes - 1
                             }).then(() => {
                             })
                         }}/>
@@ -331,10 +330,10 @@ export function CharacterPanel(props: {
                         name={"repos long"}
                         onClickBtn={() => {
                             ApiL7RProvider.updateCharacter({
-                                ...currentCharacter,
-                                pv: currentCharacter.pvMax,
-                                pf: currentCharacter.pfMax,
-                                pp: currentCharacter.ppMax
+                                ...props.currentCharacter,
+                                pv: props.currentCharacter.pvMax,
+                                pf: props.currentCharacter.pfMax,
+                                pp: props.currentCharacter.ppMax
                             }).then(() => {
                             })
                             setIsLongRestModalOpen(true);
@@ -344,44 +343,48 @@ export function CharacterPanel(props: {
                 </ButtonsRow>
             </CharacterBlocks>
 
-            {Character.hasDisplayCategory(currentCharacter, DisplayCategory.MAGIE) && (
+            {Character.hasDisplayCategory(props.currentCharacter, DisplayCategory.MAGIE) && (
                 <CharacterBlockBtn
+                    currentCharacter={props.currentCharacter}
                     displayCategory={DisplayCategory.MAGIE}
                     displayCategoryName={"Magie"}
                     cardDisplay={props.cardDisplay}/>
             )}
-            {Character.hasDisplayCategory(currentCharacter, DisplayCategory.ARCANES) && (
+            {Character.hasDisplayCategory(props.currentCharacter, DisplayCategory.ARCANES) && (
                 <CharacterBlockBtn
+                    currentCharacter={props.currentCharacter}
                     displayCategory={DisplayCategory.ARCANES}
                     displayCategoryName={"Arcanes"}
                     cardDisplay={props.cardDisplay}/>
             )}
-            {Character.hasDisplayCategory(currentCharacter, DisplayCategory.PACIFICATEURS) && (
+            {Character.hasDisplayCategory(props.currentCharacter, DisplayCategory.PACIFICATEURS) && (
                 <CharacterBlockBtn
+                    currentCharacter={props.currentCharacter}
                     displayCategory={DisplayCategory.PACIFICATEURS}
                     displayCategoryName={"Pacification"}
                     cardDisplay={props.cardDisplay}/>
             )}
-            {Character.hasDisplayCategory(currentCharacter, DisplayCategory.SOLDATS) && (
+            {Character.hasDisplayCategory(props.currentCharacter, DisplayCategory.SOLDATS) && (
                 <CharacterBlockBtn
+                    currentCharacter={props.currentCharacter}
                     displayCategory={DisplayCategory.SOLDATS}
                     displayCategoryName={"Soldat"}
                     cardDisplay={props.cardDisplay}/>
             )}
             <RestModal
-                currentCharacter={currentCharacter}
+                currentCharacter={props.currentCharacter}
                 isOpen={isRestModalOpen}
                 onRequestClose={() => {
                     setIsRestModalOpen(false);
                 }}/>
             <LongRestModal
-                currentCharacter={currentCharacter}
+                currentCharacter={props.currentCharacter}
                 isOpen={isLongRestModalOpen}
                 onRequestClose={() => {
                     setIsLongRestModalOpen(false);
                 }}/>
             <EmpiriqueRollModal
-                currentCharacter={currentCharacter}
+                currentCharacter={props.currentCharacter}
                 isOpen={isEmpiriqueRollModalOpen}
                 sendRoll={sendRoll}
                 onRequestClose={() => {

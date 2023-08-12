@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import config from '../config/config';
-import {characterSlice} from "./store/character-slice";
-import {Character} from "../domain/models/Character";
+import config from '../../config/config';
+import {characterSlice} from "../store/character-slice";
+import {Character} from "../../domain/models/Character";
 
 export function useSSECharacterByName(props: { name: string }) {
     const dispatch = useDispatch();

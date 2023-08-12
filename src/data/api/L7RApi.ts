@@ -1,10 +1,10 @@
 import axios from 'axios';
 import config from '../../config/config';
-import {CharacterRaw} from "../CharacterRaw";
-import {CharacterPreviewRaw} from "../CharacterPreviewRaw";
+import {CharacterRaw} from "./CharacterRaw";
+import {CharacterPreviewRaw} from "./CharacterPreviewRaw";
 import {Character} from "../../domain/models/Character";
-import {CharacterUpdateRequest} from "../CharacterUpdateRequest";
-import {RollRaw} from "../RollRaw";
+import {CharacterUpdateRequest} from "./CharacterUpdateRequest";
+import {RollRaw} from "./RollRaw";
 
 export class L7RApi {
     static async getPJs(): Promise<CharacterPreviewRaw[]> {

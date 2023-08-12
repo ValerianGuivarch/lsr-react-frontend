@@ -1,5 +1,5 @@
 import {DisplayCategory} from "./DisplayCategory";
-import {ApotheoseRaw} from "../../data/ApotheoseRaw";
+import {ApotheoseRaw} from "../../data/api/ApotheoseRaw";
 
 export class Apotheose {
     name: string

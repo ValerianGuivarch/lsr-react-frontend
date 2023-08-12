@@ -1,4 +1,4 @@
-import {Character} from "../domain/models/Character";
+import {Character} from "../../domain/models/Character";
 
 export class CharacterUpdateRequest {
     chair: number

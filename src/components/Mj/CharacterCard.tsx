@@ -3,21 +3,19 @@ import styled from 'styled-components';
 import {useDispatch, useSelector} from "react-redux";
 import {Character} from "../../domain/models/Character";
 import {CharacterPanel} from "../Character/CharacterPanel/CharacterPanel";
+import {CharacterViewModel} from "../../domain/models/CharacterViewModel";
 
 export function CharacterCard(props : {
-    characterName: string
+    currentCharacter: Character
 }) {
-    const dispatch = useDispatch();
-    // @ts-ignore
-    const currentCharacter: Character = useSelector((store) => store.CHARACTER.character);
 
     return (
         <CardContainer>
             <TitleContainer>
-                <ProfilePicture src={currentCharacter.picture} alt="Profile Picture" />
-                <CharacterName>{currentCharacter.name}</CharacterName>
+                <ProfilePicture src={props.currentCharacter.picture} alt="Profile Picture" />
+                <CharacterName>{props.currentCharacter.name}</CharacterName>
             </TitleContainer>
-            <CharacterPanel cardDisplay={true}/>
+            <CharacterPanel cardDisplay={true} currentCharacter={props.currentCharacter}/>
         </CardContainer>
 )
 }

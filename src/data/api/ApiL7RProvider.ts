@@ -1,11 +1,11 @@
 import {Roll} from "../../domain/models/Roll";
 import {L7RApi} from "./L7RApi";
-import {RollRaw} from "../RollRaw";
-import {CharacterPreviewRaw} from "../CharacterPreviewRaw";
+import {RollRaw} from "./RollRaw";
+import {CharacterPreviewRaw} from "./CharacterPreviewRaw";
 import {CharacterPreview} from "../../domain/models/CharacterPreview";
 import {Character} from "../../domain/models/Character";
-import {CharacterUpdateRequest} from "../CharacterUpdateRequest";
-import {CharacterRaw} from "../CharacterRaw";
+import {CharacterUpdateRequest} from "./CharacterUpdateRequest";
+import {CharacterRaw} from "./CharacterRaw";
 
 export class ApiL7RProvider {
 
@@ -56,7 +56,7 @@ export class ApiL7RProvider {
         return new Character(response);
     }
 
-    static async getSessionCharacter (): Promise<Character[]> {
+    static async getSessionCharacters (): Promise<Character[]> {
         const response = await L7RApi.getSessionCharacter();
         return response.map((character: CharacterRaw) => {
             return new Character(character);

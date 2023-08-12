@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { rollsSlice } from './store/rolls-slice';
-import config from '../config/config';
+import { rollsSlice } from '../store/rolls-slice';
+import config from '../../config/config';
 
 export function useSSERolls() {
     const dispatch = useDispatch();

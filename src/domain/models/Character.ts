@@ -1,4 +1,4 @@
-import {CharacterRaw} from "../../data/CharacterRaw";
+import {CharacterRaw} from "../../data/api/CharacterRaw";
 import {Genre} from "./Genre";
 import {BattleState} from "./BattleState";
 import {Skill} from "./Skill";

@@ -1,4 +1,4 @@
-import {CharacterPreviewRaw} from "../../data/CharacterPreviewRaw";
+import {CharacterPreviewRaw} from "../../data/api/CharacterPreviewRaw";
 
 export class CharacterPreview {
     name: string

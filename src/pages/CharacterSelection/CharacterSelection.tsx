@@ -1,15 +1,25 @@
-import React from 'react';
-// @ts-ignore
-import s from './style.module.css';
-import { useSelector } from "react-redux";
+import React, {useEffect} from 'react';
+import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import {CharacterPreview} from "../../domain/models/CharacterPreview";
+import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
+import {setPreviewPjsList} from "../../data/store/preview-pjs-slice";
+import styled from "styled-components";
 
-export interface CharacterSelectionProps {
 
-}
+export default function CharacterSelection() {
 
-export default function CharacterSelection(props: CharacterSelectionProps) {
+    const dispatch = useDispatch();
+
+    async function fetchAllCharacterPreview() {
+        const characterPreviewRaws = await ApiL7RProvider.getPJs();
+        dispatch(setPreviewPjsList(characterPreviewRaws));
+    }
+    useEffect(() => {
+        fetchAllCharacterPreview().then(() => {});
+    }, []);
+
+
     // @ts-ignore
     const pjsList = useSelector((store) => store.PREVIEW_PJS.previewPjsList);
     const [selectedPlayerName, setSelectedPlayerName] = React.useState<string>("");
@@ -25,8 +35,10 @@ export default function CharacterSelection(props: CharacterSelectionProps) {
         setSelectedName(event.target.value);
     };
 
+
+
     return (
-        <div className={s.container}>
+        <PageSelectionContainer>
             <form>
                 <label>
                     Player Name:
@@ -65,13 +77,20 @@ export default function CharacterSelection(props: CharacterSelectionProps) {
                     onClick={() => {
                         const confirmed = window.confirm("Êtes-vous sûr de vouloir devenir MJ ?");
                         if (confirmed) {
-                            window.location.href = "/mj";
+                            navigate("/mj/")
                         }
                     }}
                 >
                     Devenir MJ !
                 </button>
             </form>
-        </div>
+        </PageSelectionContainer>
     );
 }
+
+
+
+
+const PageSelectionContainer = styled.div`
+  display: flex;
+`;

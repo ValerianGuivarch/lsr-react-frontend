@@ -1,4 +1,4 @@
-import {RollRaw} from "../../data/RollRaw";
+import {RollRaw} from "../../data/api/RollRaw";
 import {SkillStat} from "./SkillStat";
 
 export class Roll {
