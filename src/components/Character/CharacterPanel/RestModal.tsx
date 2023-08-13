@@ -11,8 +11,13 @@ export function RestModal (props : {
 }) {
     const [restValue, setRestValue] = useState<number>(props.currentCharacter.rest);
     const closing = () => {
-        setRestValue(props.currentCharacter.rest);
-        props.onRequestClose();
+        ApiL7RProvider.updateCharacter({
+            ...props.currentCharacter,
+            arcanes: props.currentCharacter.arcanesMax,
+        }).then(() => {
+            setRestValue(props.currentCharacter.rest);
+            props.onRequestClose();
+        })
     }
     return (
         <ReactModal
