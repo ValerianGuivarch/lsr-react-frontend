@@ -8,6 +8,8 @@ export function useSSECharacterByName(props: { name: string }) {
     const dispatch = useDispatch();
 
     useEffect(() => {
+        console.log("useSSECharacterByName");
+        console.log(config.BASE_URL);
         const eventSource = new EventSource(`${config.BASE_URL}/sse/characters/${props.name}`);
 
         eventSource.onmessage = (event) => {
