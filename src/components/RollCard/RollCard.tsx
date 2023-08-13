@@ -1,17 +1,16 @@
 import React from 'react';
-// @ts-ignore
-import s from './style.module.css';
 import {Roll} from "../../domain/models/Roll";
 import {FaDiceFive, FaDiceFour, FaDiceOne, FaDiceSix, FaDiceThree, FaDiceTwo} from 'react-icons/fa6';
 import {SkillStat} from "../../domain/models/SkillStat";
+import styled from "styled-components";
+
 
 function Dice(props: { value: number }) {
     const DiceIcon = [FaDiceOne, FaDiceTwo, FaDiceThree, FaDiceFour, FaDiceFive, FaDiceSix][props.value - 1];
 
-    return (
-        <DiceIcon size="2em"/>
-    );
+    return <DiceIcon size="2em" />;
 }
+
 
 export interface RollCardProps {
     roll: Roll
@@ -46,10 +45,11 @@ function getRollEffectText(roll: Roll) {
 export default function RollCard(props: RollCardProps) {
     const roll = props.roll
     const displayParts = roll.display.split('*');
-    return <div className={s.container}>
-        <img className={s.avatar} src={props.roll.picture} alt={props.roll.rollerName}/>
-        <div className={s.rollDisplay}>
-            <div className={s.textPartOne}>
+    return (
+        <Container>
+            <Avatar src={props.roll.picture} alt={props.roll.rollerName} />
+            <RollDisplay>
+                <TextPartOne>
                 <span>{roll.secret ? '(secret) ' : ''} </span>
                 <span><b>{roll.rollerName.split(' ')
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -75,9 +75,9 @@ export default function RollCard(props: RollCardProps) {
                         {' succès.'}
                     </span> : '.'
                 }
-            </div>
-            {
-                roll.displayDices && <div className={s.dicesDisplay}>
+                </TextPartOne>
+                {
+                    roll.displayDices && <DicesDisplay>
                     {
                         roll.result.map((dice, index) => {
                             if(roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)
@@ -86,9 +86,29 @@ export default function RollCard(props: RollCardProps) {
                                 return <span key={index}>[{dice}]</span>
                         })
                     }
-                </div>
-            }
-        </div>
-
-    </div>
+                    </DicesDisplay>
+                }
+            </RollDisplay>
+        </Container>
+    );
 }
+
+const Container = styled.div`
+    display: flex;
+`;
+
+const Avatar = styled.img`
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 20px;
+`;
+
+const RollDisplay = styled.div`
+`;
+
+const TextPartOne = styled.div`
+`;
+
+const DicesDisplay = styled.div`
+`;

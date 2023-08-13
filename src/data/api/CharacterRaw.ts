@@ -37,7 +37,7 @@ export interface CharacterRaw {
     secunda: string
     notes: string
     category: string
-    apotheoseName: string
+    apotheoseName: string | null
     apotheoseImprovement?: string
     apotheoseImprovementList: string[]
     genre: string
@@ -52,4 +52,5 @@ export interface CharacterRaw {
     skills: SkillRaw[]
     proficiencies: ProficiencyRaw[]
     apotheoses: ApotheoseRaw[]
+    apotheoseState: string
 }

@@ -10,12 +10,16 @@ import {CharacterViewModel} from "../../domain/models/CharacterViewModel";
 import {setCharacters} from "../../data/store/character-slice";
 import {RootState} from "../../data/store";
 import {useSSECharacters} from "../../data/api/useSSECharacters";
+import {useSSECharactersControlled} from "../../data/api/useSSECharactersControlled";
+import {useParams} from "react-router-dom";
+import styled from "styled-components";
 
-export function MjSheet() {
+export function CharacterControllingSheet() {
     const dispatch = useDispatch();
 
+    const {characterName} = useParams();
     async function fetchSessionCharacters() {
-        const characters = await ApiL7RProvider.getSessionCharacters();
+        const characters = await ApiL7RProvider.getControlledCharacters(characterName ? characterName : '');
         dispatch(setCharacters(characters));
     }
 
@@ -31,7 +35,7 @@ export function MjSheet() {
         });
     }, []);
 
-    useSSECharacters()
+    useSSECharactersControlled({name: characterName ? characterName : ''})
     useSSERolls();
 
     const loadingCharacter: boolean = useSelector((store: RootState) =>
@@ -49,25 +53,44 @@ export function MjSheet() {
             {loadingCharacter ? (
                 <p>Loading...</p>
             ) : (
-                <div>
-                     <button onClick={() => {
-                      ApiL7RProvider.sendNewTurn()
-                    }}>
-                        New Turn</button>
-
-                    <CharacterCard characterViewModel={characterViewModels[0]}/>
-                    <CharacterCard characterViewModel={characterViewModels[1]}/>
-                    <div>
+                <Container>
+                    <CharactersContainer>
+                        {characterViewModels.length > 0 ? (
+                            characterViewModels.map((characterVM, index) => (
+                                <CharacterCard key={index} characterViewModel={characterVM} />
+                            ))
+                        ) : (
+                            <p>No characters available</p>
+                        )}
+                    </CharactersContainer>
+                    <RollsContainer>
                         {rolls.map((roll: Roll) => (
-                            <div key={roll.id}>
-                                <RollCard roll={roll}/>
-                            </div>
+                            <RollCard key={roll.id} roll={roll} />
                         ))}
-                    </div>
-                </div>
-
+                    </RollsContainer>
+                </Container>
             )}
         </>
     );
-
 }
+
+
+ const CharactersContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+    width: 60%;
+    float: left;
+    overflow-y: auto;
+`;
+
+const RollsContainer = styled.div`
+    width: 40%;
+    float: left;
+    overflow-y: auto;
+`;
+
+const Container = styled.div`
+    display: flex;
+    clear: both;
+  width: 100%;
+`;

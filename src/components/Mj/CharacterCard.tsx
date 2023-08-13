@@ -1,21 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
-import {useDispatch, useSelector} from "react-redux";
-import {Character} from "../../domain/models/Character";
 import {CharacterPanel} from "../Character/CharacterPanel/CharacterPanel";
 import {CharacterViewModel} from "../../domain/models/CharacterViewModel";
 
 export function CharacterCard(props : {
-    currentCharacter: Character
+    characterViewModel: CharacterViewModel
 }) {
 
     return (
         <CardContainer>
             <TitleContainer>
-                <ProfilePicture src={props.currentCharacter.picture} alt="Profile Picture" />
-                <CharacterName>{props.currentCharacter.name}</CharacterName>
+                <ProfilePicture src={props.characterViewModel.character.picture} alt="Profile Picture" />
+                <CharacterName>{props.characterViewModel.character.name}</CharacterName>
             </TitleContainer>
-            <CharacterPanel cardDisplay={true} currentCharacter={props.currentCharacter}/>
+            <CharacterPanel cardDisplay={true} characterViewModel={props.characterViewModel}/>
         </CardContainer>
 )
 }
@@ -27,6 +25,7 @@ const CardContainer = styled.div`
   padding: 4px;
   margin: 4px;
   max-width: 200px;
+  max-height: 250px;
 `;
 
 const TitleContainer = styled.div`

@@ -3,6 +3,8 @@ import {Character} from "./Character";
 export class CharacterState {
     focusActivated: boolean
     powerActivated: boolean
+    bonusActivated: boolean
+    malusActivated: boolean
     bonus: number
     malus: number
     proficiencies: Map<string, boolean>
@@ -12,10 +14,10 @@ export class CharacterState {
     secret: boolean
 
     constructor(state?: CharacterState, character?: Character) {
-        console.log('state')
-        console.log(character?.pf )
         this.focusActivated = (state && character?.pf && character?.pf >0) ? state.focusActivated : false
         this.powerActivated = (state && character?.pp && character?.pp >0) ? state.powerActivated : false
+        this.bonusActivated = state ? state.bonusActivated : false
+        this.malusActivated = state ? state.malusActivated : false
         this.bonus = state ? state.bonus : 0
         this.malus = state ? state.malus : 0
         this.proficiencies = state ? state.proficiencies : new Map<string, boolean>()

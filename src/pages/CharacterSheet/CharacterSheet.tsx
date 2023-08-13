@@ -1,9 +1,6 @@
 import React, {useEffect} from 'react';
-// @ts-ignore
-import s from './style.module.css';
 import {useDispatch, useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
-import {setCharacter} from "../../data/store/character-slice";
 import {setRolls} from "../../data/store/rolls-slice";
 import RollCard from "../../components/RollCard/RollCard";
 import {Roll} from "../../domain/models/Roll";
@@ -13,7 +10,10 @@ import { CharacterPanel } from '../../components/Character/CharacterPanel/Charac
 import {useSSECharacterByName} from "../../data/api/useSSECharacterByName";
 import {CharacterBanner} from "../../components/Character/CharacterBanner/CharacterBanner";
 import {CharacterNotes} from "../../components/Character/CharacterNotes/CharacterNotes";
-import {Character} from "../../domain/models/Character";
+import {setCharacters} from "../../data/store/character-slice";
+import {CharacterViewModel} from "../../domain/models/CharacterViewModel";
+import {RootState} from "../../data/store";
+import styled from "styled-components";
 
 export function CharacterSheet() {
     const dispatch = useDispatch();
@@ -21,7 +21,7 @@ export function CharacterSheet() {
 
     async function fetchCurrentCharacter() {
         const currentCharacter = await ApiL7RProvider.getCharacterByName(characterName ? characterName : '');
-        dispatch(setCharacter(currentCharacter));
+        dispatch(setCharacters([currentCharacter]));
     }
 
     async function fetchRolls(): Promise<void> {
@@ -42,39 +42,48 @@ export function CharacterSheet() {
     useSSERolls();
 
 
-    const loadingCharacter: boolean = useSelector((store) =>
-        // @ts-ignore
-        store.CHARACTER.loading
+    const loadingCharacter: boolean = useSelector((store: RootState) =>
+        store.CHARACTERS.loading
     );
-    const currentCharacter: Character = useSelector((store) =>
-        // @ts-ignore
-        store.CHARACTER.character
+    const characterViewModel = useSelector((store: RootState) =>
+        store.CHARACTERS.characterViewModels.find((characterViewModel: CharacterViewModel) => characterViewModel.character.name === characterName)
     );
-    const rolls: Roll[] = useSelector((store) =>
-        // @ts-ignore
+    const rolls: Roll[] = useSelector((store: RootState) =>
         store.ROLLS.rolls
     );
+
+    if (!characterViewModel) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <>
             {loadingCharacter ? (
                 <p>Loading...</p>
             ) : (
-                <div className={s.main_container}>
-                    <CharacterBanner/>
+                <MainContainer>
+                    <CharacterBanner character={characterViewModel.character}/>
                     <CharacterNotes/>
-                    <CharacterPanel cardDisplay={false} currentCharacter={currentCharacter}/>
+                    <CharacterPanel cardDisplay={false} characterViewModel={characterViewModel}/>
 
-                    <div className={s.rolls}>
+                    <Rolls>
                         {rolls.map((roll: Roll) => (
                             <div key={roll.id}>
                                 <RollCard roll={roll}/>
                             </div>
                         ))}
-                    </div>
-                </div>
-
+                    </Rolls>
+                </MainContainer>
             )}
         </>
     );
 }
+
+const MainContainer = styled.div`
+`;
+
+const Rolls = styled.div`
+`;
+
+
+

@@ -1,19 +1,19 @@
-import React, {useEffect, useState} from 'react';
-// @ts-ignore
-import s from './style.module.css';
+import React, {useEffect} from 'react';
 import {useParams} from "react-router-dom";
-import {Character} from "../../domain/models/Character";
 import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
 import {useDispatch, useSelector} from "react-redux";
-import {setCharacter} from "../../data/store/character-slice";
+import {setCharacters, setCharacter} from "../../data/store/character-slice";
+import {RootState} from "../../data/store";
+import {CharacterViewModel} from "../../domain/models/CharacterViewModel";
+import styled from "styled-components";
 
 export function CharacterEdition() {
     const dispatch = useDispatch();
     const {characterName} = useParams();
 
     async function fetchCurrentCharacter() {
-        const currentCharacter = await ApiL7RProvider.getCharacterByName(characterName ? characterName : '');
-        dispatch(setCharacter(currentCharacter));
+        const characterToEdit = await ApiL7RProvider.getCharacterByName(characterName ? characterName : '');
+        dispatch(setCharacters([characterToEdit]));
     }
 
 
@@ -22,11 +22,13 @@ export function CharacterEdition() {
         });
     }, []);
 
-    const currentCharacter: Character = useSelector((store) =>
-        // @ts-ignore
-        store.CHARACTER.character
+    const currentCharacter = useSelector((store: RootState) =>
+        store.CHARACTERS.characterViewModels.find((characterViewModel: CharacterViewModel) => characterViewModel.character.name === characterName)?.character
     );
 
+    if(!currentCharacter) {
+        return <div>Loading...</div>;
+    }
 
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,15 +54,15 @@ export function CharacterEdition() {
     }
 
     return (
-        <div className={s.editCharacter}>
-            <form onSubmit={handleSubmit}>
+        <EditCharacterContainer>
+            <Form onSubmit={handleSubmit}>
                 <div>
                     <label>Nom :</label>
-                    <span>{currentCharacter.name}</span> {/* Le nom est non modifiable */}
+                    <span>{currentCharacter.name}</span>
                 </div>
                 <div>
                     <label>Niveau :</label>
-                    <input type="number" name="niveau" value={currentCharacter.niveau} onChange={handleInputChange} />
+                    <Input type="number" name="niveau" value={currentCharacter.niveau} onChange={handleInputChange} />
                 </div>
                 <div>
                     <label>Chair :</label>
@@ -112,11 +114,48 @@ export function CharacterEdition() {
                 </div>
                 <div>
                     <label>Background :</label>
-                    <input name="background" value={currentCharacter.background} onChange={handleInputChange} />
+                    <Input name="background" value={currentCharacter.background} onChange={handleInputChange} />
                 </div>
 
-                <button type="submit">Mettre à jour</button>
-            </form>
-        </div>
+                <Button type="submit">Mettre à jour</Button>
+            </Form>
+        </EditCharacterContainer>
     );
 }
+
+const EditCharacterContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  margin: auto;
+  padding: 20px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+`;
+
+const Form = styled.form`
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+`;
+
+const Input = styled.input`
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+`;
+
+const Button = styled.button`
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: #0056b3;
+    }
+`;

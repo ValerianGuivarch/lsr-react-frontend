@@ -7,8 +7,15 @@ import {Character} from "../../domain/models/Character";
 import {CharacterUpdateRequest} from "./CharacterUpdateRequest";
 import {CharacterRaw} from "./CharacterRaw";
 
+export interface ApiResponse {
+    error: boolean
+    message: string
+}
 export class ApiL7RProvider {
 
+    static async sendNewTurn(): Promise<void> {
+        await L7RApi.sendNewTurn();
+    }
     static async sendRoll(p:
         {
             skillName: string,
@@ -21,14 +28,18 @@ export class ApiL7RProvider {
             malus: number,
             empiriqueRoll?: string
         }
-        ) {
+        ): Promise<ApiResponse> {
         try {
-            console.log('lol3')
             await L7RApi.sendRoll(p);
-            console.log('lol2')
-
+            return {
+                error: false,
+                message: "Roll sent"
+            }
         } catch (e: any) {
-            alert(e.response.data.message);
+            return {
+                error: true,
+                message: e.response.data.message
+            }
         }
     }
     static async getRolls(): Promise<Roll[]> {
@@ -56,8 +67,15 @@ export class ApiL7RProvider {
         return new Character(response);
     }
 
-    static async getSessionCharacters (): Promise<Character[]> {
+    static async getSessionCharacters(): Promise<Character[]> {
         const response = await L7RApi.getSessionCharacter();
+        return response.map((character: CharacterRaw) => {
+            return new Character(character);
+        })
+    }
+
+    static async getControlledCharacters(characterName: string): Promise<Character[]> {
+        const response = await L7RApi.getControlledCharacters(characterName);
         return response.map((character: CharacterRaw) => {
             return new Character(character);
         })

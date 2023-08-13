@@ -1,7 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {Roll} from "../../domain/models/Roll";
 
-interface RollsSliceType {
+export interface RollsSliceType {
   rolls: Roll[];
 }
 

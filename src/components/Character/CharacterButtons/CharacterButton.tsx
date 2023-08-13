@@ -18,7 +18,7 @@ export function CharacterButton(props: CharacterButtonProps) {
     return (
         <MainContainer>
             {props.onClickDecr && (
-                <Change cardDisplay={props.cardDisplay} left={true} onClick={props.onClickDecr}>
+                <Change card={props.cardDisplay} left={true} onClick={props.onClickDecr}>
                     <FaMinus />
                 </Change>
             )}
@@ -37,13 +37,13 @@ export function CharacterButton(props: CharacterButtonProps) {
                 )}
             </ButtonSelectable>
             {props.onClickIncr && (
-                <Change cardDisplay={props.cardDisplay} left={false} onClick={props.onClickIncr}>
+                <Change card={props.cardDisplay} left={false} onClick={props.onClickIncr}>
                     <FaPlus />
                 </Change>
             )}
         </MainContainer>
     );
-};
+}
 
 
 const MainContainer = styled.div`
@@ -51,20 +51,20 @@ const MainContainer = styled.div`
   align-items: center;
 `;
 
-const Change = styled.div<{ cardDisplay: boolean, left: boolean }>`
+const Change = styled.div<{ card: boolean, left: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: ${(props) => (props.cardDisplay ? '8px' : '24px')};
-  height: ${(props) => (props.cardDisplay ? '8px' : '24px')};
+  width: ${(props) => (props.card ? '8px' : '24px')};
+  height: ${(props) => (props.card ? '8px' : '24px')};
   border-radius: 50%;
   background-color: #f0f0f0;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transform: perspective(1px) scale(1.02);
   transition: transform 0.3s ease;
-  margin-right: ${(props) => (props.cardDisplay ? (props.left ? '0px' : '4px') : (props.left ? '4px' : '8px'))};
-  margin-left: ${(props) => (props.cardDisplay ? (props.left ? '4px' : '0px') : (props.left ? '8px' : '4px'))};
+  margin-right: ${(props) => (props.card ? (props.left ? '0px' : '4px') : (props.left ? '4px' : '8px'))};
+  margin-left: ${(props) => (props.card ? (props.left ? '4px' : '0px') : (props.left ? '8px' : '4px'))};
 
   &:hover {
     transform: perspective(1px) scale(1.05);

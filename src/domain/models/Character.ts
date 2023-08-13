@@ -6,6 +6,7 @@ import {DisplayCategory} from "./DisplayCategory";
 import {Proficiency} from "./Proficiency";
 import {Apotheose} from "./Apotheose";
 import {UtilsString} from "../../utils/UtilsString";
+import {ApotheoseState} from "./ApotheoseState";
 
 export class Character {
     name: string
@@ -40,7 +41,7 @@ export class Character {
     secunda: string
     notes: string
     category: string
-    apotheoseName: string
+    apotheoseName: string | null
     apotheoseImprovement?: string
     apotheoseImprovementList: string[]
     genre: Genre
@@ -55,10 +56,12 @@ export class Character {
     skills: Skill[]
     proficiencies: Proficiency[]
     apotheoses: Apotheose[]
+    apotheoseState: ApotheoseState
     rest: number
     longRest: number
 
     constructor(p: CharacterRaw) {
+        this.apotheoseState = ApotheoseState[p.apotheoseState  as keyof typeof ApotheoseState]
         this.skills = p.skills.map(s => new Skill(s))
         this.proficiencies = p.proficiencies.map(s => new Proficiency(s))
         this.apotheoses = p.apotheoses.map(s => new Apotheose(s))

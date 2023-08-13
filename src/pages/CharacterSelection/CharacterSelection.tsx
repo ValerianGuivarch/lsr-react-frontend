@@ -5,6 +5,7 @@ import {CharacterPreview} from "../../domain/models/CharacterPreview";
 import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
 import {setPreviewPjsList} from "../../data/store/preview-pjs-slice";
 import styled from "styled-components";
+import {RootState} from "../../data/store";
 
 
 export default function CharacterSelection() {
@@ -20,12 +21,11 @@ export default function CharacterSelection() {
     }, []);
 
 
-    // @ts-ignore
-    const pjsList = useSelector((store) => store.PREVIEW_PJS.previewPjsList);
+    const pjsList = useSelector((store: RootState) => store.PREVIEW_PJS.previewPjsList);
     const [selectedPlayerName, setSelectedPlayerName] = React.useState<string>("");
     const [selectedName, setSelectedName] = React.useState<string>("");
     const navigate = useNavigate();
-    const playerNames: string[] = Array.from(new Set(pjsList.map((item: CharacterPreview) => item.playerName)));
+    const playerNames: string[] = Array.from(new Set(pjsList.map((item: CharacterPreview) => item.playerName))) as string[];
     const handlePlayerNameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedPlayerName(event.target.value);
         setSelectedName("");

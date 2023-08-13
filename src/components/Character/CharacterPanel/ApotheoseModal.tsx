@@ -3,57 +3,65 @@ import {ApiL7RProvider} from "../../../data/api/ApiL7RProvider";
 import ReactModal from "react-modal";
 import {Character} from "../../../domain/models/Character";
 import {ModalDisplay, ModalEmpiriqueButtonValidation, ModalDisplayTitle} from "./ModalStyle";
+import {Apotheose} from "../../../domain/models/Apotheose";
 
-export function LongRestModal (props : {
+export function ApotheoseModal (props : {
     currentCharacter: Character,
+    apotheose: Apotheose
     isOpen: boolean,
-    onRequestClose: () => void
+    onRequestClose: () => void,
+    stopApotheose: () => void
 }) {
-    const [longRestValue, setLongRestValue] = useState<number>(props.currentCharacter.longRest);
+    const [apotheoseValue, setApotheoseValue] = useState<number>(props.apotheose.cost);
 
     const closing = () => {
-        setLongRestValue(props.currentCharacter.longRest);
+        setApotheoseValue(props.apotheose.cost);
         props.onRequestClose();
+    }
+    const stop = () => {
+        setApotheoseValue(props.apotheose.cost);
+        props.stopApotheose();
     }
     return (
         <ReactModal
             isOpen={props.isOpen}
             onRequestClose={closing}
-            contentLabel="Repos Long"
+            contentLabel="Apotheose"
         >
             <ModalDisplay>
-                <ModalDisplayTitle>Repos : {longRestValue} / {props.currentCharacter.longRest}</ModalDisplayTitle>
+                <ModalDisplayTitle>Cout de l'apothéose : {apotheoseValue} / {props.apotheose.cost}</ModalDisplayTitle>
                 <button onClick={() => {
-                    if(props.currentCharacter.pv > 0 && longRestValue > 0) {
+                    if(props.currentCharacter.pv > 0 && apotheoseValue > 0) {
                         ApiL7RProvider.updateCharacter({
                             ...props.currentCharacter,
                             pv: props.currentCharacter.pv - 1
                         }).then(() => {
-                            setLongRestValue(longRestValue - 1);
+                            setApotheoseValue(apotheoseValue - 1);
                         })
                     }
                 }}>PV : {props.currentCharacter.pv} / {props.currentCharacter.pvMax}</button>
                 <button onClick={() => {
-                    if(props.currentCharacter.pf > 0 && longRestValue > 0) {
+                    if(props.currentCharacter.pf > 0 && apotheoseValue > 0) {
                         ApiL7RProvider.updateCharacter({
                             ...props.currentCharacter,
                             pf: props.currentCharacter.pf - 1
                         }).then(() => {
-                            setLongRestValue(longRestValue - 1);
+                            setApotheoseValue(apotheoseValue - 1);
                         })
                     }
                 }}>PF : {props.currentCharacter.pf} / {props.currentCharacter.pfMax}</button>
                 <button onClick={() => {
-                    if(props.currentCharacter.pp > 0 && longRestValue > 0) {
+                    if(props.currentCharacter.pp > 0 && apotheoseValue > 0) {
                         ApiL7RProvider.updateCharacter({
                             ...props.currentCharacter,
                             pp: props.currentCharacter.pp - 1
                         }).then(() => {
-                            setLongRestValue(longRestValue - 1);
+                            setApotheoseValue(apotheoseValue - 1);
                         })
                     }
                 }}>PP : {props.currentCharacter.pp} / {props.currentCharacter.ppMax}</button>
-                <ModalEmpiriqueButtonValidation onClick={closing}>Valider</ModalEmpiriqueButtonValidation>
+                <ModalEmpiriqueButtonValidation onClick={closing}>Continuer</ModalEmpiriqueButtonValidation>
+                <ModalEmpiriqueButtonValidation onClick={stop}>Arrêter</ModalEmpiriqueButtonValidation>
             </ModalDisplay>
         </ReactModal>
     )

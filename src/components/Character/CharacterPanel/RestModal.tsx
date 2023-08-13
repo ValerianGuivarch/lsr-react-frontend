@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {ApiL7RProvider} from "../../../data/api/ApiL7RProvider";
 import ReactModal from "react-modal";
 import {Character} from "../../../domain/models/Character";
-import {ModalEmpirique, ModalEmpiriqueButtonValidation, ModalEmpiriqueTitle} from "./ModalStyle";
+import {ModalDisplay, ModalEmpiriqueButtonValidation, ModalDisplayTitle} from "./ModalStyle";
 
 export function RestModal (props : {
     currentCharacter: Character,
@@ -20,15 +20,15 @@ export function RestModal (props : {
             onRequestClose={closing}
             contentLabel="Repos"
         >
-            <ModalEmpirique>
-            <ModalEmpiriqueTitle>Repos : {restValue} / {props.currentCharacter.rest}</ModalEmpiriqueTitle>
+            <ModalDisplay>
+            <ModalDisplayTitle>Repos : {restValue} / {props.currentCharacter.rest}</ModalDisplayTitle>
             <button onClick={() => {
                 if(props.currentCharacter.pv < props.currentCharacter.pvMax && restValue > 0) {
-                    setRestValue(restValue - 1);
                     ApiL7RProvider.updateCharacter({
                         ...props.currentCharacter,
                         pv: props.currentCharacter.pv + 1
                     }).then(() => {
+                        setRestValue(restValue - 1);
                     })
                 }
             }}>PV : {props.currentCharacter.pv} / {props.currentCharacter.pvMax}</button>
@@ -53,7 +53,7 @@ export function RestModal (props : {
                 }
             }}>PP : {props.currentCharacter.pp} / {props.currentCharacter.ppMax}</button>
             <ModalEmpiriqueButtonValidation onClick={closing}>Valider</ModalEmpiriqueButtonValidation>
-            </ModalEmpirique>
+            </ModalDisplay>
         </ReactModal>
     )
 }

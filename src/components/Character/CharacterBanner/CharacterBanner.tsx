@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import {useSelector} from 'react-redux';
 import { FaPenToSquare } from 'react-icons/fa6';
 import { Character } from '../../../domain/models/Character';
 
-export function CharacterBanner() {
+export function CharacterBanner(props: {
+    character: Character;
+}) {
     const [isEditButtonVisible, setIsEditButtonVisible] = useState(false);
-    const character: Character = useSelector(
-        // @ts-ignore
-        (store) => store.CHARACTER.character
-    );
 
     const handleMouseEnter = () => {
         setIsEditButtonVisible(true);
@@ -21,12 +18,12 @@ export function CharacterBanner() {
 
     return (
         <CharacterBannerBox>
-            <CharacterBackground src={character.background} alt="Background" />
+            <CharacterBackground src={props.character.background} alt="Background" />
             <CharacterBannerContainer>
-                {character.apotheoseName ? (
-                    <CharacterAvatar src={character.pictureApotheose} alt="Avatar" />
+                {props.character.apotheoseName ? (
+                    <CharacterAvatar src={props.character.pictureApotheose} alt="Avatar" />
                 ) : (
-                    <CharacterAvatar src={character.picture} alt="Avatar" />
+                    <CharacterAvatar src={props.character.picture} alt="Avatar" />
                 )}
                 <CharacterListInfo
                     onMouseEnter={handleMouseEnter}
@@ -35,21 +32,21 @@ export function CharacterBanner() {
                     {isEditButtonVisible && (
                         <EditCharacterIcon
                             onClick={() => {
-                                window.location.href = `/characters/${character.name}/edit`;
+                                window.location.href = `/characters/${props.character.name}/edit`;
                             }}
                         />
                     )}
                     <CharacterName>
-                        {Character.getDisplayNameAndDescription(character)}
+                        {Character.getDisplayNameAndDescription(props.character)}
                     </CharacterName>
-                    <CharacterInfo>Lux: {character.lux}</CharacterInfo>
-                    <CharacterInfo>Umbra: {character.umbra}</CharacterInfo>
-                    <CharacterInfo>Secunda: {character.secunda}</CharacterInfo>
+                    <CharacterInfo>Lux: {props.character.lux}</CharacterInfo>
+                    <CharacterInfo>Umbra: {props.character.umbra}</CharacterInfo>
+                    <CharacterInfo>Secunda: {props.character.secunda}</CharacterInfo>
                 </CharacterListInfo>
             </CharacterBannerContainer>
         </CharacterBannerBox>
     );
-};
+}
 
 
 const CharacterBannerBox = styled.div`
@@ -100,7 +97,7 @@ const EditCharacterIcon = styled(FaPenToSquare)`
   position: absolute;
   top: 0;
   right: 0;
-  margin: 1rem 3rem 0 0;
+  margin: 1rem 1rem 0 0;
   padding: 0.5rem;
   border-radius: 0.5rem;
   background-color: #ccc;

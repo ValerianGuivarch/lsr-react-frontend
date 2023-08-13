@@ -2,20 +2,21 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import config from '../../config/config';
 import {Character} from "../../domain/models/Character";
-import {setCharacter} from "../store/character-slice";
+import {CharacterRaw} from "./CharacterRaw";
+import {setCharacters} from "../store/character-slice";
 
-export function useSSECharacterByName(props: { name: string }) {
+export function useSSECharactersControlled(props: { name: string }) {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const eventSource = new EventSource(`${config.BASE_URL}/sse/characters/${props.name}`);
+        const eventSource = new EventSource(`${config.BASE_URL}/sse/characters/${props.name}/characters-controller`);
 
         eventSource.onmessage = (event) => {
             try {
-                console.log("SSE character");
+                console.log("SSE controlled characters");
                 console.log(event.data);
-                const character = new Character(JSON.parse(event.data.substring(6)));
-                dispatch(setCharacter(character));
+                const characters = JSON.parse(event.data.substring(6)).map((c: CharacterRaw) =>  new Character(c));
+                dispatch(setCharacters(characters));
             } catch (error) {
                 console.error('Error parsing SSE data:', error);
             }

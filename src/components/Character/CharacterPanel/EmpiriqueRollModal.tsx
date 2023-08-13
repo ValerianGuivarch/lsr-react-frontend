@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import ReactModal from 'react-modal';
 import { Character } from '../../../domain/models/Character';
 import {
-    ModalEmpirique,
+    ModalDisplay,
     ModalEmpiriqueButtonCancel,
     ModalEmpiriqueButtonValidation,
-    ModalEmpiriqueTitle
+    ModalDisplayTitle
 } from "./ModalStyle";
 
 export interface EmpiriqueRollModalProps {
@@ -33,8 +33,8 @@ export function EmpiriqueRollModal(props: EmpiriqueRollModalProps) {
             onRequestClose={props.onRequestClose}
             contentLabel="Jet Empirique"
         >
-            <ModalEmpirique>
-                <ModalEmpiriqueTitle>Jet Empirique</ModalEmpiriqueTitle>
+            <ModalDisplay>
+                <ModalDisplayTitle>Jet Empirique</ModalDisplayTitle>
                 <input
                     type="text"
                     value={empiriqueValue}
@@ -46,7 +46,7 @@ export function EmpiriqueRollModal(props: EmpiriqueRollModalProps) {
                 <ModalEmpiriqueButtonCancel onClick={props.onRequestClose}>
                     Annuler
                 </ModalEmpiriqueButtonCancel>
-            </ModalEmpirique>
+            </ModalDisplay>
         </ReactModal>
     );
 };

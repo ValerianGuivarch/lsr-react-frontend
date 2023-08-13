@@ -7,6 +7,10 @@ import {CharacterUpdateRequest} from "./CharacterUpdateRequest";
 import {RollRaw} from "./RollRaw";
 
 export class L7RApi {
+
+    static async sendNewTurn(): Promise<void> {
+        await axios.put(`${config.BASE_URL}/mj/newTurn`);
+    }
     static async getPJs(): Promise<CharacterPreviewRaw[]> {
         const response = await axios.get(`${config.BASE_URL}/characters?category=PJ`);
         return response.data;
@@ -23,6 +27,11 @@ export class L7RApi {
 
     static async getSessionCharacter (): Promise<CharacterRaw[]> {
         const response = await axios.get(`${config.BASE_URL}/mj/characters`);
+        return response.data;
+    }
+
+    static async getControlledCharacters (characterName: string): Promise<CharacterRaw[]> {
+        const response = await axios.get(`${config.BASE_URL}/characters/`+characterName+`/characters-controller`);
         return response.data;
     }
 
@@ -44,8 +53,6 @@ export class L7RApi {
             empiriqueRoll?: string
         }
         ): Promise<void> {
-        console.log("lul1")
-        try {
             await axios.post(`${config.BASE_URL}/rolls`, {
                 skillName: p.skillName,
                 rollerName: p.characterName,
@@ -57,11 +64,5 @@ export class L7RApi {
                 malus: p.malus,
                 empiriqueRoll: p.empiriqueRoll
             });
-        } catch (e: any) {
-            console.log('error')
-            console.log(e)
-        }
-
-        console.log("lul2")
     }
 }

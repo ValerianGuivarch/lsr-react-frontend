@@ -5,8 +5,9 @@ export class CharacterViewModel {
     character: Character
     state: CharacterState
 
-    constructor(p: Character) {
-        this.character = p
-        this.state = new CharacterState()
+    constructor(character: Character, state?: CharacterState) {
+        console.log("LUL")
+        this.character = character
+        this.state = state ? state : new CharacterState()
     }
 }

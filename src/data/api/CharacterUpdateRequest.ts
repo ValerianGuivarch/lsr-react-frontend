@@ -18,12 +18,14 @@ export class CharacterUpdateRequest {
     umbra: string
     secunda: string
     notes: string
-    apotheoseName: string
+    apotheoseName: string | null
     apotheoseImprovement?: string
     apotheoseImprovementList: string[]
     relance: number
+    apotheoseState: string
 
     constructor(character: Character) {
+        this.apotheoseState = character.apotheoseState
         this.chair = character.chair
         this.esprit = character.esprit
         this.essence = character.essence

@@ -1,14 +1,18 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { previewPjsReducer } from "./preview-pjs-slice";
-import {characterReducer} from "./character-slice";
-import {rollsReducer} from "./rolls-slice";
-import {mjReducer} from "./mj-slice";
+import {previewPjsReducer, PreviewPjsSliceType} from "./preview-pjs-slice";
+import {rollsReducer, RollsSliceType} from "./rolls-slice";
+import {CharacterSliceType, charactersReducer} from "./character-slice";
 
 export const store = configureStore({
     reducer: {
         PREVIEW_PJS: previewPjsReducer,
-        CHARACTER: characterReducer,
+        CHARACTERS: charactersReducer,
         ROLLS: rollsReducer,
-        MJ: mjReducer,
     },
 });
+
+export interface RootState {
+    PREVIEW_PJS: PreviewPjsSliceType;
+    CHARACTERS: CharacterSliceType;
+    ROLLS: RollsSliceType;
+}

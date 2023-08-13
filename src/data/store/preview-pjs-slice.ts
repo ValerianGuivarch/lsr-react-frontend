@@ -1,7 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {CharacterPreviewRaw} from "../api/CharacterPreviewRaw";
 
-interface PreviewPjsSliceType {
+export interface PreviewPjsSliceType {
   previewPjsList: CharacterPreviewRaw[];
 }
 

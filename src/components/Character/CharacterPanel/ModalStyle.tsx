@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const ModalEmpirique = styled.div`
+export const ModalDisplay = styled.div`
   background: white;
   display: flex;
   flex-direction: column;
@@ -16,7 +16,7 @@ export const ModalEmpirique = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
-export const ModalEmpiriqueTitle = styled.div`
+export const ModalDisplayTitle = styled.div`
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 16px;
