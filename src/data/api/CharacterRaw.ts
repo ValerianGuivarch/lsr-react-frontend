@@ -22,6 +22,9 @@ export interface CharacterRaw {
     chair: number
     esprit: number
     essence: number
+    chairBonus: number
+    espritBonus: number
+    essenceBonus: number
     pv: number
     pvMax: number
     pf: number

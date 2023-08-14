@@ -168,6 +168,7 @@ export function CharacterPanel(props: {
                         cardDisplay={props.cardDisplay}
                         name={props.cardDisplay ? "ch" : "chair"}
                         value={currentCharacter.chair}
+                        bonusValue={currentCharacter.chairBonus}
                         onClickBtn={() => {
                             sendRoll("chair");
                         }}
@@ -229,6 +230,7 @@ export function CharacterPanel(props: {
                         cardDisplay={props.cardDisplay}
                         name={props.cardDisplay ? "sp" : "esprit"}
                         value={currentCharacter.esprit}
+                        bonusValue={currentCharacter.espritBonus}
                         onClickBtn={() => {
                             sendRoll("esprit");
                         }}
@@ -291,6 +293,7 @@ export function CharacterPanel(props: {
                         cardDisplay={props.cardDisplay}
                         name={props.cardDisplay ? "es" : "essence"}
                         value={currentCharacter.essence}
+                        bonusValue={currentCharacter.essenceBonus}
                         onClickBtn={() => {
                             sendRoll("essence");
                         }}

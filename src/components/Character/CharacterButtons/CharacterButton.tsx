@@ -11,6 +11,7 @@ interface CharacterButtonProps {
     selected?: boolean;
     value?: number;
     maxValue?: number;
+    bonusValue? : number;
     icon?: IconType;
     onClickDecr?: () => void;
     onClickBtn?: () => void;
@@ -20,7 +21,7 @@ interface CharacterButtonProps {
 export function CharacterButton(props: CharacterButtonProps) {
     const shouldDisplayIcon = props.value === 0 && props.icon;
     return (
-        <MainContainer>
+        <MainContainer card={props.cardDisplay}>
             {props.onClickDecr && (
                 <Change card={props.cardDisplay} left={true} onClick={props.onClickDecr}>
                     <FaMinus />
@@ -42,6 +43,7 @@ export function CharacterButton(props: CharacterButtonProps) {
                         {props.value !== undefined && (
                             <div>
                                 {props.value}
+                                {props.bonusValue ? ` (+${props.bonusValue})` : ''}
                                 {props.maxValue && ` / ${props.maxValue}`}
                             </div>
                         )}
@@ -58,9 +60,10 @@ export function CharacterButton(props: CharacterButtonProps) {
 }
 
 
-const MainContainer = styled.div`
+const MainContainer = styled.div<{ card: boolean }>`
   display: flex;
   align-items: center;
+  margin: ${(props) => (props.card ? '0' : '0 6px 0 6px;')};
 `;
 
 const Change = styled.div<{ card: boolean, left: boolean }>`

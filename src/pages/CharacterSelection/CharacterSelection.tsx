@@ -43,8 +43,10 @@ export default function CharacterSelection() {
                 <label>
                     Player Name:
                     <select value={selectedPlayerName} onChange={handlePlayerNameChange}>
-                        <option value="">Select Player Name</option>
-                        {playerNames.map((playerName: string, index: number) => (
+                        <option value="">Joueuse</option>
+                        {playerNames
+                            .sort()
+                            .map((playerName: string, index: number) => (
                             <option key={index} value={playerName}>
                                 {playerName}
                             </option>
@@ -55,9 +57,10 @@ export default function CharacterSelection() {
                 <label>
                     Name:
                     <select value={selectedName} onChange={handleNameChange} disabled={!selectedPlayerName}>
-                        <option value="">Select Name</option>
+                        <option value="">Personnage</option>
                         {pjsList
                             .filter((item: any) => item.playerName === selectedPlayerName)
+                            .sort()
                             .map((item: any, index: number) => (
                                 <option key={index} value={item.name}>
                                     {item.name}
@@ -75,7 +78,7 @@ export default function CharacterSelection() {
                 <p>OU</p>
                 <button
                     onClick={() => {
-                        const confirmed = window.confirm("Êtes-vous sûr de vouloir devenir MJ ?");
+                        const confirmed = window.confirm("Tu es sûr d'avoir le droit d'être MJ ?");
                         if (confirmed) {
                             navigate("/mj/")
                         }

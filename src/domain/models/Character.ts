@@ -26,6 +26,9 @@ export class Character {
     chair: number
     esprit: number
     essence: number
+    chairBonus: number
+    espritBonus: number
+    essenceBonus: number
     pv: number
     pvMax: number
     pf: number
@@ -74,6 +77,9 @@ export class Character {
         this.chair = p.chair
         this.esprit = p.esprit
         this.essence = p.essence
+        this.chairBonus = p.chairBonus
+        this.espritBonus = p.espritBonus
+        this.essenceBonus = p.essenceBonus
         this.pv = p.pv
         this.pvMax = p.pvMax
         this.pf = p.pf
