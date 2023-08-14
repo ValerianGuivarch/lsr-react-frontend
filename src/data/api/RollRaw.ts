@@ -19,4 +19,5 @@ export interface RollRaw {
     empirique?: string;
     display: string;
     stat: string;
+    resistRolls: RollRaw[];
 }

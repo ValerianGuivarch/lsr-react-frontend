@@ -22,6 +22,7 @@ export class Roll {
   empirique?: string;
   stat?: SkillStat;
   display: string;
+  resistRolls: Roll[];
 
   constructor(p: RollRaw) {
     this.id = p.id;
@@ -44,5 +45,6 @@ export class Roll {
     this.empirique = p.empirique;
     this.display = p.display;
     this.stat = SkillStat[p.stat  as keyof typeof SkillStat];
+    this.resistRolls = p.resistRolls.map(r => new Roll(r));
   }
 }

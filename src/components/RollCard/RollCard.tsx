@@ -8,12 +8,13 @@ import styled from "styled-components";
 function Dice(props: { value: number }) {
     const DiceIcon = [FaDiceOne, FaDiceTwo, FaDiceThree, FaDiceFour, FaDiceFive, FaDiceSix][props.value - 1];
 
-    return <DiceIcon size="2em" />;
+    return <DiceIcon size="2em"/>;
 }
 
 
 export interface RollCardProps {
-    roll: Roll
+    roll: Roll,
+    clickOnResist?: (stat: "chair"|"esprit"|"essence", resistRoll: string) => void
 }
 
 function getRollEffectText(roll: Roll) {
@@ -47,61 +48,92 @@ export default function RollCard(props: RollCardProps) {
     const displayParts = roll.display.split('*');
     return (
         <Container>
-            <Avatar src={props.roll.picture} alt={props.roll.rollerName} />
+            <Avatar src={props.roll.picture} alt={props.roll.rollerName}/>
             <RollDisplay>
                 <TextPartOne>
-                <span>{roll.secret ? '(secret) ' : ''} </span>
-                <span><b>{roll.rollerName.split(' ')
-                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ')} </b></span>
-                <span>
-                {displayParts.map((part, index) => {
-                    if (index % 2 === 1) {
-                        // Met en gras le texte entre les astérisques
-                        return <em key={index}>{part}</em>;
-                    } else {
-                        return <span key={index}>{part}</span>;
+                    <span>{roll.secret ? '(secret) ' : ''} </span>
+                    <span>
+                        <b>
+                            {roll.rollerName
+                                .split(' ')
+                                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                .join(' ') + ' '
+                            }
+                        </b>
+                    </span>
+                    <span>
+                        {
+                            displayParts.map((part, index) => {
+                                if (index % 2 === 1) {
+                                    return <em key={index}>{part}</em>;
+                                } else {
+                                    return <span key={index}>{part}</span>;
+                                }
+                            })
+                        }
+                    </span>
+                    <span>
+                        {getRollEffectText(roll)}
+                    </span>
+                    {
+                        roll.success !== null
+                            ? <span>
+                                {' et obtient '}
+                                <em>{roll.success}</em>
+                                {' succès.'}
+                                </span>
+                            : roll.stat === SkillStat.CUSTOM ?
+                                <span>
+                                    <em>{roll.data}</em>
+                                    {'.'}
+                                </span>
+                                : '.'
                     }
-                })}
-    </span>
-                <span>
-                {getRollEffectText(roll)}
-            </span>
-                {
-                    roll.success !== null ? <span>
-                        {' et obtient '}
-                        <em>{roll.success}</em>
+                    {
+                        (roll.stat && props.clickOnResist && (roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)) &&
+                        <>
+                            (<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist("chair", roll.id)}>R-Chair</ClickableStat>,
+                            <ClickableStat onClick={() => props.clickOnResist && props.clickOnResist("esprit", roll.id)}>R-Esprit</ClickableStat>,
+                            <ClickableStat onClick={() => props.clickOnResist && props.clickOnResist("essence", roll.id)}>R-Essence</ClickableStat>)
+                        </>
 
-                        {' succès.'}
-                    </span> : '.'
-                }
+                    }
                 </TextPartOne>
                 {
                     roll.displayDices && <DicesDisplay>
-                    {
-                        roll.result.map((dice, index) => {
-                            if(roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)
-                                return <Dice value={dice} key={index}/>
-                            else if(roll.stat === SkillStat.EMPIRIQUE)
-                                return <span key={index}>[{dice}]</span>
-                        })
-                    }
+                        {
+                            roll.result.map((dice, index) => {
+                                if (roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)
+                                    return <Dice value={dice} key={index}/>
+                                else if (roll.stat === SkillStat.EMPIRIQUE || roll.stat === SkillStat.CUSTOM)
+                                    return <span key={index}>[{dice}]</span>
+                            })
+                        }
                     </DicesDisplay>
                 }
+                <Rolls>
+                    {roll.resistRolls && roll.resistRolls.map((roll: Roll) => (
+                        <div key={roll.id}>
+                            <RollCard roll={roll} clickOnResist={undefined}/>
+                        </div>
+                    ))}
+                </Rolls>
             </RollDisplay>
         </Container>
     );
 }
 
 const Container = styled.div`
-    display: flex;
+  display: flex;
+  border-top: 1px solid #ccc;
+  padding: 6px 6px 2px 6px;
 `;
 
 const Avatar = styled.img`
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 20px;
 `;
 
 const RollDisplay = styled.div`
@@ -112,3 +144,26 @@ const TextPartOne = styled.div`
 
 const DicesDisplay = styled.div`
 `;
+
+const ClickableStat = styled.span`
+  color: #007BFF;  // Typical hyperlink blue color
+  font-weight: bold;
+  text-decoration: none;  // Links might not always be underlined
+  cursor: pointer;
+
+  &:hover {
+    color: #0056b3;  // Darken the color a bit on hover
+    text-decoration: underline;
+  }
+
+  &:active {
+    color: #004085;  // Further darken for active state
+  }
+`;
+
+
+const Rolls = styled.div`
+`;
+
+
+

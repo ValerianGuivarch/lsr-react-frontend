@@ -18,6 +18,7 @@ import {CharacterViewModel} from "../../../domain/models/CharacterViewModel";
 import {setStateForCharacter} from "../../../data/store/character-slice";
 import {ApotheoseState} from "../../../domain/models/ApotheoseState";
 import {ApotheoseModal} from "./ApotheoseModal";
+import { FaSkullCrossbones } from 'react-icons/fa';
 
 export function CharacterPanel(props: {
     cardDisplay: boolean,
@@ -48,11 +49,8 @@ export function CharacterPanel(props: {
             malus: malus,
             empiriqueRoll: empiriqueRoll
         }).then((response) => {
-            console.log("arg1");
             if(response.error) {
-                console.log("arg2");
                 alert(response.message);
-                console.error(response.message);
             } else {
             dispatch(setStateForCharacter({
                 characterName: currentCharacter.name,
@@ -93,7 +91,13 @@ export function CharacterPanel(props: {
                         <CharacterButton
                             cardDisplay={props.cardDisplay}
                             key={skill.name}
-                            name={props.cardDisplay ? skill.shortName : skill.name}
+                            description={skill.description}
+                            name={
+                                (props.cardDisplay ? skill.shortName : (skill.longName ? skill.longName : skill.name))
+                                + (skill.dailyUse !== null ? (
+                                    " ("+skill.dailyUse+")"
+                                ) : "")
+                        }
                             onClickBtn={() => {
                                 sendRoll(skill.name);
                             }}
@@ -104,6 +108,7 @@ export function CharacterPanel(props: {
                             cardDisplay={props.cardDisplay}
                             selected={state.proficiencies.get(proficiency.name)}
                             key={proficiency.name}
+                            description={proficiency.description}
                             name={props.cardDisplay ? proficiency.shortName :proficiency.name}
                             onClickBtn={() => {
                                 dispatch(setStateForCharacter({
@@ -121,10 +126,10 @@ export function CharacterPanel(props: {
                             cardDisplay={props.cardDisplay}
                             selected={currentCharacter.apotheoseName === apotheose.name}
                             key={apotheose.name}
+                            description={apotheose.description}
                             name={props.cardDisplay ? apotheose.shortName :apotheose.name}
                             onClickBtn={() => {
                                 if(currentCharacter.apotheoseName === null) {
-                                    console.log("arg31");
                                     ApiL7RProvider.updateCharacter({
                                         ...currentCharacter,
                                         apotheoseName: apotheose.name
@@ -174,6 +179,7 @@ export function CharacterPanel(props: {
                         selected={false}
                         value={currentCharacter.pv}
                         maxValue={currentCharacter.pvMax}
+                        icon={FaSkullCrossbones}
                         onClickIncr={() => {
                             ApiL7RProvider.updateCharacter({
                                 ...currentCharacter,
@@ -190,7 +196,9 @@ export function CharacterPanel(props: {
                             })
                         }}
                         onClickBtn={() => {
-                            // TODO jet de sauv vs la mort si 0
+                            if(currentCharacter.pv === 0) {
+                                sendRoll("KO");
+                            }
                         }}/>
                     <CharacterButton
                         cardDisplay={props.cardDisplay}
@@ -398,7 +406,9 @@ export function CharacterPanel(props: {
                         cardDisplay={props.cardDisplay}
                         name={props.cardDisplay ? "rp" : "repos"}
                         onClickBtn={() => {
+                            ApiL7RProvider.rest(currentCharacter).then(() => {
                             setIsRestModalOpen(true);
+                        })
                         }}
                     />
                     {!props.cardDisplay && (
@@ -412,11 +422,12 @@ export function CharacterPanel(props: {
                                 pv: currentCharacter.pvMax,
                                 pf: currentCharacter.pfMax,
                                 pp: currentCharacter.ppMax,
-                                apotheoseState: ApotheoseState.NONE,
-                                apotheoseName: null
                             }).then(() => {
+                                ApiL7RProvider.rest(currentCharacter).then(() => {
+                                setIsLongRestModalOpen(true);
                             })
-                            setIsLongRestModalOpen(true);
+                            })
+
                         }}
                     />
                         )}
@@ -433,7 +444,7 @@ export function CharacterPanel(props: {
                 <CharacterBlockBtn
                     
                     displayCategory={DisplayCategory.ARCANES}
-                    displayCategoryName={"Arcanes"}
+                    displayCategoryName={"Arcanes " + currentCharacter.arcanes + "/" + currentCharacter.arcanesMax}
                     cardDisplay={props.cardDisplay}/>
             )}
             {Character.hasDisplayCategory(currentCharacter, DisplayCategory.PACIFICATEURS) && (
@@ -516,6 +527,7 @@ const CharacterApotheose = styled.div`
 const ButtonsRow = styled.div<{ cardDisplay: boolean }>`
     display: ${(props) => (props.cardDisplay ? 'inline-flex' : 'flex')};
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: center;
     margin-bottom: ${(props) => (props.cardDisplay ? '0px' : '4px')};
 `;

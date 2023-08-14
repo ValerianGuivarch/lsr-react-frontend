@@ -1,20 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FaMinus, FaPlus } from 'react-icons/fa';
+import {IconType} from "react-icons";
 
 interface CharacterButtonProps {
     cardDisplay: boolean;
+    description?: string;
     column?: boolean;
     name: string;
     selected?: boolean;
     value?: number;
     maxValue?: number;
+    icon?: IconType;
     onClickDecr?: () => void;
     onClickBtn?: () => void;
     onClickIncr?: () => void;
 }
 
 export function CharacterButton(props: CharacterButtonProps) {
+    const shouldDisplayIcon = props.value === 0 && props.icon;
     return (
         <MainContainer>
             {props.onClickDecr && (
@@ -26,14 +30,22 @@ export function CharacterButton(props: CharacterButtonProps) {
                 columnDisplay={props.column || false}
                 cardDisplay={props.cardDisplay}
                 selected={props.selected}
+                title={props.description}
                 onClick={props.onClickBtn}
             >
-                <ButtonName>{props.name}&nbsp; </ButtonName>
-                {props.value && (
-                    <div>
-                        {props.value}
-                        {props.maxValue && ` / ${props.maxValue}`}
-                    </div>
+                {shouldDisplayIcon ? (
+                    <IconContainer>
+                        <span>&nbsp;</span>{React.createElement(props.icon!)}<span>&nbsp;</span></IconContainer>
+                ) : (
+                    <>
+                    <ButtonName>{props.name}&nbsp;</ButtonName>
+                        {props.value !== undefined && (
+                            <div>
+                                {props.value}
+                                {props.maxValue && ` / ${props.maxValue}`}
+                            </div>
+                        )}
+                    </>
                 )}
             </ButtonSelectable>
             {props.onClickIncr && (
@@ -100,4 +112,12 @@ const ButtonSelectable = styled.div<{ cardDisplay: boolean, columnDisplay: boole
 const ButtonName = styled.div`
   font-weight: bold;
   margin: 2px 0 2px 0;
+`;
+
+const IconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
 `;

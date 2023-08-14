@@ -4,11 +4,17 @@ import {DisplayCategory} from "./DisplayCategory";
 export class Skill {
     name: string
     shortName: string
+    longName?: string
+    description?: string
     displayCategory: DisplayCategory
+    dailyUse?: number
     constructor(p: SkillRaw) {
         this.name = p.name
         this.shortName = p.shortName
+        this.longName = p.longName
+        this.description = p.description
         this.displayCategory = DisplayCategory[p.displayCategory as keyof typeof DisplayCategory]
+        this.dailyUse = p.dailyUse
     }
 
 }

@@ -56,6 +56,23 @@ export function CharacterSheet() {
         return <div>Loading...</div>;
     }
 
+    const clickOnResist = (stat: "chair"|"esprit"|"essence", resistRoll: string) => {
+        console.log(stat)
+        ApiL7RProvider.sendRoll({
+            skillName: stat,
+            characterName: characterViewModel.character.name,
+            focus: characterViewModel.state.focusActivated,
+            power: characterViewModel.state.powerActivated,
+            proficiency: Array.from(characterViewModel.state.proficiencies.values()).some((value) => value),
+            secret: characterViewModel.state.secret,
+            bonus: characterViewModel.state.bonus,
+            malus: characterViewModel.state.malus,
+            resistRoll: resistRoll
+        }).then(r => {
+
+        })
+    }
+
     return (
         <>
             {loadingCharacter ? (
@@ -69,7 +86,7 @@ export function CharacterSheet() {
                     <Rolls>
                         {rolls.map((roll: Roll) => (
                             <div key={roll.id}>
-                                <RollCard roll={roll}/>
+                                <RollCard roll={roll} clickOnResist={clickOnResist}/>
                             </div>
                         ))}
                     </Rolls>

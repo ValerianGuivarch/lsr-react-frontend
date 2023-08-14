@@ -26,6 +26,7 @@ export class ApiL7RProvider {
             secret: boolean,
             bonus: number,
             malus: number,
+            resistRoll?: string,
             empiriqueRoll?: string
         }
         ): Promise<ApiResponse> {
@@ -65,6 +66,9 @@ export class ApiL7RProvider {
         const characterUpdateRequest = new CharacterUpdateRequest(character);
         const response = await L7RApi.updateCharacter(character.name, characterUpdateRequest);
         return new Character(response);
+    }
+    static async rest(character: Character): Promise<void> {
+        await L7RApi.rest(character.name);
     }
 
     static async getSessionCharacters(): Promise<Character[]> {

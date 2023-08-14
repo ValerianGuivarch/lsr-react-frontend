@@ -25,6 +25,10 @@ export class L7RApi {
         return new Character(response.data);
     }
 
+    static async rest(characterName: string) {
+        await axios.put(`${config.BASE_URL}/characters/`+characterName+'/rest');
+    }
+
     static async getSessionCharacter (): Promise<CharacterRaw[]> {
         const response = await axios.get(`${config.BASE_URL}/mj/characters`);
         return response.data;
@@ -50,6 +54,7 @@ export class L7RApi {
             secret: boolean,
             bonus: number,
             malus: number,
+            resistRoll?: string,
             empiriqueRoll?: string
         }
         ): Promise<void> {
@@ -62,7 +67,8 @@ export class L7RApi {
                 secret: p.secret,
                 bonus: p.bonus,
                 malus: p.malus,
-                empiriqueRoll: p.empiriqueRoll
+                empiriqueRoll: p.empiriqueRoll,
+                resistRoll: p.resistRoll ? ""+p.resistRoll : undefined
             });
     }
 }

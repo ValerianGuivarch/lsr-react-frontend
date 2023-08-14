@@ -44,6 +44,22 @@ export function MjSheet() {
         store.ROLLS.rolls
     );
 
+    const clickOnResist = (stat: "chair"|"esprit"|"essence") => {
+        console.log(stat)
+        ApiL7RProvider.sendRoll({
+            skillName: stat,
+            characterName: "jonathan",
+            focus: false,
+            power: true,
+            proficiency: false,
+            secret: false,
+            bonus: 0,
+            malus: 0
+        }).then(r => {
+
+        })
+    }
+
     return (
         <>
             {loadingCharacter ? (
@@ -60,7 +76,7 @@ export function MjSheet() {
                     <div>
                         {rolls.map((roll: Roll) => (
                             <div key={roll.id}>
-                                <RollCard roll={roll}/>
+                                <RollCard roll={roll} clickOnResist={clickOnResist}/>
                             </div>
                         ))}
                     </div>

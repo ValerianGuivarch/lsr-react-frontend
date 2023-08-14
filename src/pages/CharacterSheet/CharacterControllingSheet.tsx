@@ -65,7 +65,7 @@ export function CharacterControllingSheet() {
                     </CharactersContainer>
                     <RollsContainer>
                         {rolls.map((roll: Roll) => (
-                            <RollCard key={roll.id} roll={roll} />
+                            <RollCard key={roll.id} roll={roll} clickOnResist={() => {}} />
                         ))}
                     </RollsContainer>
                 </Container>
