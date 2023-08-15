@@ -13,7 +13,7 @@ export default function CharacterSelection() {
     const dispatch = useDispatch();
 
     async function fetchAllCharacterPreview() {
-        const characterPreviewRaws = await ApiL7RProvider.getPJs();
+        const characterPreviewRaws = await ApiL7RProvider.getCharactersPreview();
         dispatch(setPreviewPjsList(characterPreviewRaws));
     }
     useEffect(() => {
@@ -25,7 +25,7 @@ export default function CharacterSelection() {
     const [selectedPlayerName, setSelectedPlayerName] = React.useState<string>("");
     const [selectedName, setSelectedName] = React.useState<string>("");
     const navigate = useNavigate();
-    const playerNames: string[] = Array.from(new Set(pjsList.map((item: CharacterPreview) => item.playerName))) as string[];
+    const playerNames: string[] = Array.from(new Set(pjsList.map((item: CharacterPreview) => item.playerName).filter((c) => c !== ""))) as string[];
     const handlePlayerNameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedPlayerName(event.target.value);
         setSelectedName("");

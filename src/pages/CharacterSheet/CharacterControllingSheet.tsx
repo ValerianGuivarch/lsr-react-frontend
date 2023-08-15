@@ -9,7 +9,6 @@ import {CharacterCard} from "../../components/Mj/CharacterCard";
 import {CharacterViewModel} from "../../domain/models/CharacterViewModel";
 import {setCharacters} from "../../data/store/character-slice";
 import {RootState} from "../../data/store";
-import {useSSECharacters} from "../../data/api/useSSECharacters";
 import {useSSECharactersControlled} from "../../data/api/useSSECharactersControlled";
 import {useParams} from "react-router-dom";
 import styled from "styled-components";
@@ -57,7 +56,7 @@ export function CharacterControllingSheet() {
                     <CharactersContainer>
                         {characterViewModels.length > 0 ? (
                             characterViewModels.map((characterVM, index) => (
-                                <CharacterCard key={index} characterViewModel={characterVM} />
+                                <CharacterCard key={index} allie={true} characterViewModel={characterVM} />
                             ))
                         ) : (
                             <p>No characters available</p>

@@ -23,9 +23,11 @@ export class CharacterUpdateRequest {
     apotheoseImprovementList: string[]
     relance: number
     apotheoseState: string
+    battleState: string
 
     constructor(character: Character) {
         this.apotheoseState = character.apotheoseState
+        this.battleState = character.battleState
         this.chair = character.chair
         this.esprit = character.esprit
         this.essence = character.essence

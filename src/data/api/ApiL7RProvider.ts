@@ -13,8 +13,29 @@ export interface ApiResponse {
 }
 export class ApiL7RProvider {
 
+    static async getCharactersByCategory(): Promise<{ pnj: string[]; pj: string[]; }> {
+        const response = await L7RApi.getCharactersPreview();
+        const pj = response.filter((character) => {
+            return character.playerName !== "";
+        }).map((character) => {
+            return character.name;
+        });
+        const pnj = response.filter((character) => {
+            return character.playerName === "";
+        }).map((character) => {
+            return character.name;
+        });
+        return {
+            pj: pj,
+            pnj: pnj
+        }
+    }
+
     static async sendNewTurn(): Promise<void> {
         await L7RApi.sendNewTurn();
+    }
+    static async resetRolls(): Promise<void> {
+        await L7RApi.resetRolls();
     }
     static async sendRoll(p:
         {
@@ -50,8 +71,8 @@ export class ApiL7RProvider {
         });
     }
 
-    static async getPJs(): Promise<CharacterPreview[]> {
-        const response = await L7RApi.getPJs();
+    static async getCharactersPreview(): Promise<CharacterPreview[]> {
+        const response = await L7RApi.getCharactersPreview();
         return response.map((characterPreview: CharacterPreviewRaw) => {
             return new CharacterPreview(characterPreview);
         });

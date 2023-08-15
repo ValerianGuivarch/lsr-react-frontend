@@ -12,6 +12,7 @@ export class CharacterState {
     umbra: boolean
     secunda: boolean
     secret: boolean
+    selected: boolean
 
     constructor(state?: CharacterState, character?: Character) {
         this.focusActivated = (state && character?.pf && character?.pf >0) ? state.focusActivated : false
@@ -25,5 +26,6 @@ export class CharacterState {
         this.umbra = state ? state.umbra : false
         this.secunda = state ? state.secunda : false
         this.secret = state ? state.secret : false
+        this.selected = state ? state.selected : false
     }
 }

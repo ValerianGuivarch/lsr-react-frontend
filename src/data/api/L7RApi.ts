@@ -11,13 +11,25 @@ export class L7RApi {
     static async sendNewTurn(): Promise<void> {
         await axios.put(`${config.BASE_URL}/mj/newTurn`);
     }
-    static async getPJs(): Promise<CharacterPreviewRaw[]> {
-        const response = await axios.get(`${config.BASE_URL}/characters?category=PJ`);
+    static async resetRolls(): Promise<void> {
+        await axios.put(`${config.BASE_URL}/mj/resetRolls`);
+    }
+    static async getCharactersPreview(): Promise<CharacterPreviewRaw[]> {
+        const response = await axios.get(`${config.BASE_URL}/characters`);
         return response.data;
     }
     static async getCharacterByName (characterName: string): Promise<CharacterRaw> {
-        const response = await axios.get(`${config.BASE_URL}/characters/`+characterName);
-        return response.data;
+        console.log("kik1")
+        console.log(characterName)
+        try {
+            const response = await axios.get(`${config.BASE_URL}/characters/`+characterName);
+            console.log("kik2")
+            return response.data;
+        } catch (e: any) {
+            console.log("kik3")
+            console.log(e)
+            throw e;
+        }
     }
 
     static async updateCharacter(characterName: string, characterUpdateRequest: CharacterUpdateRequest) {
