@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FaMinus, FaPlus } from 'react-icons/fa';
 import {IconType} from "react-icons";
+import { css } from 'styled-components';
 
 interface CharacterButtonProps {
     cardDisplay: boolean;
@@ -20,6 +21,8 @@ interface CharacterButtonProps {
 
 export function CharacterButton(props: CharacterButtonProps) {
     const shouldDisplayIcon = props.value === 0 && props.icon;
+    const isActionButton = props.selected === undefined;
+
     return (
         <MainContainer card={props.cardDisplay}>
             {props.onClickDecr && (
@@ -30,6 +33,7 @@ export function CharacterButton(props: CharacterButtonProps) {
             <ButtonSelectable
                 columnDisplay={props.column || false}
                 cardDisplay={props.cardDisplay}
+                isActionButton={isActionButton}
                 selected={props.selected}
                 title={props.description}
                 onClick={props.onClickBtn}
@@ -89,28 +93,41 @@ const Change = styled.div<{ card: boolean, left: boolean }>`
 
 
 
-const ButtonSelectable = styled.div<{ cardDisplay: boolean, columnDisplay: boolean, selected?: boolean }>`
+
+const ButtonSelectable = styled.div<{ cardDisplay: boolean, columnDisplay: boolean, selected?: boolean, isActionButton: boolean }>`
   display: flex;
   flex-direction: ${(props) => (props.cardDisplay && props.columnDisplay ? 'column' : 'row')};
   align-items: center;
   justify-content: center;
   background-color: #f0f0f0;
   padding: ${(props) => (props.cardDisplay ? '2px' : '8px')};
-  border-radius: 4px;
+  border-radius: ${(props) => (props.isActionButton ? '20px' : '4px')}; /* CTA: Highly rounded, Selectable: Slightly rounded */
   margin: 4px;
   cursor: pointer;
   border: none;
   outline: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transform: perspective(1px) scale(1.02);
-  transition: transform 0.3s ease;
+  box-shadow: ${(props) => (props.selected ? '0 2px 4px rgba(0, 0, 0, 0.4)' : '0 2px 4px rgba(0, 0, 0, 0.2)')}; /* Selected: Darker shadow */
+  transition: transform 0.3s ease, background-color 0.2s ease;
 
-  ${({ selected }) => selected && `background-color: #ccc;`}
+  /* Selected state for a selectable button */
+  ${({ selected, isActionButton }) => selected && !isActionButton && css`
+    background-color: #e0e0e0; /* Darker Grey for Selected State */
+  `}
 
+    /* Hover state */
   &:hover {
-    transform: perspective(1px) scale(1.05);
+    background-color: #e6e6e6;
+  }
+
+  /* Active state */
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   }
 `;
+
+
+
 
 const ButtonName = styled.div`
   font-weight: bold;

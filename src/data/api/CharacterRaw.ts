@@ -12,11 +12,6 @@ export interface CharacterRaw {
         name: string,
         display: string
     }
-    arcaneList: {
-        name: string
-        type: string
-        use: string
-    }[]
     rest: number
     longRest: number
     chair: number
@@ -34,6 +29,8 @@ export interface CharacterRaw {
     dettes: number
     arcanes: number
     arcanesMax: number
+    arcanePrimes: number
+    arcanePrimesMax: number
     niveau: number
     lux: string
     umbra: string

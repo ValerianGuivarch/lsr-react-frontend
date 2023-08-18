@@ -445,9 +445,15 @@ export function CharacterPanel(props: {
             )}
             {Character.hasDisplayCategory(currentCharacter, DisplayCategory.ARCANES) && (
                 <CharacterBlockBtn
-                    
+
                     displayCategory={DisplayCategory.ARCANES}
                     displayCategoryName={"Arcanes " + currentCharacter.arcanes + "/" + currentCharacter.arcanesMax}
+                    cardDisplay={props.cardDisplay}/>
+            )}
+            {Character.hasDisplayCategory(currentCharacter, DisplayCategory.ARCANES_PRIMES) && (
+                <CharacterBlockBtn
+                    displayCategory={DisplayCategory.ARCANES_PRIMES}
+                    displayCategoryName={"Arcanes Primes " + currentCharacter.arcanePrimes + "/" + currentCharacter.arcanePrimesMax}
                     cardDisplay={props.cardDisplay}/>
             )}
             {Character.hasDisplayCategory(currentCharacter, DisplayCategory.PACIFICATEURS) && (

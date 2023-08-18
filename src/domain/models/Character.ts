@@ -18,11 +18,6 @@ export class Character {
         name: string,
         display: string
     }
-    arcaneList: {
-        name: string
-        type: string
-        use: string
-    }[]
     chair: number
     esprit: number
     essence: number
@@ -38,6 +33,8 @@ export class Character {
     dettes: number
     arcanes: number
     arcanesMax: number
+    arcanePrimes: number
+    arcanePrimesMax: number
     niveau: number
     lux: string
     umbra: string
@@ -89,7 +86,8 @@ export class Character {
         this.dettes = p.dettes
         this.arcanes = p.arcanes
         this.arcanesMax = p.arcanesMax
-        this.arcaneList = p.arcaneList
+        this.arcanePrimes = p.arcanePrimes
+        this.arcanePrimesMax = p.arcanePrimesMax
         this.niveau = p.niveau
         this.lux = p.lux
         this.umbra = p.umbra

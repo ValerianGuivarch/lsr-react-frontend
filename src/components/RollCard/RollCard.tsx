@@ -3,6 +3,7 @@ import {Roll} from "../../domain/models/Roll";
 import {FaDiceFive, FaDiceFour, FaDiceOne, FaDiceSix, FaDiceThree, FaDiceTwo} from 'react-icons/fa6';
 import {SkillStat} from "../../domain/models/SkillStat";
 import styled from "styled-components";
+import {UtilsRules} from "../../utils/UtilsRules";
 
 
 function Dice(props: { value: number }) {
@@ -14,7 +15,9 @@ function Dice(props: { value: number }) {
 
 export interface RollCardProps {
     roll: Roll,
+    originRoll?: Roll,
     clickOnResist?: (stat: "chair"|"esprit"|"essence", resistRoll: string) => void
+    clickOnSubir?: (roll: Roll, originRoll?: Roll) => void
 }
 
 function getRollEffectText(roll: Roll) {
@@ -92,11 +95,16 @@ export default function RollCard(props: RollCardProps) {
                     {
                         (roll.stat && props.clickOnResist && (roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)) &&
                         <>
-                            (<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist("chair", roll.id)}>R-Chair</ClickableStat>,
-                            <ClickableStat onClick={() => props.clickOnResist && props.clickOnResist("esprit", roll.id)}>R-Esprit</ClickableStat>,
-                            <ClickableStat onClick={() => props.clickOnResist && props.clickOnResist("essence", roll.id)}>R-Essence</ClickableStat>)
+                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist("chair", roll.id)}>R-Chair</ClickableStat>]
+                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist("esprit", roll.id)}>R-Esprit</ClickableStat>]
+                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist("essence", roll.id)}>R-Essence</ClickableStat>]
                         </>
-
+                    }
+                    {
+                        (roll.stat && props.clickOnSubir && (roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)) &&
+                        <>
+                            [<ClickableStat onClick={() => props.clickOnSubir && props.clickOnSubir(roll, props.originRoll)}>Subir {UtilsRules.getDegats(roll, props.originRoll)}</ClickableStat>]
+                        </>
                     }
                 </TextPartOne>
                 {
@@ -112,9 +120,9 @@ export default function RollCard(props: RollCardProps) {
                     </DicesDisplay>
                 }
                 <Rolls>
-                    {roll.resistRolls && roll.resistRolls.map((roll: Roll) => (
-                        <div key={roll.id}>
-                            <RollCard roll={roll} clickOnResist={undefined}/>
+                    {roll.resistRolls && roll.resistRolls.map((subRoll: Roll) => (
+                        <div key={subRoll.id}>
+                            <RollCard roll={subRoll} originRoll={roll} clickOnResist={undefined} clickOnSubir={props.clickOnSubir}/>
                         </div>
                     ))}
                 </Rolls>

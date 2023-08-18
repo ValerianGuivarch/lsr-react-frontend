@@ -15,23 +15,25 @@ export function CharacterCard(props: {
 }) {
     const dispatch = useDispatch();
 
+    const handleSelection = () => {
+        dispatch(setStateForCharacter({
+                characterName: props.characterViewModel.character.name,
+                characterState: {
+                    ...props.characterViewModel.state,
+                    selected: !props.characterViewModel.state.selected
+                }
+            }
+        ));
+    }
     return (
         <CardContainer selected={props.characterViewModel.state.selected}>
             <TitleContainer allie={props.allie}>
-                <ProfilePicture src={props.characterViewModel.character.picture} alt="Profile Picture" onClick={() => {
-                    dispatch(setStateForCharacter({
-                            characterName: props.characterViewModel.character.name,
-                            characterState: {
-                                ...props.characterViewModel.state,
-                                selected: !props.characterViewModel.state.selected
-                            }
-                        }
-                    ));
-                }
-                }
+                <ProfilePicture src={props.characterViewModel.character.picture}
+                                alt="Profile Picture"
+                                onClick={handleSelection}
                                 selected={props.characterViewModel.state.selected}
                 />
-                <CharacterName>{props.characterViewModel.character.name}</CharacterName>
+                <CharacterName  onClick={handleSelection} >{props.characterViewModel.character.name}</CharacterName>
                 {props.onChange && <IconWrapper onClick={
                     () => {
                         props.onChange && props.onChange(props.allie ? BattleState.ENNEMIES : BattleState.ALLIES)

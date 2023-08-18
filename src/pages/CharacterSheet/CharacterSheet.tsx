@@ -14,6 +14,7 @@ import {setCharacters} from "../../data/store/character-slice";
 import {CharacterViewModel} from "../../domain/models/CharacterViewModel";
 import {RootState} from "../../data/store";
 import styled from "styled-components";
+import {UtilsRules} from "../../utils/UtilsRules";
 
 export function CharacterSheet() {
     const dispatch = useDispatch();
@@ -57,7 +58,6 @@ export function CharacterSheet() {
     }
 
     const clickOnResist = (stat: "chair"|"esprit"|"essence", resistRoll: string) => {
-        console.log(stat)
         ApiL7RProvider.sendRoll({
             skillName: stat,
             characterName: characterViewModel.character.name,
@@ -70,6 +70,14 @@ export function CharacterSheet() {
             resistRoll: resistRoll
         }).then(r => {
 
+        })
+    }
+
+    const clickOnSubir = async (roll: Roll, originRoll?: Roll) => {
+        const degats = UtilsRules.getDegats(roll, originRoll)
+        await ApiL7RProvider.updateCharacter({
+            ...characterViewModel.character,
+            pv: Math.max(characterViewModel.character.pv - degats, 0)
         })
     }
 
@@ -86,7 +94,7 @@ export function CharacterSheet() {
                     <Rolls>
                         {rolls.map((roll: Roll) => (
                             <div key={roll.id}>
-                                <RollCard roll={roll} clickOnResist={clickOnResist}/>
+                                <RollCard roll={roll} clickOnResist={clickOnResist} clickOnSubir={clickOnSubir}/>
                             </div>
                         ))}
                     </Rolls>

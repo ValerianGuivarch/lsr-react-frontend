@@ -12,6 +12,7 @@ import {RootState} from "../../data/store";
 import {useSSECharacters} from "../../data/api/useSSECharacters";
 import styled from "styled-components";
 import {BattleState} from "../../domain/models/BattleState";
+import {UtilsRules} from "../../utils/UtilsRules";
 
 export function MjSheet() {
     const dispatch = useDispatch();
@@ -57,20 +58,36 @@ export function MjSheet() {
         store.ROLLS.rolls
     );
 
-    const clickOnResist = (stat: "chair"|"esprit"|"essence") => {
-        console.log(stat)
-        ApiL7RProvider.sendRoll({
-            skillName: stat,
-            characterName: "jonathan",
-            focus: false,
-            power: true,
-            proficiency: false,
-            secret: false,
-            bonus: 0,
-            malus: 0
-        }).then(r => {
 
-        })
+
+    const clickOnSubir = async (roll: Roll, originRoll?: Roll) => {
+        const degats = UtilsRules.getDegats(roll, originRoll)
+        for (const characterViewModel of characterViewModels) {
+            if (characterViewModel.state.selected) {
+                await ApiL7RProvider.updateCharacter({
+                    ...characterViewModel.character,
+                    pv: Math.max(characterViewModel.character.pv - degats, 0)
+                })
+            }
+        }
+    }
+
+    const clickOnResist = async (stat: "chair" | "esprit" | "essence", resistRoll: string) => {
+        for (const characterViewModel of characterViewModels) {
+            if (characterViewModel.state.selected) {
+                await ApiL7RProvider.sendRoll({
+                    skillName: stat,
+                    characterName: characterViewModel.character.name,
+                    focus: characterViewModel.state.focusActivated,
+                    power: characterViewModel.state.powerActivated,
+                    proficiency: Array.from(characterViewModel.state.proficiencies.values()).some((value) => value),
+                    secret: characterViewModel.state.secret,
+                    bonus: characterViewModel.state.bonus,
+                    malus: characterViewModel.state.malus,
+                    resistRoll: resistRoll
+                })
+            }
+        }
     }
     async function onCharacterBattleStateChange(name: string, battleState: BattleState) {
         if (name) {
@@ -85,6 +102,21 @@ export function MjSheet() {
             ApiL7RProvider.sendNewTurn().then(() => {});
         } else if (idAction === 'RESET_ROLLS') {
             ApiL7RProvider.resetRolls().then(() => {});
+        } else if (idAction === 'RESET_CHARS') {
+            for (const characterViewModel of characterViewModels) {
+                if (characterViewModel.state.selected) {
+                    await ApiL7RProvider.updateCharacter({
+                        ...characterViewModel.character,
+                        pv: characterViewModel.character.pvMax,
+                        pf: characterViewModel.character.pfMax,
+                        pp: characterViewModel.character.ppMax,
+                        arcanes: characterViewModel.character.arcanesMax,
+
+                    }).then(async () => {
+                        await ApiL7RProvider.rest(characterViewModel.character)
+                    })
+                }
+            }
         }
         const selectElement = document.getElementById('mj-action') as HTMLSelectElement;
         selectElement.value = 'action';
@@ -96,11 +128,10 @@ export function MjSheet() {
             ) : (
                 <div>
                     <MjHeader>
-                        <MjHeaderContent>
                             <SelectContainer>
                                 <Select id="pj-select" onChange={(e) => onCharacterBattleStateChange(e.target.value, BattleState.ALLIES)}>
                                     <option value="">PJ</option>
-                                    {charactersList.pj.map((name) => (
+                                    {charactersList.pj.sort().map((name) => (
                                         <option key={name} value={name}>{name}</option>
                                     ))}
                                 </Select>
@@ -108,7 +139,7 @@ export function MjSheet() {
                             <SelectContainer>
                                 <Select id="pnj-select" onChange={(e) => onCharacterBattleStateChange(e.target.value, BattleState.ENNEMIES)}>
                                     <option value="">PNJ</option>
-                                    {charactersList.pnj.map((name) => (
+                                    {charactersList.pnj.sort().map((name) => (
                                         <option key={name} value={name}>{name}</option>
                                     ))}
                                 </Select>
@@ -118,17 +149,9 @@ export function MjSheet() {
                                     <option key="action" value="action">Action</option>
                                     <option key="Nouveau tour" value={'NEW_TURN'}>Nouveau tour</option>
                                     <option key="Effacer dés" value={'RESET_ROLLS'}>Effacer dés</option>
+                                    <option key="Soin PNJ" value={'RESET_CHARS'}>Soin PNJ</option>
                                 </Select>
                             </SelectContainer>
-                        </MjHeaderContent>
-
-                        <MjHeaderContent>
-                            <NewTurnButton onClick={() => {
-                                ApiL7RProvider.sendNewTurn().then(() => {});
-                            }}>
-                                Nouveau tour
-                            </NewTurnButton>
-                        </MjHeaderContent>
                     </MjHeader>
                     <MjPageContainer>
                         <CharactersContainer>
@@ -182,7 +205,7 @@ export function MjSheet() {
                         <RollsContainer>
                             {rolls.map((roll: Roll) => (
                                 <div key={roll.id}>
-                                    <RollCard roll={roll} clickOnResist={clickOnResist}/>
+                                    <RollCard roll={roll} clickOnResist={clickOnResist}  clickOnSubir={clickOnSubir}/>
                                 </div>
                             ))}
                         </RollsContainer>
@@ -240,50 +263,19 @@ const MjHeader = styled.div`
   display: flex;
   flex-direction: row;
   position: fixed;
+  padding: 0 10px;
+  justify-content: center;
   top: 0;
   left: 0;
   width: 100%;
   background-color: white;
   z-index: 100;
-  justify-content: space-between;
 `;
-
-const MjHeaderContent = styled.div`
-    display: flex;
-    flex-direction: row;
-  padding: 0 10px;
-` ;
 
 const SelectContainer = styled.div`
   margin: 10px
 `;
 
-const SelectLabel = styled.label`
-  margin-right: 10px;
-`;
-
 const Select = styled.select`
   padding: 5px;
-`;
-
-const NewTurnButton = styled.button`
-  height: 29px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-top: 10px;
-`;
-
-const ResetRollsButton = styled.button`
-  height: 29px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-top: 10px;
 `;
