@@ -5,4 +5,6 @@ export interface SkillRaw {
     description?: string
     displayCategory: string
     dailyUse?: number
+    limitationMax?: number
+    soldatCost: number
 }

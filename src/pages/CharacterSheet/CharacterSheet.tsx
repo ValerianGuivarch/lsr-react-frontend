@@ -1,7 +1,5 @@
-import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from "react-redux";
+import React, {useState, useEffect} from 'react';
 import {useParams} from "react-router-dom";
-import {setRolls} from "../../data/store/rolls-slice";
 import RollCard from "../../components/RollCard/RollCard";
 import {Roll} from "../../domain/models/Roll";
 import {useSSERolls} from "../../data/api/useSSERolls";
@@ -10,91 +8,152 @@ import { CharacterPanel } from '../../components/Character/CharacterPanel/Charac
 import {useSSECharacterByName} from "../../data/api/useSSECharacterByName";
 import {CharacterBanner} from "../../components/Character/CharacterBanner/CharacterBanner";
 import {CharacterNotes} from "../../components/Character/CharacterNotes/CharacterNotes";
-import {setCharacters} from "../../data/store/character-slice";
-import {CharacterViewModel} from "../../domain/models/CharacterViewModel";
-import {RootState} from "../../data/store";
 import styled from "styled-components";
 import {UtilsRules} from "../../utils/UtilsRules";
+import {Character} from "../../domain/models/Character";
+import {CharacterState} from "../../domain/models/CharacterState";
 
 export function CharacterSheet() {
-    const dispatch = useDispatch();
     const {characterName} = useParams();
+    const [characterState, setCharacterState] = useState<CharacterState>(new CharacterState({}));
+    const [rolls, setRolls] = useState<Roll[]>([]);
+    const [character, setCharacter] = useState<Character | undefined>(undefined);
 
-    async function fetchCurrentCharacter() {
-        const currentCharacter = await ApiL7RProvider.getCharacterByName(characterName ? characterName : '');
-        dispatch(setCharacters([currentCharacter]));
-    }
-
-    async function fetchRolls(): Promise<void> {
-        const rolls = await ApiL7RProvider.getRolls();
-        dispatch(setRolls(rolls));
-    }
 
     useEffect(() => {
-        fetchCurrentCharacter().then(() => {
-        });
-        fetchRolls().then(() => {
-        });
+        fetchCharacter().then(() => {});
+        fetchRolls().then(() => {});
     }, []);
 
+
+    async function fetchCharacter() {
+        try {
+            const character = await ApiL7RProvider.getCharacterByName(characterName ?? '');
+            setCharacter(character);
+        } catch (error) {
+            console.error('Error fetching character:', error);
+        }
+    }
+
+    async function fetchRolls() {
+        try {
+            const rolls = await ApiL7RProvider.getRolls();
+            setRolls(rolls);
+        } catch (error) {
+            console.error('Error fetching rolls:', error);
+        }
+    }
+
     useSSECharacterByName({
-        name: characterName || ''
+        name: characterName || '',
+        callback: (character: Character) => {
+            setCharacter(character)
+        }
     });
-    useSSERolls();
 
+    useSSERolls({callback: (rolls: Roll[]) => {
+        setRolls(rolls);
+    }});
 
-    const loadingCharacter: boolean = useSelector((store: RootState) =>
-        store.CHARACTERS.loading
-    );
-    const characterViewModel = useSelector((store: RootState) =>
-        store.CHARACTERS.characterViewModels.find((characterViewModel: CharacterViewModel) => characterViewModel.character.name === characterName)
-    );
-    const rolls: Roll[] = useSelector((store: RootState) =>
-        store.ROLLS.rolls
-    );
-
-    if (!characterViewModel) {
-        return <div>Loading...</div>;
+    async function handleSendRoll(p: { skillName: string, empiriqueRoll?: string }) {
+        try {
+            if (character) {
+                await ApiL7RProvider.sendRoll({
+                    skillName: p.skillName,
+                    characterName: character.name,
+                    focus: characterState.focusActivated,
+                    power: characterState.powerActivated,
+                    proficiency: Array.from(characterState.proficiencies.values()).some((value) => value),
+                    secret: characterState.secret,
+                    bonus: characterState.bonus,
+                    malus: characterState.malus,
+                    empiriqueRoll: p.empiriqueRoll
+                });
+            }
+        } catch (error) {
+            console.error('Error sending roll:', error);
+        }
     }
 
-    const clickOnResist = (stat: "chair"|"esprit"|"essence", resistRoll: string) => {
-        ApiL7RProvider.sendRoll({
-            skillName: stat,
-            characterName: characterViewModel.character.name,
-            focus: characterViewModel.state.focusActivated,
-            power: characterViewModel.state.powerActivated,
-            proficiency: Array.from(characterViewModel.state.proficiencies.values()).some((value) => value),
-            secret: characterViewModel.state.secret,
-            bonus: characterViewModel.state.bonus,
-            malus: characterViewModel.state.malus,
-            resistRoll: resistRoll
-        }).then(r => {
-
-        })
+    async function handleUpdateState(newState: CharacterState) {
+        setCharacterState(newState);
     }
 
-    const clickOnSubir = async (roll: Roll, originRoll?: Roll) => {
-        const degats = UtilsRules.getDegats(roll, originRoll)
-        await ApiL7RProvider.updateCharacter({
-            ...characterViewModel.character,
-            pv: Math.max(characterViewModel.character.pv - degats, 0)
-        })
+    async function handleRest() {
+        try {
+            if (character) {
+                await ApiL7RProvider.rest(character.name);
+            }
+        } catch (error) {
+            console.error('Error resting character:', error);
+        }
+    }
+
+    async function handleUpdateCharacter(newCharacter: Character) {
+        try {
+            if (character) {
+                await ApiL7RProvider.updateCharacter(newCharacter);
+            }
+        } catch (error) {
+            console.error('Error updating character:', error);
+        }
+    }
+
+    async function handleSubir(p: { roll: Roll, originRoll?: Roll }) {
+        try {
+            if (character) {
+                const degats = UtilsRules.getDegats(p.roll, p.originRoll);
+                await ApiL7RProvider.updateCharacter({
+                    ...character,
+                    pv: Math.max(character.pv - degats, 0)
+                });
+            }
+        } catch (error) {
+            console.error('Error updating character:', error);
+        }
+    }
+
+    async function handleResist(p: { stat: "chair" | "esprit" | "essence", resistRoll: string }) {
+        try {
+            if (character) {
+                await ApiL7RProvider.sendRoll({
+                    skillName: p.stat,
+                    characterName: character.name,
+                    focus: characterState.focusActivated,
+                    power: characterState.powerActivated,
+                    proficiency: Array.from(characterState.proficiencies.values()).some((value) => value),
+                    secret: characterState.secret,
+                    bonus: characterState.bonus,
+                    malus: characterState.malus,
+                    resistRoll: p.resistRoll
+                });
+            }
+        } catch (error) {
+            console.error('Error sending resist roll:', error);
+        }
     }
 
     return (
         <>
-            {loadingCharacter ? (
+            {(!character) ? (
                 <p>Loading...</p>
             ) : (
                 <MainContainer>
-                    <CharacterBanner character={characterViewModel.character}/>
+                    <CharacterBanner character={character}/>
                     <CharacterNotes/>
-                    <CharacterPanel cardDisplay={false} characterViewModel={characterViewModel}/>
-
+                    <CharacterPanel
+                        characterState={characterState}
+                        cardDisplay={false}
+                        character={character}
+                        sendRoll={handleSendRoll}
+                        updateCharacter={handleUpdateCharacter}
+                        updateState={handleUpdateState}
+                        rest={handleRest}
+                    />
                     <Rolls>
                         {rolls.map((roll: Roll) => (
                             <div key={roll.id}>
-                                <RollCard roll={roll} clickOnResist={clickOnResist} clickOnSubir={clickOnSubir}/>
+                                <RollCard mjDisplay={false} roll={roll} clickOnResist={handleResist} clickOnSubir={handleSubir}/>
                             </div>
                         ))}
                     </Rolls>

@@ -1,40 +1,41 @@
-import React, {useEffect} from 'react';
+import React, {Dispatch, useEffect} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import {CharacterPreview} from "../../domain/models/CharacterPreview";
 import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
-import {setPreviewPjsList} from "../../data/store/preview-pjs-slice";
 import styled from "styled-components";
 import {RootState} from "../../data/store";
+import {AnyAction} from "@reduxjs/toolkit";
+import {selectCharacterName, selectPlayerName, setPreviewPjsList} from "./CharacterSelectionSlice";
 
+
+class CharacterSelectionViewModel {
+    private readonly dispatch: Dispatch<AnyAction> = useDispatch();
+    public state = useSelector((store: RootState) => store.CHARACTER_SELECTION);
+
+    fetchAllCharacterPreview = async () => {
+        const characterPreviewRaws = await ApiL7RProvider.getCharactersPreview();
+        this.dispatch(setPreviewPjsList(characterPreviewRaws));
+    };
+
+    handlePlayerNameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        this.dispatch(selectPlayerName(event.target.value));
+    };
+
+    handleCharacterNameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        this.dispatch(selectCharacterName(event.target.value));
+    };
+}
 
 export default function CharacterSelection() {
 
-    const dispatch = useDispatch();
-
-    async function fetchAllCharacterPreview() {
-        const characterPreviewRaws = await ApiL7RProvider.getCharactersPreview();
-        dispatch(setPreviewPjsList(characterPreviewRaws));
-    }
-    useEffect(() => {
-        fetchAllCharacterPreview().then(() => {});
-    }, []);
-
-
-    const pjsList = useSelector((store: RootState) => store.PREVIEW_PJS.previewPjsList);
-    const [selectedPlayerName, setSelectedPlayerName] = React.useState<string>("");
-    const [selectedName, setSelectedName] = React.useState<string>("");
     const navigate = useNavigate();
-    const playerNames: string[] = Array.from(new Set(pjsList.map((item: CharacterPreview) => item.playerName).filter((c) => c !== ""))) as string[];
-    const handlePlayerNameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedPlayerName(event.target.value);
-        setSelectedName("");
-    };
+    const viewModel = new CharacterSelectionViewModel();
+    const { selectedPlayerName, selectedCharacterName, playersName, pjsList, charactersName } = viewModel.state;
 
-    const handleNameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedName(event.target.value);
-    };
 
+    useEffect(() => {
+        viewModel.fetchAllCharacterPreview().then(() => {});
+    }, []);
 
 
     return (
@@ -42,10 +43,9 @@ export default function CharacterSelection() {
             <form>
                 <label>
                     Player Name:
-                    <select value={selectedPlayerName} onChange={handlePlayerNameChange}>
+                    <select value={selectedPlayerName} onChange={viewModel.handlePlayerNameChange}>
                         <option value="">Joueuse</option>
-                        {playerNames
-                            .sort()
+                        {playersName
                             .map((playerName: string, index: number) => (
                             <option key={index} value={playerName}>
                                 {playerName}
@@ -56,11 +56,10 @@ export default function CharacterSelection() {
                 <br />
                 <label>
                     Name:
-                    <select value={selectedName} onChange={handleNameChange} disabled={!selectedPlayerName}>
+                    <select value={charactersName} onChange={viewModel.handleCharacterNameChange} disabled={!selectedPlayerName}>
                         <option value="">Personnage</option>
                         {pjsList
                             .filter((item: any) => item.playerName === selectedPlayerName)
-                            .sort()
                             .map((item: any, index: number) => (
                                 <option key={index} value={item.name}>
                                     {item.name}
@@ -70,10 +69,10 @@ export default function CharacterSelection() {
                 </label>
                 <br />
                 <button
-                    disabled={!selectedPlayerName || !selectedName}
-                    onClick={() => navigate("/characters/" + selectedName)}
+                    disabled={!selectedPlayerName || !selectedCharacterName}
+                    onClick={() => navigate("/characters/" + selectedCharacterName)}
                 >
-                    Go to {selectedName}
+                    Go to {selectedCharacterName}
                 </button>
                 <p>OU</p>
                 <button

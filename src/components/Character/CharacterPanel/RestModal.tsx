@@ -5,17 +5,17 @@ import {Character} from "../../../domain/models/Character";
 import {ModalDisplay, ModalEmpiriqueButtonValidation, ModalDisplayTitle} from "./ModalStyle";
 
 export function RestModal (props : {
-    currentCharacter: Character,
+    character: Character,
     isOpen: boolean,
     onRequestClose: () => void
 }) {
-    const [restValue, setRestValue] = useState<number>(props.currentCharacter.rest);
+    const [restValue, setRestValue] = useState<number>(props.character.rest);
     const closing = () => {
         ApiL7RProvider.updateCharacter({
-            ...props.currentCharacter,
-            arcanes: props.currentCharacter.arcanesMax,
+            ...props.character,
+            arcanes: props.character.arcanesMax,
         }).then(() => {
-            setRestValue(props.currentCharacter.rest);
+            setRestValue(props.character.rest);
             props.onRequestClose();
         })
     }
@@ -26,37 +26,37 @@ export function RestModal (props : {
             contentLabel="Repos"
         >
             <ModalDisplay>
-            <ModalDisplayTitle>Repos : {restValue} / {props.currentCharacter.rest}</ModalDisplayTitle>
+            <ModalDisplayTitle>Repos : {restValue} / {props.character.rest}</ModalDisplayTitle>
             <button onClick={() => {
-                if(props.currentCharacter.pv < props.currentCharacter.pvMax && restValue > 0) {
+                if(props.character.pv < props.character.pvMax && restValue > 0) {
                     ApiL7RProvider.updateCharacter({
-                        ...props.currentCharacter,
-                        pv: props.currentCharacter.pv + 1
+                        ...props.character,
+                        pv: props.character.pv + 1
                     }).then(() => {
                         setRestValue(restValue - 1);
                     })
                 }
-            }}>PV : {props.currentCharacter.pv} / {props.currentCharacter.pvMax}</button>
+            }}>PV : {props.character.pv} / {props.character.pvMax}</button>
             <button onClick={() => {
-                if(props.currentCharacter.pf < props.currentCharacter.pfMax && restValue > 0) {
+                if(props.character.pf < props.character.pfMax && restValue > 0) {
                     setRestValue(restValue - 1);
                     ApiL7RProvider.updateCharacter({
-                        ...props.currentCharacter,
-                        pf: props.currentCharacter.pf + 1
+                        ...props.character,
+                        pf: props.character.pf + 1
                     }).then(() => {
                     })
                 }
-            }}>PF : {props.currentCharacter.pf} / {props.currentCharacter.pfMax}</button>
+            }}>PF : {props.character.pf} / {props.character.pfMax}</button>
             <button onClick={() => {
-                if(props.currentCharacter.pp < props.currentCharacter.ppMax && restValue > 0) {
+                if(props.character.pp < props.character.ppMax && restValue > 0) {
                     setRestValue(restValue - 1);
                     ApiL7RProvider.updateCharacter({
-                        ...props.currentCharacter,
-                        pp: props.currentCharacter.pp + 1
+                        ...props.character,
+                        pp: props.character.pp + 1
                     }).then(() => {
                     })
                 }
-            }}>PP : {props.currentCharacter.pp} / {props.currentCharacter.ppMax}</button>
+            }}>PP : {props.character.pp} / {props.character.ppMax}</button>
             <ModalEmpiriqueButtonValidation onClick={closing}>Valider</ModalEmpiriqueButtonValidation>
             </ModalDisplay>
         </ReactModal>

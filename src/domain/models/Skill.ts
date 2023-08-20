@@ -8,6 +8,8 @@ export class Skill {
     description?: string
     displayCategory: DisplayCategory
     dailyUse?: number
+    limitationMax?: number
+    soldatCost: number
     constructor(p: SkillRaw) {
         this.name = p.name
         this.shortName = p.shortName
@@ -15,6 +17,8 @@ export class Skill {
         this.description = p.description
         this.displayCategory = DisplayCategory[p.displayCategory as keyof typeof DisplayCategory]
         this.dailyUse = p.dailyUse
+        this.limitationMax = p.limitationMax
+        this.soldatCost = p.soldatCost
     }
 
 }

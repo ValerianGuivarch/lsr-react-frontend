@@ -15,9 +15,11 @@ function Dice(props: { value: number }) {
 
 export interface RollCardProps {
     roll: Roll,
+    mjDisplay: boolean,
     originRoll?: Roll,
-    clickOnResist?: (stat: "chair"|"esprit"|"essence", resistRoll: string) => void
-    clickOnSubir?: (roll: Roll, originRoll?: Roll) => void
+    clickOnResist?: (p:{stat: "chair"|"esprit"|"essence",
+                     resistRoll: string}) => void
+    clickOnSubir?: (p:{roll: Roll, originRoll?: Roll}) => void
 }
 
 function getRollEffectText(roll: Roll) {
@@ -79,36 +81,37 @@ export default function RollCard(props: RollCardProps) {
                         {getRollEffectText(roll)}
                     </span>
                     {
-                        roll.success !== null
+                        roll.stat === SkillStat.CUSTOM
                             ? <span>
-                                {' et obtient '}
-                                <em>{roll.success}</em>
-                                {' succès.'}
-                                </span>
-                            : roll.stat === SkillStat.CUSTOM ?
-                                <span>
-                                    <em>{roll.data}</em>
-                                    {'.'}
-                                </span>
+            <em>{roll.data}</em>
+                                {'.'}
+          </span>
+                            : roll.success !== null
+                                ? <span>
+                {' et obtient '}
+                                    <em>{roll.success}</em>
+                                    {' succès.'}
+              </span>
                                 : '.'
                     }
+
                     {
                         (roll.stat && props.clickOnResist && (roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)) &&
                         <>
-                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist("chair", roll.id)}>R-Chair</ClickableStat>]
-                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist("esprit", roll.id)}>R-Esprit</ClickableStat>]
-                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist("essence", roll.id)}>R-Essence</ClickableStat>]
+                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist({stat:"chair", resistRoll:roll.id})}>R-Chair</ClickableStat>]
+                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist({stat:"esprit", resistRoll:roll.id})}>R-Esprit</ClickableStat>]
+                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist({stat:"essence", resistRoll:roll.id})}>R-Essence</ClickableStat>]
                         </>
                     }
                     {
                         (roll.stat && props.clickOnSubir && (roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)) &&
                         <>
-                            [<ClickableStat onClick={() => props.clickOnSubir && props.clickOnSubir(roll, props.originRoll)}>Subir {UtilsRules.getDegats(roll, props.originRoll)}</ClickableStat>]
+                            [<ClickableStat onClick={() => props.clickOnSubir && props.clickOnSubir({roll:roll, originRoll:props.originRoll})}>Subir {UtilsRules.getDegats(roll, props.originRoll)}</ClickableStat>]
                         </>
                     }
                 </TextPartOne>
                 {
-                    roll.displayDices && <DicesDisplay>
+                    (roll.displayDices || props.mjDisplay) && <DicesDisplay>
                         {
                             roll.result.map((dice, index) => {
                                 if (roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)
@@ -122,7 +125,7 @@ export default function RollCard(props: RollCardProps) {
                 <Rolls>
                     {roll.resistRolls && roll.resistRolls.map((subRoll: Roll) => (
                         <div key={subRoll.id}>
-                            <RollCard roll={subRoll} originRoll={roll} clickOnResist={undefined} clickOnSubir={props.clickOnSubir}/>
+                            <RollCard mjDisplay={props.mjDisplay} roll={subRoll} originRoll={roll} clickOnResist={undefined} clickOnSubir={props.clickOnSubir}/>
                         </div>
                     ))}
                 </Rolls>

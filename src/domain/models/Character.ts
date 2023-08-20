@@ -10,6 +10,7 @@ import {ApotheoseState} from "./ApotheoseState";
 
 export class Character {
     name: string
+    controlledBy?: string
     classe: {
         name: string,
         display: string
@@ -35,6 +36,8 @@ export class Character {
     arcanesMax: number
     arcanePrimes: number
     arcanePrimesMax: number
+    munitions: number
+    munitionsMax: number
     niveau: number
     lux: string
     umbra: string
@@ -61,6 +64,7 @@ export class Character {
     longRest: number
 
     constructor(p: CharacterRaw) {
+        this.controlledBy = p.controlledBy
         this.apotheoseState = ApotheoseState[p.apotheoseState  as keyof typeof ApotheoseState]
         this.skills = p.skills.map(s => new Skill(s))
         this.proficiencies = p.proficiencies.map(s => new Proficiency(s))
@@ -88,6 +92,8 @@ export class Character {
         this.arcanesMax = p.arcanesMax
         this.arcanePrimes = p.arcanePrimes
         this.arcanePrimesMax = p.arcanePrimesMax
+        this.munitions = p.munitions
+        this.munitionsMax = p.munitionsMax
         this.niveau = p.niveau
         this.lux = p.lux
         this.umbra = p.umbra
@@ -113,18 +119,6 @@ export class Character {
 
     static hasDisplayCategory(character: Character, displayCategory: DisplayCategory): boolean {
         return character.skills.some((skill) => skill.displayCategory === displayCategory) || character.proficiencies.some((proficiency) => proficiency.displayCategory === displayCategory);
-    }
-
-    static getSkills(character: Character, displayCategory: DisplayCategory): Skill[] {
-        return character.skills.filter((skill) => skill.displayCategory === displayCategory);
-    }
-
-    static getProficiencies(character: Character, displayCategory: DisplayCategory): Skill[] {
-        return character.proficiencies.filter((skill) => skill.displayCategory === displayCategory);
-    }
-
-    static getApotheoses(character: Character, displayCategory: DisplayCategory): Apotheose[] {
-        return character.apotheoses.filter((apotheose) => apotheose.displayCategory === displayCategory);
     }
 
 

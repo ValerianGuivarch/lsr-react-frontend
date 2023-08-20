@@ -1,40 +1,27 @@
 import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from "react-redux";
-import {setRolls} from "../../data/store/rolls-slice";
 import RollCard from "../../components/RollCard/RollCard";
 import {Roll} from "../../domain/models/Roll";
 import {useSSERolls} from "../../data/api/useSSERolls";
 import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
-import {CharacterCard} from "../../components/Mj/CharacterCard";
-import {CharacterViewModel} from "../../domain/models/CharacterViewModel";
-import {setCharacters} from "../../data/store/character-slice";
-import {RootState} from "../../data/store";
-import {useSSECharacters} from "../../data/api/useSSECharacters";
 import styled from "styled-components";
 import {BattleState} from "../../domain/models/BattleState";
 import {UtilsRules} from "../../utils/UtilsRules";
+import {CharacterState} from "../../domain/models/CharacterState";
+import {Character} from "../../domain/models/Character";
+import {useSSECharactersSession} from "../../data/api/useSSECharacters";
+import {CharacterCard} from "../../components/Mj/CharacterCard";
 
 export function MjSheet() {
-    const dispatch = useDispatch();
+
+    const [charactersState, setCharactersState] = useState<Map<string,CharacterState>>(new Map<string,CharacterState>());
+    const [rolls, setRolls] = useState<Roll[]>([]);
+    const [charactersSession, setCharactersSession] = useState<Character[]>([]);
     const [charactersList, setCharactersList] = useState<{ pnj: string[]; pj: string[]; }>({
         pnj: [],
         pj: []
     });
+    const [selectedCharacters, setSelectedCharacters] = useState<string[]>([]);
 
-    async function fetchCharactersList() {
-        const list = await ApiL7RProvider.getCharactersByCategory();
-        setCharactersList(list);
-    }
-
-    async function fetchSessionCharacters() {
-        const characters = await ApiL7RProvider.getSessionCharacters();
-        dispatch(setCharacters(characters));
-    }
-
-    async function fetchRolls(): Promise<void> {
-        const rolls = await ApiL7RProvider.getRolls();
-        dispatch(setRolls(rolls));
-    }
 
     useEffect(() => {
         fetchSessionCharacters().then(() => {
@@ -45,46 +32,128 @@ export function MjSheet() {
         });
     }, []);
 
-    useSSECharacters()
-    useSSERolls();
-
-    const loadingCharacter: boolean = useSelector((store: RootState) =>
-        store.CHARACTERS.loading
-    );
-    const characterViewModels: CharacterViewModel[] = useSelector((store: RootState) =>
-        store.CHARACTERS.characterViewModels
-    );
-    const rolls: Roll[] = useSelector((store: RootState) =>
-        store.ROLLS.rolls
-    );
-
-
-
-    const clickOnSubir = async (roll: Roll, originRoll?: Roll) => {
-        const degats = UtilsRules.getDegats(roll, originRoll)
-        for (const characterViewModel of characterViewModels) {
-            if (characterViewModel.state.selected) {
-                await ApiL7RProvider.updateCharacter({
-                    ...characterViewModel.character,
-                    pv: Math.max(characterViewModel.character.pv - degats, 0)
-                })
-            }
+    async function fetchCharactersList() {
+        try {
+        const list = await ApiL7RProvider.getCharactersByCategory();
+        setCharactersList(list);
+        } catch (error) {
+            console.error('Error fetching characters list:', error);
         }
     }
 
-    const clickOnResist = async (stat: "chair" | "esprit" | "essence", resistRoll: string) => {
-        for (const characterViewModel of characterViewModels) {
-            if (characterViewModel.state.selected) {
+    async function fetchSessionCharacters() {
+        try {
+            const characters = await ApiL7RProvider.getSessionCharacters();
+            for(const character of characters) {
+                if(!charactersState.has(character.name)) {
+                    const characterState = new CharacterState({character: character});
+                    charactersState.set(character.name, characterState);
+                    setCharactersState(charactersState);
+                }
+            }
+            setCharactersSession(characters);
+        } catch (error) {
+            console.error('Error fetching characters session:', error);
+        }
+    }
+
+    async function fetchRolls(): Promise<void> {
+        try {
+            const rolls = await ApiL7RProvider.getRolls();
+            setRolls(rolls);
+        } catch (error) {
+            console.error('Error fetching rolls:', error);
+        }
+    }
+
+    useSSECharactersSession({
+        callback: (characters: Character[]) => {
+            setCharactersSession(characters);
+        }
+    });
+
+    useSSERolls({callback: (rolls: Roll[]) => {
+            setRolls(rolls);
+        }});
+
+
+    async function handleSendRoll(p: { characterName: string, skillName: string, empiriqueRoll?: string }) {
+        try {
+            const character = charactersSession.find((character) => character.name === p.characterName);
+            const characterState = charactersState.get(p.characterName) as CharacterState;
+            if (character) {
                 await ApiL7RProvider.sendRoll({
-                    skillName: stat,
-                    characterName: characterViewModel.character.name,
-                    focus: characterViewModel.state.focusActivated,
-                    power: characterViewModel.state.powerActivated,
-                    proficiency: Array.from(characterViewModel.state.proficiencies.values()).some((value) => value),
-                    secret: characterViewModel.state.secret,
-                    bonus: characterViewModel.state.bonus,
-                    malus: characterViewModel.state.malus,
-                    resistRoll: resistRoll
+                    skillName: p.skillName,
+                    characterName: character.name,
+                    focus: characterState.focusActivated,
+                    power: characterState.powerActivated,
+                    proficiency: Array.from(characterState.proficiencies.values()).some((value) => value),
+                    secret: characterState.secret,
+                    bonus: characterState.bonus,
+                    malus: characterState.malus,
+                    empiriqueRoll: p.empiriqueRoll
+                });
+            }
+        } catch (error) {
+            console.error('Error sending roll:', error);
+        }
+    }
+    async function handleUpdateState(characterName: string, newState: CharacterState) {
+        const newCharactersState = charactersState.set(characterName, newState);
+        setCharactersState(newCharactersState);
+    }
+
+    async function handleSelectCharacter(characterName: string) {
+        if (selectedCharacters.includes(characterName)) {
+            setSelectedCharacters(selectedCharacters.filter((name) => name !== characterName));
+        } else {
+            setSelectedCharacters([...selectedCharacters, characterName]);
+        }
+    }
+
+    async function handleUpdateCharacter(characterName: string, newCharacter: Character) {
+        console.log('update character', characterName, newCharacter.pv);
+        await ApiL7RProvider.updateCharacter(newCharacter);
+    }
+
+    const clickOnSubir = async (p:{roll: Roll, originRoll?: Roll}) => {
+        const degats = UtilsRules.getDegats(p.roll, p.originRoll)
+
+            if(p.originRoll) {
+                const character = charactersSession.find((character) => character.name === p.roll.rollerName);
+                if(character) {
+                await ApiL7RProvider.updateCharacter({
+                    ...character,
+                    pv: Math.max(character.pv - degats, 0)
+                })
+                }
+            } else {
+                for (const character of charactersSession) {
+                if (selectedCharacters.includes(character.name)) {
+                    await ApiL7RProvider.updateCharacter({
+                        ...character,
+                        pv: Math.max(character.pv - degats, 0)
+                    })
+                }
+                }
+
+        }
+    }
+
+    const clickOnResist = async (p:{stat: "chair" | "esprit" | "essence", resistRoll: string}) => {
+        for (const character of charactersSession) {
+            if (selectedCharacters.includes(character.name)) {
+                const state = charactersState.get(character.name) as CharacterState;
+                await ApiL7RProvider.sendRoll({
+                    skillName: p.stat,
+                    characterName: character.name,
+                    focus: state.focusActivated,
+                    power: state.powerActivated,
+                    proficiency: Array.from(state.proficiencies.values()).some((value) => value),
+                    secret: state.secret,
+                    bonus: state.bonus,
+                    malus: state.malus,
+                    resistRoll: p.resistRoll
                 })
             }
         }
@@ -103,18 +172,17 @@ export function MjSheet() {
         } else if (idAction === 'RESET_ROLLS') {
             ApiL7RProvider.resetRolls().then(() => {});
         } else if (idAction === 'RESET_CHARS') {
-            for (const characterViewModel of characterViewModels) {
-                if (characterViewModel.state.selected) {
+            for (const character of charactersSession) {
+                if (selectedCharacters.includes(character.name)) {
                     await ApiL7RProvider.updateCharacter({
-                        ...characterViewModel.character,
-                        pv: characterViewModel.character.pvMax,
-                        pf: characterViewModel.character.pfMax,
-                        pp: characterViewModel.character.ppMax,
-                        arcanes: characterViewModel.character.arcanesMax,
+                        ...character,
+                        pv: character.pvMax,
+                        pf: character.pfMax,
+                        pp: character.ppMax,
+                        arcanes: character.arcanesMax,
 
-                    }).then(async () => {
-                        await ApiL7RProvider.rest(characterViewModel.character)
                     })
+                    await ApiL7RProvider.rest(character.name)
                 }
             }
         }
@@ -122,10 +190,6 @@ export function MjSheet() {
         selectElement.value = 'action';
     }
     return (
-        <>
-            {loadingCharacter ? (
-                <p>Loading...</p>
-            ) : (
                 <div>
                     <MjHeader>
                             <SelectContainer>
@@ -155,47 +219,59 @@ export function MjSheet() {
                     </MjHeader>
                     <MjPageContainer>
                         <CharactersContainer>
-                            {characterViewModels.length > 0 ? (
-                                characterViewModels
-                                    .filter((characterVM) => characterVM.character.battleState === BattleState.ALLIES)
-                                    .map((characterVM, index) => (
+                            {charactersSession.length > 0 ? (
+                                charactersSession
+                                    .filter((character) => character.battleState === BattleState.ALLIES)
+                                    .map((character, index) => (
                                     <CharacterCard
                                         onChange={
                                         (battleState: BattleState) =>
-                                        {onCharacterBattleStateChange(characterVM.character.name, battleState)
+                                        {onCharacterBattleStateChange(character.name, battleState)
                                             .then(() => {})
                                         }}
                                         onDelete={
                                             () =>
-                                            {onCharacterBattleStateChange(characterVM.character.name, BattleState.NONE)
+                                            {onCharacterBattleStateChange(character.name, BattleState.NONE)
                                                 .then(() => {})
                                             }}
                                         key={index}
                                         allie={true}
-                                        characterViewModel={characterVM}
+                                        character={character}
+                                        characterState={charactersState.get(character.name) ?? new CharacterState({character: character})}
+                                        sendRoll={handleSendRoll}
+                                        selected={selectedCharacters.includes(character.name)}
+                                        updateCharacter={handleUpdateCharacter}
+                                        updateState={handleUpdateState}
+                                        onSelect={handleSelectCharacter}
                                     />
                                 ))
                             ) : (
                                 <></>
                             )}
-                            {characterViewModels.length > 0 ? (
-                                characterViewModels
-                                    .filter((characterVM) => characterVM.character.battleState === BattleState.ENNEMIES)
-                                    .map((characterVM, index) => (
+                            {charactersSession.length > 0 ? (
+                                charactersSession
+                                    .filter((character) => character.battleState === BattleState.ENNEMIES)
+                                    .map((character, index) => (
                                         <CharacterCard
                                             onChange={
                                                 (battleState: BattleState) =>
-                                                {onCharacterBattleStateChange(characterVM.character.name, battleState)
+                                                {onCharacterBattleStateChange(character.name, battleState)
                                                     .then(() => {})
                                                 }}
                                             onDelete={
                                                 () =>
-                                                {onCharacterBattleStateChange(characterVM.character.name, BattleState.NONE)
+                                                {onCharacterBattleStateChange(character.name, BattleState.NONE)
                                                     .then(() => {})
                                                 }}
                                             key={index}
                                             allie={false}
-                                            characterViewModel={characterVM}
+                                            character={character}
+                                            characterState={charactersState.get(character.name) ?? new CharacterState({character: character})}
+                                            sendRoll={handleSendRoll}
+                                            selected={selectedCharacters.includes(character.name)}
+                                            updateCharacter={handleUpdateCharacter}
+                                            updateState={handleUpdateState}
+                                            onSelect={handleSelectCharacter}
                                         />
                                 ))
                             ) : (
@@ -205,15 +281,12 @@ export function MjSheet() {
                         <RollsContainer>
                             {rolls.map((roll: Roll) => (
                                 <div key={roll.id}>
-                                    <RollCard roll={roll} clickOnResist={clickOnResist}  clickOnSubir={clickOnSubir}/>
+                                    <RollCard mjDisplay={true} roll={roll} clickOnResist={clickOnResist}  clickOnSubir={clickOnSubir}/>
                                 </div>
                             ))}
                         </RollsContainer>
                     </MjPageContainer>
                 </div>
-
-            )}
-        </>
     );
 
 }

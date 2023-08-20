@@ -15,6 +15,8 @@ export class CharacterUpdateRequest {
     arcanesMax: number
     arcanePrimes: number
     arcanePrimesMax: number
+    munitions: number
+    munitionsMax: number
     niveau: number
     lux: string
     umbra: string
@@ -44,6 +46,8 @@ export class CharacterUpdateRequest {
         this.arcanesMax = character.arcanesMax
         this.arcanePrimes = character.arcanePrimes
         this.arcanePrimesMax = character.arcanePrimesMax
+        this.munitions = character.munitions
+        this.munitionsMax = character.munitionsMax
         this.niveau = character.niveau
         this.lux = character.lux
         this.umbra = character.umbra
