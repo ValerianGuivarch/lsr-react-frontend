@@ -9,7 +9,8 @@ import CharacterSelection from "./pages/CharacterSelection/CharacterSelection";
 import {CharacterSheet} from "./pages/CharacterSheet/CharacterSheet";
 import {CharacterEdition} from "./pages/CharacterEdition/CharacterEdition";
 import {MjSheet} from "./pages/MjSheet/MjSheet";
-import {CharacterControllingSheet} from "./pages/CharacterSheet/CharacterControllingSheet";
+import {CharacterControllingSheet} from "./pages/CharacterPanelSheet/CharacterControllingSheet";
+import {CharacterMunitionsSheet} from "./pages/CharacterSheet/CharacterMunitionsSheet";
 
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -22,6 +23,7 @@ root.render(
                     <Route path="/" element={<CharacterSelection />} />
                     <Route path="/characters/:characterName" element={<CharacterSheet />} />
                     <Route path="/characters/:characterName/invocation" element={<CharacterControllingSheet />} />
+                    <Route path="/characters/:characterName/munitions" element={<CharacterMunitionsSheet />} />
                     <Route path="/mj" element={<MjSheet/>} />
                     <Route path="/characters/:characterName/edit" element={<CharacterEdition />} />
                 </Route>

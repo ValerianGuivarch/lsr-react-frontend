@@ -4,6 +4,7 @@ import {ApotheoseRaw} from "./ApotheoseRaw";
 
 export interface CharacterRaw {
     name: string
+    controlledBy?: string
     classe: {
         name: string,
         display: string
@@ -31,6 +32,8 @@ export interface CharacterRaw {
     arcanesMax: number
     arcanePrimes: number
     arcanePrimesMax: number
+    munitions: number
+    munitionsMax: number
     niveau: number
     lux: string
     umbra: string

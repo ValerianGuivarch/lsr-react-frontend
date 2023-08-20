@@ -5,14 +5,14 @@ import {Character} from "../../../domain/models/Character";
 import {ModalDisplay, ModalEmpiriqueButtonValidation, ModalDisplayTitle} from "./ModalStyle";
 
 export function LongRestModal (props : {
-    currentCharacter: Character,
+    character: Character,
     isOpen: boolean,
     onRequestClose: () => void
 }) {
-    const [longRestValue, setLongRestValue] = useState<number>(props.currentCharacter.longRest);
+    const [longRestValue, setLongRestValue] = useState<number>(props.character.longRest);
 
     const closing = () => {
-        setLongRestValue(props.currentCharacter.longRest);
+        setLongRestValue(props.character.longRest);
         props.onRequestClose();
     }
     return (
@@ -22,37 +22,37 @@ export function LongRestModal (props : {
             contentLabel="Repos Long"
         >
             <ModalDisplay>
-                <ModalDisplayTitle>Repos : {longRestValue} / {props.currentCharacter.longRest}</ModalDisplayTitle>
+                <ModalDisplayTitle>Repos : {longRestValue} / {props.character.longRest}</ModalDisplayTitle>
                 <button onClick={() => {
-                    if(props.currentCharacter.pv > 0 && longRestValue > 0) {
+                    if(props.character.pv > 0 && longRestValue > 0) {
                         ApiL7RProvider.updateCharacter({
-                            ...props.currentCharacter,
-                            pv: props.currentCharacter.pv - 1
+                            ...props.character,
+                            pv: props.character.pv - 1
                         }).then(() => {
                             setLongRestValue(longRestValue - 1);
                         })
                     }
-                }}>PV : {props.currentCharacter.pv} / {props.currentCharacter.pvMax}</button>
+                }}>PV : {props.character.pv} / {props.character.pvMax}</button>
                 <button onClick={() => {
-                    if(props.currentCharacter.pf > 0 && longRestValue > 0) {
+                    if(props.character.pf > 0 && longRestValue > 0) {
                         ApiL7RProvider.updateCharacter({
-                            ...props.currentCharacter,
-                            pf: props.currentCharacter.pf - 1
+                            ...props.character,
+                            pf: props.character.pf - 1
                         }).then(() => {
                             setLongRestValue(longRestValue - 1);
                         })
                     }
-                }}>PF : {props.currentCharacter.pf} / {props.currentCharacter.pfMax}</button>
+                }}>PF : {props.character.pf} / {props.character.pfMax}</button>
                 <button onClick={() => {
-                    if(props.currentCharacter.pp > 0 && longRestValue > 0) {
+                    if(props.character.pp > 0 && longRestValue > 0) {
                         ApiL7RProvider.updateCharacter({
-                            ...props.currentCharacter,
-                            pp: props.currentCharacter.pp - 1
+                            ...props.character,
+                            pp: props.character.pp - 1
                         }).then(() => {
                             setLongRestValue(longRestValue - 1);
                         })
                     }
-                }}>PP : {props.currentCharacter.pp} / {props.currentCharacter.ppMax}</button>
+                }}>PP : {props.character.pp} / {props.character.ppMax}</button>
                 <ModalEmpiriqueButtonValidation onClick={closing}>Valider</ModalEmpiriqueButtonValidation>
             </ModalDisplay>
         </ReactModal>

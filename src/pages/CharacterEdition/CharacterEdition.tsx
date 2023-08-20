@@ -2,12 +2,11 @@ import React, {useEffect} from 'react';
 import {useParams} from "react-router-dom";
 import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
 import {useDispatch, useSelector} from "react-redux";
-import {setCharacters, setCharacter} from "../../data/store/character-slice";
 import {RootState} from "../../data/store";
-import {CharacterViewModel} from "../../domain/models/CharacterViewModel";
 import styled from "styled-components";
 
 export function CharacterEdition() {
+    /*
     const dispatch = useDispatch();
     const {characterName} = useParams();
 
@@ -121,6 +120,8 @@ export function CharacterEdition() {
             </Form>
         </EditCharacterContainer>
     );
+     */
+    return <div>TODO</div>
 }
 
 const EditCharacterContainer = styled.div`

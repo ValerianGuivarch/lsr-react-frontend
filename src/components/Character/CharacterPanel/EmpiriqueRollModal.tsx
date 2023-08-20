@@ -9,10 +9,10 @@ import {
 } from "./ModalStyle";
 
 export interface EmpiriqueRollModalProps {
-    currentCharacter: Character;
+    character: Character;
     isOpen: boolean;
     onRequestClose: () => void;
-    sendRoll: (skillName: string, empiriqueRoll?: string) => void;
+    sendRoll: (empiriqueRoll: string) => void;
 }
 
 export function EmpiriqueRollModal(props: EmpiriqueRollModalProps) {
@@ -23,7 +23,7 @@ export function EmpiriqueRollModal(props: EmpiriqueRollModalProps) {
     };
 
     const handleValidationClick = () => {
-        props.sendRoll('empirique', empiriqueValue);
+        props.sendRoll(empiriqueValue);
         props.onRequestClose();
     };
 

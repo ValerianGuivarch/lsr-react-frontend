@@ -6,6 +6,7 @@ import {CharacterPreview} from "../../domain/models/CharacterPreview";
 import {Character} from "../../domain/models/Character";
 import {CharacterUpdateRequest} from "./CharacterUpdateRequest";
 import {CharacterRaw} from "./CharacterRaw";
+import {Skill} from "../../domain/models/Skill";
 
 export interface ApiResponse {
     error: boolean
@@ -88,8 +89,8 @@ export class ApiL7RProvider {
         const response = await L7RApi.updateCharacter(character.name, characterUpdateRequest);
         return new Character(response);
     }
-    static async rest(character: Character): Promise<void> {
-        await L7RApi.rest(character.name);
+    static async rest(characterName: string): Promise<void> {
+        await L7RApi.rest(characterName);
     }
 
     static async getSessionCharacters(): Promise<Character[]> {
@@ -104,5 +105,14 @@ export class ApiL7RProvider {
         return response.map((character: CharacterRaw) => {
             return new Character(character);
         })
+    }
+
+    static async deleteCharacter(controllerName: string, characterToDeleteName: string) {
+        await L7RApi.deleteCharacter(controllerName, characterToDeleteName);
+    }
+
+    static async updateCharacterMunitions(characterName: string, skillName: string, limitationMax: number): Promise<Character> {
+        const response = await L7RApi.updateCharacterMunitions(characterName, skillName, limitationMax);
+        return new Character(response);
     }
 }
