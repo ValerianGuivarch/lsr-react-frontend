@@ -28,22 +28,28 @@ export  function CharacterBlockBtn(props: {
             <CharacterBlocks>
                 <Separator text={displayCategoryName} display={!cardDisplay && (skills.length>0 || proficiencies.length>0 || apotheoses.length>0)}/>
                 <ButtonsRow cardDisplay={cardDisplay}>
-                    {skills.map((skill: Skill) => (
-                        <CharacterButton
-                            cardDisplay={cardDisplay}
-                            key={skill.name}
-                            description={skill.description}
-                            name={
-                                (cardDisplay ? skill.shortName : (skill.longName ? skill.longName : skill.name))
-                                + (skill.dailyUse !== null ? (
-                                    " ("+skill.dailyUse+")"
-                                ) : "")
+                    {skills.map((skill: Skill) => {
+                        const shouldDisplayButton = skill.dailyUse !== 0 || skill.limitationMax !== null;
+
+                        if (!shouldDisplayButton) {
+                            return null; // Skip rendering the button
                         }
-                            onClickBtn={() => {
-                                props.onClickSkill(skill.name)
-                            }}
-                        />
-                    ))}
+
+                        return (
+                            <CharacterButton
+                                cardDisplay={cardDisplay}
+                                key={skill.name}
+                                description={skill.description}
+                                name={
+                                    (cardDisplay ? skill.shortName : skill.longName || skill.name) +
+                                    (skill.dailyUse !== null ? ` (${skill.dailyUse}${skill.limitationMax !== null ? `/${skill.limitationMax}` : ''})` : '')
+                                }
+                                onClickBtn={() => {
+                                    props.onClickSkill(skill.name);
+                                }}
+                            />
+                        );
+                    })}
                     {proficiencies.map((proficiency: Proficiency) => (
                         <CharacterButton
                             cardDisplay={cardDisplay}

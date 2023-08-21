@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FaGun, FaPenToSquare, FaPeopleGroup } from 'react-icons/fa6';
+import { FaGear, FaGun, FaPenToSquare, FaPeopleGroup } from 'react-icons/fa6';
 import { Character } from '../../../domain/models/Character';
 import {IconType} from "react-icons";
-import { Classe } from '../../../domain/models/Classe';
 
 export function CharacterBanner(props: {
     character: Character;
@@ -55,6 +54,14 @@ export function CharacterBanner(props: {
                                     icon={FaGun}
                                     onClick={() => {
                                         window.location.href = `/characters/${props.character.name}/munitions`;
+                                    }}
+                                />
+                            )}
+                            {props.character.classe.name === "pacificateur" && (
+                                <EditCharacterIcon
+                                    icon={FaGear}
+                                    onClick={() => {
+                                        window.location.href = `/characters/${props.character.name}/cartouches`;
                                     }}
                                 />
                             )}

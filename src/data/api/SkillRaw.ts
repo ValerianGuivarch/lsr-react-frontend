@@ -7,4 +7,5 @@ export interface SkillRaw {
     dailyUse?: number
     limitationMax?: number
     soldatCost: number
+    isHeal: boolean
 }

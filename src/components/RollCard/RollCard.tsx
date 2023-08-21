@@ -16,6 +16,7 @@ function Dice(props: { value: number }) {
 export interface RollCardProps {
     roll: Roll,
     mjDisplay: boolean,
+    allies?: string[],
     originRoll?: Roll,
     clickOnResist?: (p:{stat: "chair"|"esprit"|"essence",
                      resistRoll: string}) => void
@@ -122,6 +123,7 @@ export default function RollCard(props: RollCardProps) {
                         }
                     </DicesDisplay>
                 }
+                {props.roll.isHeal && <span>Soins !</span>}
                 <Rolls>
                     {roll.resistRolls && roll.resistRolls.map((subRoll: Roll) => (
                         <div key={subRoll.id}>

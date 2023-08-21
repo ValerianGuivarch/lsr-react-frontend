@@ -10,6 +10,7 @@ export class Skill {
     dailyUse?: number
     limitationMax?: number
     soldatCost: number
+    isHeal: boolean
     constructor(p: SkillRaw) {
         this.name = p.name
         this.shortName = p.shortName
@@ -19,6 +20,7 @@ export class Skill {
         this.dailyUse = p.dailyUse
         this.limitationMax = p.limitationMax
         this.soldatCost = p.soldatCost
+        this.isHeal = p.isHeal
     }
 
 }

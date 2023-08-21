@@ -5,7 +5,6 @@ import {CharacterPreviewRaw} from "./CharacterPreviewRaw";
 import {Character} from "../../domain/models/Character";
 import {CharacterUpdateRequest} from "./CharacterUpdateRequest";
 import {RollRaw} from "./RollRaw";
-import {Skill} from "../../domain/models/Skill";
 
 export class L7RApi {
 
@@ -89,11 +88,10 @@ export class L7RApi {
         await axios.delete(`${config.BASE_URL}/characters/`+controllerName+`/characters-controller/`+characterToDeleteName);
     }
 
-    static async updateCharacterMunitions(characterName: string, skillName: string, limitationMax: number): Promise<CharacterRaw> {
-        const response = await axios.put(`${config.BASE_URL}/characters/`+characterName+`/munitions`, {
+    static async updateCharacterSkillsAttribution(characterName: string, skillName: string, dailyUse: number): Promise<void> {
+        await axios.put(`${config.BASE_URL}/characters/`+characterName+`/skills`, {
             skillName: skillName,
-            limitationMax: limitationMax
+            dailyUse: dailyUse
         });
-        return response.data;
     }
 }

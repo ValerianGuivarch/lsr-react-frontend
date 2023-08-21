@@ -8,11 +8,10 @@ import {Character} from "../../domain/models/Character";
 import {Skill} from "../../domain/models/Skill";
 import {CharacterButton} from "../../components/Character/CharacterButtons/CharacterButton";
 
-export function CharacterMunitionsSheet() {
+export function CharacterCartouchesSheet() {
     const {characterName} = useParams();
-    const [munitionsList, setMunitionsList] = useState<Skill[]>([]);
+    const [cartouchesList, setCartouchesList] = useState<Skill[]>([]);
     const [character, setCharacter] = useState<Character | undefined>(undefined);
-    const [munitionMax, setMunitionMax] = useState<number>(0);
 
 
     useEffect(() => {
@@ -24,10 +23,8 @@ export function CharacterMunitionsSheet() {
         try {
             const character = await ApiL7RProvider.getCharacterByName(characterName ?? '');
             setCharacter(character);
-            const munitionsList = character.skills.filter((skill) => skill.soldatCost && skill.soldatCost > 0);
-            setMunitionsList(munitionsList);
-            const munitionsMax = character.niveau - munitionsList.map((skill) => (skill.dailyUse ?? 0) * skill.soldatCost).reduce((a, b) => a + b, 0);
-            setMunitionMax(munitionsMax);
+            const cartouchesList = character.skills.filter((skill) => skill.dailyUse !== null);
+            setCartouchesList(cartouchesList);
         } catch (error) {
             console.error('Error fetching character:', error);
         }
@@ -40,12 +37,11 @@ export function CharacterMunitionsSheet() {
         }
     });
 
-    async function handleMunitionsEvolution(munitionName: string, evolution: number) {
-        const munition = munitionsList.find((munition) => munition.name === munitionName);
-        const evolutionEffective = evolution * (munition?.soldatCost ?? 0);
-        if(character && munition && munition.dailyUse !== undefined && (munitionMax - evolutionEffective >= 0) && (munition.dailyUse + evolution >= 0)) {
-            const dailyUse = munition.dailyUse + evolution;
-            await ApiL7RProvider.updateCharacterSkillsAttribution(characterName ?? '', munitionName, dailyUse);
+    async function handleCartouchesEvolution(cartoucheName: string, evolution: number) {
+        const cartouche = cartouchesList.find((cartouche) => cartouche.name === cartoucheName);
+        if(character && cartouche && cartouche.dailyUse !== undefined && (cartouche.dailyUse + evolution >= 0)) {
+            const dailyUse = cartouche.dailyUse + evolution;
+            await ApiL7RProvider.updateCharacterSkillsAttribution(characterName ?? '', cartoucheName, dailyUse);
             fetchCharacter().then(() => {});
         }
     }
@@ -63,17 +59,16 @@ export function CharacterMunitionsSheet() {
                     <CharacterBanner
                         character={character}
                     />
-                    <MunitionsRemaining>Munitions restantes : {munitionMax}</MunitionsRemaining>
-                    {munitionsList.map((munitions) => (
-                        <div key={munitions.name}>
+                    {cartouchesList.map((cartouches) => (
+                        <div key={cartouches.name}>
                             <CharacterButton
                                 cardDisplay={false}
-                                name={munitions.name + ' : '+munitions.dailyUse + ' [' + munitions.soldatCost + ']'}
+                                name={cartouches.name + ' : '+cartouches.dailyUse }
                                 onClickDecr={() => {
-                                    handleMunitionsEvolution(munitions.name, -1);
+                                    handleCartouchesEvolution(cartouches.name, -1);
                                 }}
                                 onClickIncr={() => {
-                                    handleMunitionsEvolution(munitions.name, 1);
+                                    handleCartouchesEvolution(cartouches.name, 1);
                                 }}
                             />
                         </div>
@@ -96,7 +91,7 @@ const MainContainer = styled.div`
   margin: auto;
   padding: 20px;
 `;
-const MunitionsRemaining = styled.p`
+const CartouchesRemaining = styled.p`
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 10px;

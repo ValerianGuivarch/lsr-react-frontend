@@ -20,4 +20,5 @@ export interface RollRaw {
     display: string;
     stat: string;
     resistRolls: RollRaw[];
+    isHeal: boolean;
 }

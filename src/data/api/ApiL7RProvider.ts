@@ -111,8 +111,8 @@ export class ApiL7RProvider {
         await L7RApi.deleteCharacter(controllerName, characterToDeleteName);
     }
 
-    static async updateCharacterMunitions(characterName: string, skillName: string, limitationMax: number): Promise<Character> {
-        const response = await L7RApi.updateCharacterMunitions(characterName, skillName, limitationMax);
-        return new Character(response);
+    static async updateCharacterSkillsAttribution(characterName: string, skillName: string, dailyUse: number): Promise<void> {
+        await L7RApi.updateCharacterSkillsAttribution(characterName, skillName, dailyUse);
     }
+
 }
