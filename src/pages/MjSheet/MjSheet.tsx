@@ -77,13 +77,13 @@ export function MjSheet() {
         }});
 
 
-    async function handleSendRoll(p: { characterName: string, skillName: string, empiriqueRoll?: string }) {
+    async function handleSendRoll(p: { characterName: string, skillId: string, empiriqueRoll?: string }) {
         try {
             const character = charactersSession.find((character) => character.name === p.characterName);
             const characterState = charactersState.get(p.characterName) as CharacterState;
             if (character) {
                 await ApiL7RProvider.sendRoll({
-                    skillName: p.skillName,
+                    skillId: p.skillId,
                     characterName: character.name,
                     focus: characterState.focusActivated,
                     power: characterState.powerActivated,
@@ -145,7 +145,7 @@ export function MjSheet() {
             if (selectedCharacters.includes(character.name)) {
                 const state = charactersState.get(character.name) as CharacterState;
                 await ApiL7RProvider.sendRoll({
-                    skillName: p.stat,
+                    skillId: character.skills.find((skill) => skill.name === p.stat)?.id ?? '',
                     characterName: character.name,
                     focus: state.focusActivated,
                     power: state.powerActivated,

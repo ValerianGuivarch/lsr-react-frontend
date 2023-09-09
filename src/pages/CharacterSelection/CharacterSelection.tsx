@@ -19,7 +19,12 @@ class CharacterSelectionViewModel {
 
     handlePlayerNameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         this.dispatch(selectPlayerName(event.target.value));
+        const charactersForPlayer = this.state.pjsList.filter(item => item.playerName === event.target.value);
+        if (charactersForPlayer.length === 1) {
+            this.dispatch(selectCharacterName(""));
+        }
     };
+
 
     handleCharacterNameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         this.dispatch(selectCharacterName(event.target.value));
@@ -56,7 +61,7 @@ export default function CharacterSelection() {
                 <br />
                 <label>
                     Name:
-                    <select value={charactersName} onChange={viewModel.handleCharacterNameChange} disabled={!selectedPlayerName}>
+                    <select value={selectedCharacterName} onChange={viewModel.handleCharacterNameChange} disabled={!selectedPlayerName}>
                         <option value="">Personnage</option>
                         {pjsList
                             .filter((item: any) => item.playerName === selectedPlayerName)

@@ -11,7 +11,7 @@ export function CharacterCard(props: {
     character: Character,
     selected: boolean,
     allie: boolean,
-    sendRoll: (p:{characterName: string, skillName: string, empiriqueRoll?: string}) => void,
+    sendRoll: (p:{characterName: string, skillId: string, empiriqueRoll?: string}) => void,
     updateState: (characterName: string, newState: CharacterState) => void,
     updateCharacter: (characterName: string, newCharacter: Character) => void,
     onSelect: (characterName: string) => void,
@@ -45,10 +45,10 @@ export function CharacterCard(props: {
                         characterState={props.characterState}
                         cardDisplay={true}
                         character={props.character}
-                        sendRoll={(p:{skillName: string, empiriqueRoll?: string}) => {
+                        sendRoll={(p:{skillId: string, empiriqueRoll?: string}) => {
                             props.sendRoll({
                                 characterName: props.character.name,
-                                skillName: p.skillName,
+                                skillId: p.skillId,
                                 empiriqueRoll: p.empiriqueRoll
                             })
                         }}

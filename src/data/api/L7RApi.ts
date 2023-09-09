@@ -5,6 +5,7 @@ import {CharacterPreviewRaw} from "./CharacterPreviewRaw";
 import {Character} from "../../domain/models/Character";
 import {CharacterUpdateRequest} from "./CharacterUpdateRequest";
 import {RollRaw} from "./RollRaw";
+import {Roll} from "../../domain/models/Roll";
 
 export class L7RApi {
 
@@ -18,6 +19,14 @@ export class L7RApi {
         const response = await axios.get(`${config.BASE_URL}/characters`);
         return response.data;
     }
+
+    static async updateRoll(p:{
+        id: string
+        healPoint?: number,
+        success?:number
+    }): Promise<void>{
+       await axios.put(`${config.BASE_URL}/rolls/`+p.id, p);
+       }
     static async getCharacterByName (characterName: string): Promise<CharacterRaw> {
         console.log("kik1")
         console.log(characterName)
@@ -58,7 +67,7 @@ export class L7RApi {
 
     static async sendRoll(p:
         {
-            skillName: string,
+            skillId: string,
             characterName: string,
             focus: boolean,
             power: boolean,
@@ -71,7 +80,7 @@ export class L7RApi {
         }
         ): Promise<void> {
             await axios.post(`${config.BASE_URL}/rolls`, {
-                skillName: p.skillName,
+                skillId: ""+p.skillId,
                 rollerName: p.characterName,
                 focus: p.focus,
                 power: p.power,

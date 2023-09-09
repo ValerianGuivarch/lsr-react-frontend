@@ -23,7 +23,7 @@ export class Roll {
   stat?: SkillStat;
   display: string;
   resistRolls: Roll[];
-  isHeal: boolean;
+  healPoint?: number;
 
   constructor(p: RollRaw) {
     this.id = p.id;
@@ -47,6 +47,6 @@ export class Roll {
     this.display = p.display;
     this.stat = SkillStat[p.stat  as keyof typeof SkillStat];
     this.resistRolls = p.resistRolls.map(r => new Roll(r));
-    this.isHeal = p.isHeal;
+    this.healPoint = p.healPoint;
   }
 }

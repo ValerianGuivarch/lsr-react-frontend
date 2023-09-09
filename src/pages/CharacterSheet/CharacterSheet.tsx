@@ -12,12 +12,15 @@ import styled from "styled-components";
 import {UtilsRules} from "../../utils/UtilsRules";
 import {Character} from "../../domain/models/Character";
 import {CharacterState} from "../../domain/models/CharacterState";
+import {useSSECharactersPreviewSession} from "../../data/api/useSSECharactersPreview";
+import {CharacterPreview} from "../../domain/models/CharacterPreview";
 
 export function CharacterSheet() {
     const {characterName} = useParams();
     const [characterState, setCharacterState] = useState<CharacterState>(new CharacterState({}));
     const [rolls, setRolls] = useState<Roll[]>([]);
     const [character, setCharacter] = useState<Character | undefined>(undefined);
+    const [charactersSession, setCharactersSession] = useState<CharacterPreview[]>([]);
 
 
     useEffect(() => {
@@ -51,15 +54,21 @@ export function CharacterSheet() {
         }
     });
 
+    useSSECharactersPreviewSession({
+        callback: (charactersPreview: CharacterPreview[]) => {
+            setCharactersSession(charactersPreview);
+        }
+    });
+
     useSSERolls({callback: (rolls: Roll[]) => {
         setRolls(rolls);
     }});
 
-    async function handleSendRoll(p: { skillName: string, empiriqueRoll?: string }) {
+    async function handleSendRoll(p: { skillId: string, empiriqueRoll?: string }) {
         try {
             if (character) {
                 await ApiL7RProvider.sendRoll({
-                    skillName: p.skillName,
+                    skillId: p.skillId,
                     characterName: character.name,
                     focus: characterState.focusActivated,
                     power: characterState.powerActivated,
@@ -113,11 +122,31 @@ export function CharacterSheet() {
         }
     }
 
+    async function handleHealOnClick(p: { roll: Roll, characterName: string} )
+    {
+        try {
+            const healPoint = p.roll.healPoint
+            if(healPoint && healPoint > 0) {
+                const characterToHeal = await ApiL7RProvider.getCharacterByName(p.characterName);
+                await ApiL7RProvider.updateCharacter({
+                    ...characterToHeal,
+                    pv: Math.min(characterToHeal.pv + 1, characterToHeal.pvMax)
+                });
+                await ApiL7RProvider.updateRoll({
+                    id: p.roll.id,
+                    healPoint: healPoint - 1,
+                })
+            }
+        } catch (error) {
+            console.error('Error updating character:', error);
+        }
+    }
+
     async function handleResist(p: { stat: "chair" | "esprit" | "essence", resistRoll: string }) {
         try {
             if (character) {
                 await ApiL7RProvider.sendRoll({
-                    skillName: p.stat,
+                    skillId: character.skills.find((skill) => skill.name === p.stat)?.id ?? '',
                     characterName: character.name,
                     focus: characterState.focusActivated,
                     power: characterState.powerActivated,
@@ -153,7 +182,14 @@ export function CharacterSheet() {
                     <Rolls>
                         {rolls.map((roll: Roll) => (
                             <div key={roll.id}>
-                                <RollCard mjDisplay={false} roll={roll} clickOnResist={handleResist} clickOnSubir={handleSubir}/>
+                                <RollCard
+                                    mjDisplay={false}
+                                    roll={roll}
+                                    clickOnResist={handleResist}
+                                    clickOnSubir={handleSubir}
+                                    charactersSession={charactersSession}
+                                    onHealClick={handleHealOnClick}
+                                />
                             </div>
                         ))}
                     </Rolls>

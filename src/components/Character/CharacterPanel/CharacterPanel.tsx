@@ -21,7 +21,7 @@ export function CharacterPanel(props: {
     cardDisplay: boolean,
     character: Character,
     characterState: CharacterState,
-    sendRoll: (p:{skillName: string, empiriqueRoll?: string}) => void,
+    sendRoll: (p:{skillId: string, empiriqueRoll?: string}) => void,
     updateState: (newState: CharacterState) => void,
     updateCharacter: (newCharacter: Character) => void,
     rest?: () => void
@@ -73,7 +73,6 @@ export function CharacterPanel(props: {
             pf: character.pfMax,
             pp: character.ppMax,
         })
-        handleShortRest()
         setIsLongRestModalOpen(true);
     }
     function handleOnClickProficiency(proficiencyName: string) {
@@ -85,13 +84,13 @@ export function CharacterPanel(props: {
            })
         }
     }
-    function handleOnClickSkill(skillName: string) {
+    function handleOnClickSkill(skill: Skill | undefined) {
 
         /*const bonus = characterState.bonus + (characterState.lux ? 1 : 0) + (characterState.secunda ? 1 : 0);
         const malus = characterState.malus + (characterState.umbra ? 1 : 0);
         const hasProficiency = Array.from(characterState.proficiencies.values()).some((value) => value);
         */
-        const skill = character.skills.find((skill: Skill) => skill.name === skillName);
+
         if(skill) {
            /* if(skill.dailyUse !== null) {
                 props.updateState.updateCharacter({
@@ -109,8 +108,8 @@ export function CharacterPanel(props: {
                     props.sendRoll({skillName: skillName});
                 })
             } else {*/
-                props.sendRoll({skillName: skillName});
-            props.updateState({
+                props.sendRoll({skillId: skill.id});
+                 props.updateState({
                 ...characterState,
                 focusActivated: false,
                 powerActivated: false,
@@ -152,7 +151,7 @@ export function CharacterPanel(props: {
                         value={character.chair}
                         bonusValue={character.chairBonus}
                         onClickBtn={() => {
-                            handleOnClickSkill("chair");
+                            handleOnClickSkill(character.skills.find((skill: Skill) => skill.name === "chair"));
                         }}
                     />
                     <CharacterButton
@@ -177,7 +176,7 @@ export function CharacterPanel(props: {
                         }}
                         onClickBtn={() => {
                             if(character.pv === 0) {
-                                handleOnClickSkill("KO");
+                                handleOnClickSkill(character.skills.find((skill: Skill) => skill.name === "KO"));
                             }
                         }}/>
                     <CharacterButton
@@ -205,7 +204,7 @@ export function CharacterPanel(props: {
                         value={character.esprit}
                         bonusValue={character.espritBonus}
                         onClickBtn={() => {
-                            handleOnClickSkill("esprit");
+                            handleOnClickSkill(character.skills.find((skill: Skill) => skill.name === "esprit"));
                         }}
                     />
                     <CharacterButton
@@ -258,7 +257,7 @@ export function CharacterPanel(props: {
                         value={character.essence}
                         bonusValue={character.essenceBonus}
                         onClickBtn={() => {
-                            handleOnClickSkill("essence");
+                            handleOnClickSkill(character.skills.find((skill: Skill) => skill.name === "essence"));
                         }}
                     />
 
@@ -461,7 +460,10 @@ export function CharacterPanel(props: {
                 character={character}
                 isOpen={isEmpiriqueRollModalOpen}
                 sendRoll={(empiriqueRoll) => {
-                    props.sendRoll({skillName: "empirique", empiriqueRoll: empiriqueRoll});
+                    const skillEmpirique = character.skills.find((skill: Skill) => skill.name === "empirique");
+                    if(skillEmpirique) {
+                        props.sendRoll({skillId: skillEmpirique.id, empiriqueRoll: empiriqueRoll});
+                    }
                 }}
                 onRequestClose={() => {
                     setIsEmpiriqueRollModalOpen(false);

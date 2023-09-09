@@ -23,7 +23,7 @@ export function CharacterCartouchesSheet() {
         try {
             const character = await ApiL7RProvider.getCharacterByName(characterName ?? '');
             setCharacter(character);
-            const cartouchesList = character.skills.filter((skill) => skill.dailyUse !== null);
+            const cartouchesList = character.skills.filter((skill) => skill.dailyUse !== undefined);
             setCartouchesList(cartouchesList);
         } catch (error) {
             console.error('Error fetching character:', error);

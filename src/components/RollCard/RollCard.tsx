@@ -4,6 +4,7 @@ import {FaDiceFive, FaDiceFour, FaDiceOne, FaDiceSix, FaDiceThree, FaDiceTwo} fr
 import {SkillStat} from "../../domain/models/SkillStat";
 import styled from "styled-components";
 import {UtilsRules} from "../../utils/UtilsRules";
+import {CharacterPreview} from "../../domain/models/CharacterPreview";
 
 
 function Dice(props: { value: number }) {
@@ -16,11 +17,15 @@ function Dice(props: { value: number }) {
 export interface RollCardProps {
     roll: Roll,
     mjDisplay: boolean,
-    allies?: string[],
+    charactersSession?: CharacterPreview[],
+    isAlly?: boolean,
     originRoll?: Roll,
-    clickOnResist?: (p:{stat: "chair"|"esprit"|"essence",
-                     resistRoll: string}) => void
-    clickOnSubir?: (p:{roll: Roll, originRoll?: Roll}) => void
+    clickOnResist?: (p: {
+        stat: "chair" | "esprit" | "essence",
+        resistRoll: string
+    }) => void
+    clickOnSubir?: (p: { roll: Roll, originRoll?: Roll }) => void,
+    onHealClick?: (p: { roll: Roll, characterName: string }) => void
 }
 
 function getRollEffectText(roll: Roll) {
@@ -99,15 +104,27 @@ export default function RollCard(props: RollCardProps) {
                     {
                         (roll.stat && props.clickOnResist && (roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)) &&
                         <>
-                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist({stat:"chair", resistRoll:roll.id})}>R-Chair</ClickableStat>]
-                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist({stat:"esprit", resistRoll:roll.id})}>R-Esprit</ClickableStat>]
-                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist({stat:"essence", resistRoll:roll.id})}>R-Essence</ClickableStat>]
+                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist({
+                            stat: "chair",
+                            resistRoll: roll.id
+                        })}>R-Chair</ClickableStat>]
+                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist({
+                            stat: "esprit",
+                            resistRoll: roll.id
+                        })}>R-Esprit</ClickableStat>]
+                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist({
+                            stat: "essence",
+                            resistRoll: roll.id
+                        })}>R-Essence</ClickableStat>]
                         </>
                     }
                     {
                         (roll.stat && props.clickOnSubir && (roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)) &&
                         <>
-                            [<ClickableStat onClick={() => props.clickOnSubir && props.clickOnSubir({roll:roll, originRoll:props.originRoll})}>Subir {UtilsRules.getDegats(roll, props.originRoll)}</ClickableStat>]
+                            [<ClickableStat onClick={() => props.clickOnSubir && props.clickOnSubir({
+                            roll: roll,
+                            originRoll: props.originRoll
+                        })}>Subir {UtilsRules.getDegats(roll, props.originRoll)}</ClickableStat>]
                         </>
                     }
                 </TextPartOne>
@@ -123,11 +140,24 @@ export default function RollCard(props: RollCardProps) {
                         }
                     </DicesDisplay>
                 }
-                {props.roll.isHeal && <span>Soins !</span>}
+                {
+                    (props.roll.healPoint !== undefined) && props.onHealClick && props.charactersSession &&
+                    (<div>Soin : [{props.roll.healPoint}/{props.roll.success}]
+                        {props.charactersSession.map(characterPreview => (
+                            <HealingButton key={characterPreview.name}
+                                           onClick={() => props.onHealClick && props.onHealClick({
+                                               characterName: characterPreview.name,
+                                               roll: roll
+                                           })}>
+                                {characterPreview.name} ({characterPreview.pv}/{characterPreview.pvMax})
+                            </HealingButton>
+                        ))}</div>)
+                }
                 <Rolls>
                     {roll.resistRolls && roll.resistRolls.map((subRoll: Roll) => (
                         <div key={subRoll.id}>
-                            <RollCard mjDisplay={props.mjDisplay} roll={subRoll} originRoll={roll} clickOnResist={undefined} clickOnSubir={props.clickOnSubir}/>
+                            <RollCard mjDisplay={props.mjDisplay} roll={subRoll} originRoll={roll}
+                                      clickOnResist={undefined} clickOnSubir={props.clickOnSubir}/>
                         </div>
                     ))}
                 </Rolls>
@@ -159,18 +189,18 @@ const DicesDisplay = styled.div`
 `;
 
 const ClickableStat = styled.span`
-  color: #007BFF;  // Typical hyperlink blue color
+  color: #007BFF; // Typical hyperlink blue color
   font-weight: bold;
-  text-decoration: none;  // Links might not always be underlined
+  text-decoration: none; // Links might not always be underlined
   cursor: pointer;
 
   &:hover {
-    color: #0056b3;  // Darken the color a bit on hover
+    color: #0056b3; // Darken the color a bit on hover
     text-decoration: underline;
   }
 
   &:active {
-    color: #004085;  // Further darken for active state
+    color: #004085; // Further darken for active state
   }
 `;
 
@@ -179,4 +209,22 @@ const Rolls = styled.div`
 `;
 
 
+const HealingButton = styled.button`
+  padding: 10px 15px;
+  margin: 5px 0;
+  border: none;
+  border-radius: 5px;
+  background-color: #007BFF; // Vous pouvez ajuster la couleur si nécessaire
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #0056b3; // Une couleur plus foncée pour l'effet hover
+  }
+
+  &:active {
+    background-color: #004085; // Une couleur encore plus foncée pour l'effet active
+  }
+`;
 

@@ -40,7 +40,7 @@ export class ApiL7RProvider {
     }
     static async sendRoll(p:
         {
-            skillName: string,
+            skillId: string,
             characterName: string,
             focus: boolean,
             power: boolean,
@@ -88,6 +88,14 @@ export class ApiL7RProvider {
         const characterUpdateRequest = new CharacterUpdateRequest(character);
         const response = await L7RApi.updateCharacter(character.name, characterUpdateRequest);
         return new Character(response);
+    }
+
+    static async updateRoll(p:{
+        id: string,
+        healPoint?: number,
+        success?:number
+    }): Promise<void> {
+         await L7RApi.updateRoll(p);
     }
     static async rest(characterName: string): Promise<void> {
         await L7RApi.rest(characterName);

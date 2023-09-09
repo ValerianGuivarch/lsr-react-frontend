@@ -15,7 +15,7 @@ export  function CharacterBlockBtn(props: {
         cardDisplay: boolean,
     displayCategoryName: string,
         displayCategory: DisplayCategory,
-    onClickSkill: (skillName: string) => void,
+    onClickSkill: (skill: Skill) => void,
     onClickProficiency: (proficiencyName: string) => void,
     onClickApotheose: (apotheoseName: string) => void,
     updateState: (newState: CharacterState) => void
@@ -29,7 +29,7 @@ export  function CharacterBlockBtn(props: {
                 <Separator text={displayCategoryName} display={!cardDisplay && (skills.length>0 || proficiencies.length>0 || apotheoses.length>0)}/>
                 <ButtonsRow cardDisplay={cardDisplay}>
                     {skills.map((skill: Skill) => {
-                        const shouldDisplayButton = skill.dailyUse !== 0 || skill.limitationMax !== null;
+                        const shouldDisplayButton = skill.dailyUse !== 0 || skill.dailyUseMax !== undefined;
 
                         if (!shouldDisplayButton) {
                             return null; // Skip rendering the button
@@ -42,10 +42,10 @@ export  function CharacterBlockBtn(props: {
                                 description={skill.description}
                                 name={
                                     (cardDisplay ? skill.shortName : skill.longName || skill.name) +
-                                    (skill.dailyUse !== null ? ` (${skill.dailyUse}${skill.limitationMax !== null ? `/${skill.limitationMax}` : ''})` : '')
+                                    (skill.dailyUse !== undefined ? ` (${skill.dailyUse}${skill.dailyUseMax !== undefined ? `/${skill.dailyUseMax}` : ''})` : '')
                                 }
                                 onClickBtn={() => {
-                                    props.onClickSkill(skill.name);
+                                    props.onClickSkill(skill);
                                 }}
                             />
                         );
