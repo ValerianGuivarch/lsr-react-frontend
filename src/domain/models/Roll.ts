@@ -1,5 +1,5 @@
-import {RollRaw} from "../../data/api/RollRaw";
-import {SkillStat} from "./SkillStat";
+import { RollRaw } from "../../data/api/RollRaw";
+import { SkillStat } from "./SkillStat";
 
 export class Roll {
   id: string;
@@ -24,6 +24,10 @@ export class Roll {
   display: string;
   resistRolls: Roll[];
   healPoint?: number;
+  resistance: boolean;
+  blessure: boolean;
+  help: boolean;
+  precision?: string;
 
   constructor(p: RollRaw) {
     this.id = p.id;
@@ -45,8 +49,12 @@ export class Roll {
     this.data = p.data;
     this.empirique = p.empirique;
     this.display = p.display;
-    this.stat = SkillStat[p.stat  as keyof typeof SkillStat];
-    this.resistRolls = p.resistRolls.map(r => new Roll(r));
+    this.stat = SkillStat[p.stat as keyof typeof SkillStat];
+    this.resistRolls = p.resistRolls.map((r) => new Roll(r));
     this.healPoint = p.healPoint;
+    this.resistance = p.resistance;
+    this.blessure = p.blessure;
+    this.help = p.help;
+    this.precision = p.precision;
   }
 }

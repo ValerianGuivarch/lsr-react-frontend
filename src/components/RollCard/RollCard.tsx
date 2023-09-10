@@ -1,169 +1,251 @@
-import React from 'react';
-import {Roll} from "../../domain/models/Roll";
-import {FaDiceFive, FaDiceFour, FaDiceOne, FaDiceSix, FaDiceThree, FaDiceTwo} from 'react-icons/fa6';
-import {SkillStat} from "../../domain/models/SkillStat";
+import React from "react";
+import { Roll } from "../../domain/models/Roll";
+import {
+  FaDiceFive,
+  FaDiceFour,
+  FaDiceOne,
+  FaDiceSix,
+  FaDiceThree,
+  FaDiceTwo,
+} from "react-icons/fa6";
+import { SkillStat } from "../../domain/models/SkillStat";
 import styled from "styled-components";
-import {UtilsRules} from "../../utils/UtilsRules";
-import {CharacterPreview} from "../../domain/models/CharacterPreview";
-
+import { UtilsRules } from "../../utils/UtilsRules";
+import { CharacterPreview } from "../../domain/models/CharacterPreview";
 
 function Dice(props: { value: number }) {
-    const DiceIcon = [FaDiceOne, FaDiceTwo, FaDiceThree, FaDiceFour, FaDiceFive, FaDiceSix][props.value - 1];
+  const DiceIcon = [
+    FaDiceOne,
+    FaDiceTwo,
+    FaDiceThree,
+    FaDiceFour,
+    FaDiceFive,
+    FaDiceSix,
+  ][props.value - 1];
 
-    return <DiceIcon size="2em"/>;
+  return <DiceIcon size="2em" />;
 }
 
-
 export interface RollCardProps {
-    roll: Roll,
-    mjDisplay: boolean,
-    charactersSession?: CharacterPreview[],
-    isAlly?: boolean,
-    originRoll?: Roll,
-    clickOnResist?: (p: {
-        stat: "chair" | "esprit" | "essence",
-        resistRoll: string
-    }) => void
-    clickOnSubir?: (p: { roll: Roll, originRoll?: Roll }) => void,
-    onHealClick?: (p: { roll: Roll, characterName: string }) => void
+  roll: Roll;
+  mjDisplay: boolean;
+  charactersSession?: CharacterPreview[];
+  isAlly?: boolean;
+  originRoll?: Roll;
+  clickOnResist?: (p: {
+    stat: "chair" | "esprit" | "essence";
+    resistRoll: string;
+  }) => void;
+  clickOnSubir?: (p: { roll: Roll; originRoll?: Roll }) => void;
+  clickOnHelp?: (p: { bonus: number; malus: number }) => void;
+  onHealClick?: (p: { roll: Roll; characterName: string }) => void;
 }
 
 function getRollEffectText(roll: Roll) {
-    let text = '(';
-    if (roll.bonus > 0) {
-        text += `${roll.bonus}b, `;
-    }
-    if (roll.malus > 0) {
-        text += `${roll.malus}m, `;
-    }
-    if (roll.focus) {
-        text += 'pf, ';
-    }
-    if (roll.power) {
-        text += 'pp, ';
-    }
-    if (roll.proficiency) {
-        text += 'h, ';
-    }
-    if (text !== '(') {
-        text = text.slice(0, -2); // Supprime la virgule et l'espace en trop à la fin
-        text += ')';
-    } else {
-        text = '';
-    }
-    return text;
+  let text = "(";
+  if (roll.bonus > 0) {
+    text += `${roll.bonus}b, `;
+  }
+  if (roll.malus > 0) {
+    text += `${roll.malus}m, `;
+  }
+  if (roll.focus) {
+    text += "pf, ";
+  }
+  if (roll.power) {
+    text += "pp, ";
+  }
+  if (roll.proficiency) {
+    text += "h, ";
+  }
+  if (text !== "(") {
+    text = text.slice(0, -2); // Supprime la virgule et l'espace en trop à la fin
+    text += ")";
+  } else {
+    text = "";
+  }
+  return text;
 }
 
 export default function RollCard(props: RollCardProps) {
-    const roll = props.roll
-    const displayParts = roll.display.split('*');
-    return (
-        <Container>
-            <Avatar src={props.roll.picture} alt={props.roll.rollerName}/>
-            <RollDisplay>
-                <TextPartOne>
-                    <span>{roll.secret ? '(secret) ' : ''} </span>
-                    <span>
-                        <b>
-                            {roll.rollerName
-                                .split(' ')
-                                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                                .join(' ') + ' '
-                            }
-                        </b>
-                    </span>
-                    <span>
-                        {
-                            displayParts.map((part, index) => {
-                                if (index % 2 === 1) {
-                                    return <em key={index}>{part}</em>;
-                                } else {
-                                    return <span key={index}>{part}</span>;
-                                }
-                            })
-                        }
-                    </span>
-                    <span>
-                        {getRollEffectText(roll)}
-                    </span>
-                    {
-                        roll.stat === SkillStat.CUSTOM
-                            ? <span>
-            <em>{roll.data}</em>
-                                {'.'}
+  const roll = props.roll;
+  const displayParts = roll.display.split("*");
+  return (
+    <Container>
+      <Avatar src={props.roll.picture} alt={props.roll.rollerName} />
+      <RollDisplay>
+        <TextPartOne>
+          <span>{roll.secret ? "(secret) " : ""} </span>
+          <span>
+            <b>
+              {roll.rollerName
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ") + " "}
+            </b>
           </span>
-                            : roll.success !== null
-                                ? <span>
-                {' et obtient '}
-                                    <em>{roll.success}</em>
-                                    {' succès.'}
-              </span>
-                                : '.'
-                    }
-
-                    {
-                        (roll.stat && props.clickOnResist && (roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)) &&
-                        <>
-                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist({
-                            stat: "chair",
-                            resistRoll: roll.id
-                        })}>R-Chair</ClickableStat>]
-                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist({
-                            stat: "esprit",
-                            resistRoll: roll.id
-                        })}>R-Esprit</ClickableStat>]
-                            [<ClickableStat onClick={() => props.clickOnResist && props.clickOnResist({
-                            stat: "essence",
-                            resistRoll: roll.id
-                        })}>R-Essence</ClickableStat>]
-                        </>
-                    }
-                    {
-                        (roll.stat && props.clickOnSubir && (roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)) &&
-                        <>
-                            [<ClickableStat onClick={() => props.clickOnSubir && props.clickOnSubir({
-                            roll: roll,
-                            originRoll: props.originRoll
-                        })}>Subir {UtilsRules.getDegats(roll, props.originRoll)}</ClickableStat>]
-                        </>
-                    }
-                </TextPartOne>
-                {
-                    (roll.displayDices || props.mjDisplay) && <DicesDisplay>
-                        {
-                            roll.result.map((dice, index) => {
-                                if (roll.stat === SkillStat.CHAIR || roll.stat === SkillStat.ESPRIT || roll.stat === SkillStat.ESSENCE)
-                                    return <Dice value={dice} key={index}/>
-                                else if (roll.stat === SkillStat.EMPIRIQUE || roll.stat === SkillStat.CUSTOM)
-                                    return <span key={index}>[{dice}]</span>
-                            })
-                        }
-                    </DicesDisplay>
+          <span>
+            {displayParts.map((part, index) => {
+              if (index % 2 === 1) {
+                return <em key={index}>{part}</em>;
+              } else {
+                return <span key={index}>{part}</span>;
+              }
+            })}
+          </span>
+          <span>{getRollEffectText(roll)}</span>
+          {roll.stat === SkillStat.CUSTOM ? (
+            <span>
+              <em>{roll.data}</em>
+              {"."}
+            </span>
+          ) : roll.success !== null ? (
+            <span>
+              {" et obtient "}
+              <em>{roll.success}</em>
+              {" succès."}
+            </span>
+          ) : (
+            "."
+          )}
+          {roll.stat && props.clickOnResist && roll.resistance && (
+            <>
+              <br />[
+              <ClickableStat
+                onClick={() =>
+                  props.clickOnResist &&
+                  props.clickOnResist({
+                    stat: "chair",
+                    resistRoll: roll.id,
+                  })
                 }
-                {
-                    (props.roll.healPoint !== undefined) && props.onHealClick && props.charactersSession &&
-                    (<div>Soin : [{props.roll.healPoint}/{props.roll.success}]
-                        {props.charactersSession.map(characterPreview => (
-                            <HealingButton key={characterPreview.name}
-                                           onClick={() => props.onHealClick && props.onHealClick({
-                                               characterName: characterPreview.name,
-                                               roll: roll
-                                           })}>
-                                {characterPreview.name} ({characterPreview.pv}/{characterPreview.pvMax})
-                            </HealingButton>
-                        ))}</div>)
+              >
+                R-Chair
+              </ClickableStat>
+              ] [
+              <ClickableStat
+                onClick={() =>
+                  props.clickOnResist &&
+                  props.clickOnResist({
+                    stat: "esprit",
+                    resistRoll: roll.id,
+                  })
                 }
-                <Rolls>
-                    {roll.resistRolls && roll.resistRolls.map((subRoll: Roll) => (
-                        <div key={subRoll.id}>
-                            <RollCard mjDisplay={props.mjDisplay} roll={subRoll} originRoll={roll}
-                                      clickOnResist={undefined} clickOnSubir={props.clickOnSubir}/>
-                        </div>
-                    ))}
-                </Rolls>
-            </RollDisplay>
-        </Container>
-    );
+              >
+                R-Esprit
+              </ClickableStat>
+              ] [
+              <ClickableStat
+                onClick={() =>
+                  props.clickOnResist &&
+                  props.clickOnResist({
+                    stat: "essence",
+                    resistRoll: roll.id,
+                  })
+                }
+              >
+                R-Essence
+              </ClickableStat>
+              ]
+            </>
+          )}
+          {roll.precision && (
+            <>
+              <br />
+              <em>{roll.precision}</em>
+            </>
+          )}
+          {roll.stat && props.clickOnSubir && roll.blessure && (
+            <>
+              [
+              <ClickableStat
+                onClick={() =>
+                  props.clickOnSubir &&
+                  props.clickOnSubir({
+                    roll: roll,
+                    originRoll: props.originRoll,
+                  })
+                }
+              >
+                Subir {UtilsRules.getDegats(roll, props.originRoll)}
+              </ClickableStat>
+              ]
+            </>
+          )}
+          {roll.stat && props.clickOnHelp && roll.help && (
+            <>
+              [
+              <ClickableStat
+                onClick={() =>
+                  props.clickOnHelp &&
+                  props.clickOnHelp({
+                    bonus: roll.success ? roll.success : 0,
+                    malus: roll.success ? 0 : 1,
+                  })
+                }
+              >
+                Aide {roll.success ? roll.success : -1}
+              </ClickableStat>
+              ]
+            </>
+          )}
+        </TextPartOne>
+        {(roll.displayDices || props.mjDisplay) && (
+          <DicesDisplay>
+            {roll.result.map((dice, index) => {
+              if (
+                roll.stat === SkillStat.CHAIR ||
+                roll.stat === SkillStat.ESPRIT ||
+                roll.stat === SkillStat.ESSENCE
+              )
+                return <Dice value={dice} key={index} />;
+              else if (
+                roll.stat === SkillStat.EMPIRIQUE ||
+                roll.stat === SkillStat.CUSTOM
+              )
+                return <span key={index}>[{dice}]</span>;
+            })}
+          </DicesDisplay>
+        )}
+        {props.roll.healPoint !== null &&
+          props.onHealClick &&
+          props.charactersSession && (
+            <div>
+              Soin [{props.roll.healPoint}/{props.roll.success}] :
+              {props.charactersSession.map((characterPreview) => (
+                <HealingButton
+                  key={characterPreview.name}
+                  onClick={() =>
+                    props.onHealClick &&
+                    props.onHealClick({
+                      characterName: characterPreview.name,
+                      roll: roll,
+                    })
+                  }
+                >
+                  {characterPreview.name} ({characterPreview.pv}/
+                  {characterPreview.pvMax})
+                </HealingButton>
+              ))}
+            </div>
+          )}
+        <Rolls>
+          {roll.resistRolls &&
+            roll.resistRolls.map((subRoll: Roll) => (
+              <div key={subRoll.id}>
+                <RollCard
+                  mjDisplay={props.mjDisplay}
+                  roll={subRoll}
+                  originRoll={roll}
+                  clickOnResist={undefined}
+                  clickOnSubir={props.clickOnSubir}
+                />
+              </div>
+            ))}
+        </Rolls>
+      </RollDisplay>
+    </Container>
+  );
 }
 
 const Container = styled.div`
@@ -179,17 +261,14 @@ const Avatar = styled.img`
   margin-right: 20px;
 `;
 
-const RollDisplay = styled.div`
-`;
+const RollDisplay = styled.div``;
 
-const TextPartOne = styled.div`
-`;
+const TextPartOne = styled.div``;
 
-const DicesDisplay = styled.div`
-`;
+const DicesDisplay = styled.div``;
 
 const ClickableStat = styled.span`
-  color: #007BFF; // Typical hyperlink blue color
+  color: #007bff; // Typical hyperlink blue color
   font-weight: bold;
   text-decoration: none; // Links might not always be underlined
   cursor: pointer;
@@ -204,27 +283,26 @@ const ClickableStat = styled.span`
   }
 `;
 
-
-const Rolls = styled.div`
-`;
-
+const Rolls = styled.div``;
 
 const HealingButton = styled.button`
-  padding: 10px 15px;
-  margin: 5px 0;
+  padding: 0; // Supprimez le padding
+  margin: 5px;
   border: none;
-  border-radius: 5px;
-  background-color: #007BFF; // Vous pouvez ajuster la couleur si nécessaire
-  color: white;
+  background-color: transparent; // Aucun fond
+  color: #007bff; // Couleur du texte cliquable
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: color 0.2s; // Transition sur la couleur du texte
+  text-align: left; // Alignement du texte à gauche
+  font-size: 16px; // Taille de la police, ajustez selon vos besoins
+  outline: none; // Supprimez le contour par défaut des boutons lorsqu'ils sont cliqués
 
   &:hover {
-    background-color: #0056b3; // Une couleur plus foncée pour l'effet hover
+    color: #0056b3; // Une couleur légèrement plus foncée pour l'effet hover
+    text-decoration: underline; // Soulignez le texte au survol pour indiquer qu'il est cliquable
   }
 
   &:active {
-    background-color: #004085; // Une couleur encore plus foncée pour l'effet active
+    color: #004085; // Une couleur encore plus foncée pour l'effet active
   }
 `;
-
