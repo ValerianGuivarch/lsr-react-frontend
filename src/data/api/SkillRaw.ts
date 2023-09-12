@@ -1,6 +1,7 @@
 export interface SkillRaw {
   id: string;
   name: string;
+  stat: string;
   shortName: string;
   longName?: string;
   description?: string;

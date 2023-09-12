@@ -7,6 +7,7 @@ import styled from "styled-components";
 import { Character } from "../../domain/models/Character";
 import { Skill } from "../../domain/models/Skill";
 import { CharacterButton } from "../../components/Character/CharacterButtons/CharacterButton";
+import { SkillStat } from "../../domain/models/SkillStat";
 
 export function CharacterCartouchesSheet() {
   const { characterName } = useParams();
@@ -75,6 +76,7 @@ export function CharacterCartouchesSheet() {
           {cartouchesList.map((cartouches) => (
             <div key={cartouches.name}>
               <CharacterButton
+                skillStat={SkillStat.FIXE}
                 cardDisplay={false}
                 name={cartouches.name + " : " + cartouches.dailyUse}
                 onClickDecr={() => {
@@ -88,6 +90,7 @@ export function CharacterCartouchesSheet() {
             </div>
           ))}
           <CharacterButton
+            skillStat={SkillStat.FIXE}
             cardDisplay={false}
             onClickBtn={handleValidation}
             name={"Valider"}

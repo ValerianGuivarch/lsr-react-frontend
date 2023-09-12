@@ -13,6 +13,8 @@ export class CharacterUpdateRequest {
   dettes: number;
   arcanes: number;
   arcanesMax: number;
+  ether: number;
+  etherMax: number;
   arcanePrimes: number;
   arcanePrimesMax: number;
   munitions: number;
@@ -44,6 +46,8 @@ export class CharacterUpdateRequest {
     this.dettes = character.dettes;
     this.arcanes = character.arcanes;
     this.arcanesMax = character.arcanesMax;
+    this.ether = character.ether;
+    this.etherMax = character.etherMax;
     this.arcanePrimes = character.arcanePrimes;
     this.arcanePrimesMax = character.arcanePrimesMax;
     this.munitions = character.munitions;

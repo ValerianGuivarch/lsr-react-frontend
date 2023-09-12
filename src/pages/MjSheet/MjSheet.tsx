@@ -222,6 +222,7 @@ export function MjSheet() {
             pf: character.pfMax,
             pp: character.ppMax,
             arcanes: character.arcanesMax,
+            ether: character.etherMax,
           });
           await ApiL7RProvider.rest(character.name);
         }

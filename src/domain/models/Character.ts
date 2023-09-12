@@ -31,9 +31,12 @@ export class Character {
   pfMax: number;
   pp: number;
   ppMax: number;
+  canUsePp: boolean;
   dettes: number;
   arcanes: number;
   arcanesMax: number;
+  ether: number;
+  etherMax: number;
   arcanePrimes: number;
   arcanePrimesMax: number;
   munitions: number;
@@ -90,9 +93,12 @@ export class Character {
     this.pfMax = p.pfMax;
     this.pp = p.pp;
     this.ppMax = p.ppMax;
+    this.canUsePp = p.classe.canUsePp;
     this.dettes = p.dettes;
     this.arcanes = p.arcanes;
     this.arcanesMax = p.arcanesMax;
+    this.ether = p.ether;
+    this.etherMax = p.etherMax;
     this.arcanePrimes = p.arcanePrimes;
     this.arcanePrimesMax = p.arcanePrimesMax;
     this.munitions = p.munitions;

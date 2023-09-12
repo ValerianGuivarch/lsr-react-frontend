@@ -1,8 +1,8 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { IconType } from "react-icons";
-import { css } from "styled-components";
+import { SkillStat } from "../../../domain/models/SkillStat";
 
 interface CharacterButtonProps {
   cardDisplay: boolean;
@@ -18,6 +18,7 @@ interface CharacterButtonProps {
   onClickBtn?: () => void;
   onClickIncr?: () => void;
   large?: boolean;
+  skillStat: SkillStat;
 }
 
 export function CharacterButton(props: CharacterButtonProps) {
@@ -102,6 +103,7 @@ export function CharacterButton(props: CharacterButtonProps) {
     props.maxValue,
     !!props.onClickDecr,
   );
+  const colors = ["#D6EAAF", "#D9AED9", "#A8DADC", "#F4E1D2"];
 
   return (
     <MainContainer
@@ -123,6 +125,15 @@ export function CharacterButton(props: CharacterButtonProps) {
         isActionButton={isActionButton}
         selected={props.selected}
         title={props.description}
+        color={
+          props.skillStat === SkillStat.CHAIR
+            ? colors[0]
+            : props.skillStat === SkillStat.ESPRIT
+            ? colors[1]
+            : props.skillStat === SkillStat.ESSENCE
+            ? colors[2]
+            : colors[3]
+        }
         onClick={props.onClickBtn}
       >
         {shouldDisplayIcon ? (
@@ -201,6 +212,7 @@ const ButtonSelectable = styled.div<{
   columnDisplay: boolean;
   selected?: boolean;
   isActionButton: boolean;
+  color: string;
 }>`
   display: flex;
   width: 100%;
@@ -209,7 +221,7 @@ const ButtonSelectable = styled.div<{
     props.cardDisplay && props.columnDisplay ? "column" : "row"};
   align-items: center;
   justify-content: center;
-  background-color: #f0f0f0;
+  background-color: ${(props) => props.color};
   padding: ${(props) => (props.cardDisplay ? "2px" : "8px")};
   border-radius: ${(props) =>
     props.isActionButton

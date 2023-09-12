@@ -8,6 +8,7 @@ import { CharacterButton } from "../CharacterButtons/CharacterButton";
 import styled from "styled-components";
 import { Proficiency } from "../../../domain/models/Proficiency";
 import { Character } from "../../../domain/models/Character";
+import { SkillStat } from "../../../domain/models/SkillStat";
 
 export function CharacterBlockBtn(props: {
   characterState: CharacterState;
@@ -70,6 +71,7 @@ export function CharacterBlockBtn(props: {
               <CharacterButton
                 cardDisplay={cardDisplay}
                 key={skill.name}
+                skillStat={skill.stat}
                 description={skill.description}
                 name={
                   (cardDisplay
@@ -93,6 +95,7 @@ export function CharacterBlockBtn(props: {
             const proficiency = element;
             return (
               <CharacterButton
+                skillStat={SkillStat.FIXE}
                 cardDisplay={cardDisplay}
                 selected={characterState.proficiencies.get(proficiency.name)}
                 key={proficiency.name}
@@ -108,6 +111,7 @@ export function CharacterBlockBtn(props: {
             const apotheose = element;
             return (
               <CharacterButton
+                skillStat={SkillStat.FIXE}
                 cardDisplay={cardDisplay}
                 selected={character.currentApotheose?.name === apotheose.name}
                 key={apotheose.name}
@@ -126,7 +130,10 @@ export function CharacterBlockBtn(props: {
   }
 
   // Répartir les éléments en groupes et les afficher
-  let allElements = [...skills, ...proficiencies, ...apotheoses];
+  const displayedSkills = skills.filter(
+    (skill) => !(skill.dailyUse === 0 && skill.dailyUseMax === undefined),
+  );
+  let allElements = [...displayedSkills, ...proficiencies, ...apotheoses];
   let startIndex = 0;
   return (
     <CharacterBlocks>

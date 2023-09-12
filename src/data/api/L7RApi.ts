@@ -51,12 +51,12 @@ export class L7RApi {
   static async updateCharacter(
     characterName: string,
     characterUpdateRequest: CharacterUpdateRequest,
-  ) {
+  ): Promise<CharacterRaw> {
     const response = await axios.put(
       `${config.BASE_URL}/characters/` + characterName,
       characterUpdateRequest,
     );
-    return new Character(response.data);
+    return response.data;
   }
 
   static async rest(characterName: string) {

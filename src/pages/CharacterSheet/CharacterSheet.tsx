@@ -207,6 +207,16 @@ export function CharacterSheet() {
     }
   }
 
+  function handleUpdateCharacterNotes(text: string) {
+    if (character) {
+      console.log("Update character notes:", text);
+      ApiL7RProvider.updateCharacter({
+        ...character,
+        notes: text,
+      });
+    }
+  }
+
   return (
     <>
       {!character ? (
@@ -214,7 +224,10 @@ export function CharacterSheet() {
       ) : (
         <MainContainer>
           <CharacterBanner character={character} />
-          <CharacterNotes />
+          <CharacterNotes
+            text={character.notes}
+            setText={handleUpdateCharacterNotes}
+          />
           <CharacterPanel
             characterState={characterState}
             cardDisplay={false}

@@ -7,6 +7,7 @@ import styled from "styled-components";
 import { Character } from "../../domain/models/Character";
 import { Skill } from "../../domain/models/Skill";
 import { CharacterButton } from "../../components/Character/CharacterButtons/CharacterButton";
+import { SkillStat } from "../../domain/models/SkillStat";
 
 export function CharacterMunitionsSheet() {
   const { characterName } = useParams();
@@ -87,6 +88,7 @@ export function CharacterMunitionsSheet() {
           {munitionsList.map((munitions) => (
             <div key={munitions.name}>
               <CharacterButton
+                skillStat={SkillStat.FIXE}
                 cardDisplay={false}
                 name={
                   munitions.name +
@@ -107,6 +109,7 @@ export function CharacterMunitionsSheet() {
             </div>
           ))}
           <CharacterButton
+            skillStat={SkillStat.FIXE}
             cardDisplay={false}
             onClickBtn={handleValidation}
             name={"Valider"}

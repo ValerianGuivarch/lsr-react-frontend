@@ -1,9 +1,11 @@
 import { SkillRaw } from "../../data/api/SkillRaw";
 import { DisplayCategory } from "./DisplayCategory";
+import { SkillStat } from "./SkillStat";
 
 export class Skill {
   id: string;
   name: string;
+  stat: SkillStat;
   shortName: string;
   longName?: string;
   description?: string;
@@ -17,6 +19,7 @@ export class Skill {
   constructor(p: SkillRaw) {
     this.id = p.id;
     this.name = p.name;
+    this.stat = SkillStat[p.stat as keyof typeof SkillStat];
     this.shortName = p.shortName;
     this.longName = p.longName;
     this.description = p.description;

@@ -16,6 +16,7 @@ import { FaSkullCrossbones } from "react-icons/fa";
 import { Skill } from "../../../domain/models/Skill";
 import { Proficiency } from "../../../domain/models/Proficiency";
 import { CharacterBlockBtn } from "./CharacterBlockBtn";
+import { SkillStat } from "../../../domain/models/SkillStat";
 
 export function CharacterPanel(props: {
   cardDisplay: boolean;
@@ -149,6 +150,7 @@ export function CharacterPanel(props: {
         <Separator text={"Stats"} display={!cardDisplay} />
         <ButtonsRow cardDisplay={cardDisplay}>
           <CharacterButton
+            skillStat={SkillStat.CHAIR}
             cardDisplay={cardDisplay}
             name={cardDisplay ? "ch" : "chair"}
             value={character.chair}
@@ -164,6 +166,7 @@ export function CharacterPanel(props: {
           />
           <CharacterButton
             cardDisplay={cardDisplay}
+            skillStat={SkillStat.CHAIR}
             name={"pv"}
             column={true}
             selected={false}
@@ -192,6 +195,7 @@ export function CharacterPanel(props: {
           />
           <CharacterButton
             cardDisplay={cardDisplay}
+            skillStat={SkillStat.FIXE}
             name={cardDisplay ? "bn" : "bonus"}
             selected={characterState.bonusActivated}
             value={characterState.bonus}
@@ -220,6 +224,7 @@ export function CharacterPanel(props: {
         <ButtonsRow cardDisplay={cardDisplay}>
           <CharacterButton
             cardDisplay={cardDisplay}
+            skillStat={SkillStat.ESPRIT}
             name={cardDisplay ? "sp" : "esprit"}
             value={character.esprit}
             bonusValue={
@@ -237,6 +242,7 @@ export function CharacterPanel(props: {
           <CharacterButton
             cardDisplay={cardDisplay}
             name={"pf"}
+            skillStat={SkillStat.ESPRIT}
             selected={characterState.focusActivated}
             value={character.pf}
             maxValue={character.pfMax}
@@ -265,6 +271,7 @@ export function CharacterPanel(props: {
           <CharacterButton
             cardDisplay={cardDisplay}
             name={cardDisplay ? "ml" : "malus"}
+            skillStat={SkillStat.FIXE}
             selected={characterState.malusActivated}
             value={characterState.malus}
             onClickIncr={() => {
@@ -291,6 +298,7 @@ export function CharacterPanel(props: {
         </ButtonsRow>
         <ButtonsRow cardDisplay={cardDisplay}>
           <CharacterButton
+            skillStat={SkillStat.ESSENCE}
             cardDisplay={cardDisplay}
             name={cardDisplay ? "es" : "essence"}
             value={character.essence}
@@ -310,6 +318,7 @@ export function CharacterPanel(props: {
           <CharacterButton
             cardDisplay={cardDisplay}
             name={"pp"}
+            skillStat={SkillStat.ESSENCE}
             selected={characterState.powerActivated}
             value={character.pp}
             maxValue={character.ppMax}
@@ -326,7 +335,7 @@ export function CharacterPanel(props: {
               });
             }}
             onClickBtn={() => {
-              if (character.pp > 0) {
+              if (character.pp > 0 && character.canUsePp) {
                 props.updateState({
                   ...characterState,
                   powerActivated: !characterState.powerActivated,
@@ -336,6 +345,7 @@ export function CharacterPanel(props: {
           />
           <CharacterButton
             cardDisplay={cardDisplay}
+            skillStat={SkillStat.ESSENCE}
             name={cardDisplay ? "dt" : "dettes"}
             selected={false}
             value={character.dettes}
@@ -357,6 +367,7 @@ export function CharacterPanel(props: {
           <ButtonsRow cardDisplay={cardDisplay}>
             <CharacterButton
               cardDisplay={cardDisplay}
+              skillStat={SkillStat.FIXE}
               name={"lux"}
               selected={characterState.lux}
               onClickBtn={() => {
@@ -369,6 +380,7 @@ export function CharacterPanel(props: {
             <CharacterButton
               cardDisplay={cardDisplay}
               name={"umbra"}
+              skillStat={SkillStat.FIXE}
               selected={characterState.umbra}
               onClickBtn={() => {
                 props.updateState({
@@ -380,6 +392,7 @@ export function CharacterPanel(props: {
             <CharacterButton
               cardDisplay={cardDisplay}
               name={"secunda"}
+              skillStat={SkillStat.FIXE}
               selected={characterState.secunda}
               onClickBtn={() => {
                 props.updateState({
@@ -393,6 +406,7 @@ export function CharacterPanel(props: {
         <ButtonsRow cardDisplay={cardDisplay}>
           <CharacterButton
             cardDisplay={cardDisplay}
+            skillStat={SkillStat.FIXE}
             name={cardDisplay ? "emp" : "empirique"}
             onClickBtn={() => {
               setIsEmpiriqueRollModalOpen(true);
@@ -401,6 +415,7 @@ export function CharacterPanel(props: {
           <CharacterButton
             cardDisplay={cardDisplay}
             name={cardDisplay ? "sc" : "secret"}
+            skillStat={SkillStat.FIXE}
             selected={characterState.secret}
             onClickBtn={() => {
               props.updateState({
@@ -411,12 +426,14 @@ export function CharacterPanel(props: {
           />
           <CharacterButton
             cardDisplay={cardDisplay}
+            skillStat={SkillStat.FIXE}
             name={cardDisplay ? "rp" : "repos"}
             onClickBtn={handleShortRest}
           />
           {!cardDisplay && (
             <CharacterButton
               cardDisplay={cardDisplay}
+              skillStat={SkillStat.FIXE}
               name={"repos long"}
               onClickBtn={handleLongRest}
             />
@@ -498,7 +515,9 @@ export function CharacterPanel(props: {
             characterState={characterState}
             character={character}
             cardDisplay={cardDisplay}
-            displayCategoryName={"Pacification"}
+            displayCategoryName={
+              "Pacification " + character.ether + "/" + character.etherMax
+            }
             displayCategory={DisplayCategory.PACIFICATEURS}
             onClickSkill={handleOnClickSkill}
             onClickProficiency={handleOnClickProficiency}

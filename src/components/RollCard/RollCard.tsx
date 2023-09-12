@@ -243,6 +243,11 @@ export default function RollCard(props: RollCardProps) {
               </div>
             ))}
         </Rolls>
+        <>
+          {roll.pictureUrl && (
+            <img src={roll.pictureUrl} alt="Image" width={200} height={200} />
+          )}
+        </>
       </RollDisplay>
     </Container>
   );

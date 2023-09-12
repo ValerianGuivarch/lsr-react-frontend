@@ -25,4 +25,5 @@ export interface RollRaw {
   blessure: boolean;
   help: boolean;
   precision?: string;
+  pictureUrl?: string;
 }

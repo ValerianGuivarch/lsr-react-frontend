@@ -28,6 +28,7 @@ export class Roll {
   blessure: boolean;
   help: boolean;
   precision?: string;
+  pictureUrl?: string;
 
   constructor(p: RollRaw) {
     this.id = p.id;
@@ -56,5 +57,6 @@ export class Roll {
     this.blessure = p.blessure;
     this.help = p.help;
     this.precision = p.precision;
+    this.pictureUrl = p.pictureUrl;
   }
 }

@@ -8,6 +8,7 @@ export interface CharacterRaw {
   classe: {
     name: string;
     display: string;
+    canUsePp: boolean;
   };
   bloodline: {
     name: string;
@@ -30,6 +31,8 @@ export interface CharacterRaw {
   dettes: number;
   arcanes: number;
   arcanesMax: number;
+  ether: number;
+  etherMax: number;
   arcanePrimes: number;
   arcanePrimesMax: number;
   munitions: number;
