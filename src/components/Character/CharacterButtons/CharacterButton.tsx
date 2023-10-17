@@ -73,6 +73,12 @@ export function CharacterButton(props: CharacterButtonProps) {
     }
     console.log("fullText");
     console.log(fullText);
+    /*
+    magie : pas de dailyUse ni dailyUseMax
+    munition : dailyUse (le nb utilisable) mais pas de dailyUseMax car ça recharge pas
+    cartouche : pareil
+    arcane aurélien : dailyuse et dailyUseMax
+     */
 
     if (fullText.length < 12) {
       console.log("fullText.length < 12");

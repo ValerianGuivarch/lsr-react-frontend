@@ -1,162 +1,296 @@
-import React, {useEffect} from 'react';
-import {useParams} from "react-router-dom";
-import {ApiL7RProvider} from "../../data/api/ApiL7RProvider";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../../data/store";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { Character } from "../../domain/models/Character";
+import { useParams } from "react-router-dom";
+import { ApiL7RProvider } from "../../data/api/ApiL7RProvider";
 
 export function CharacterEdition() {
-    /*
-    const dispatch = useDispatch();
-    const {characterName} = useParams();
+  const { characterName } = useParams();
+  const [character, setCharacter] = useState<Character | null>(null);
 
-    async function fetchCurrentCharacter() {
-        const characterToEdit = await ApiL7RProvider.getCharacterByName(characterName ? characterName : '');
-        dispatch(setCharacters([characterToEdit]));
+  useEffect(() => {
+    async function fetchCharacter() {
+      try {
+        const fetchedCharacter = await ApiL7RProvider.getCharacterByName(
+          characterName ?? "",
+        );
+        setCharacter(fetchedCharacter);
+      } catch (error) {
+        console.error("Error fetching character:", error);
+      }
     }
 
+    fetchCharacter();
+  }, [characterName]);
 
-    useEffect(() => {
-        fetchCurrentCharacter().then(() => {
-        });
-    }, []);
-
-    const currentCharacter = useSelector((store: RootState) =>
-        store.CHARACTERS.characterViewModels.find((characterViewModel: CharacterViewModel) => characterViewModel.character.name === characterName)?.character
-    );
-
-    if(!currentCharacter) {
-        return <div>Loading...</div>;
+  async function handleSave(event: React.MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    console.log(character);
+    console.log("A");
+    if (character) {
+      console.log("B");
+      try {
+        console.log("C");
+        await ApiL7RProvider.updateCharacter(character);
+        console.log("D");
+        window.location.href = `/characters/${characterName}`;
+        console.log("E");
+      } catch (error) {
+        console.error("Error updating character:", error);
+      }
     }
+  }
 
+  if (!character) return <div>Loading...</div>;
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
-        const numberFields = [
-            "chair", "esprit", "essence", "pv", "pvMax", "pf", "pfMax", "pp", "ppMax",
-            "dettes", "arcanes", "arcanesMax", "niveau", "relance"
-        ];
-        const finalValue = numberFields.includes(name) ? Number(value) : value;
-        dispatch(setCharacter({ ...currentCharacter, [name]: finalValue }));
-    };
+  return (
+    <EditContainer>
+      <form>
+        {/* Name (read-only) */}
+        <label>
+          Name:
+          <input type="text" value={character.name} readOnly />
+          <br />
+        </label>
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        ApiL7RProvider.updateCharacter(currentCharacter).then(() => {
-            window.location.href = `/characters/${currentCharacter.name}`;
-        });
+        {/* Chair */}
+        <label>
+          Chair:
+          <input
+            type="number"
+            value={character.chair}
+            onChange={(e) =>
+              setCharacter({ ...character, chair: e.target.valueAsNumber })
+            }
+          />
+          <br />
+        </label>
 
-    };
+        {/* Esprit */}
+        <label>
+          Esprit:
+          <input
+            type="number"
+            value={character.esprit}
+            onChange={(e) =>
+              setCharacter({ ...character, esprit: e.target.valueAsNumber })
+            }
+          />
+          <br />
+        </label>
 
-    if (!currentCharacter) {
-        return <div>Loading...</div>;
-    }
+        {/* Essence */}
+        <label>
+          Essence:
+          <input
+            type="number"
+            value={character.essence}
+            onChange={(e) =>
+              setCharacter({ ...character, essence: e.target.valueAsNumber })
+            }
+          />
+          <br />
+        </label>
 
-    return (
-        <EditCharacterContainer>
-            <Form onSubmit={handleSubmit}>
-                <div>
-                    <label>Nom :</label>
-                    <span>{currentCharacter.name}</span>
-                </div>
-                <div>
-                    <label>Niveau :</label>
-                    <Input type="number" name="niveau" value={currentCharacter.niveau} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>Chair :</label>
-                    <input type="number" name="chair" value={currentCharacter.chair} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>Esprit :</label>
-                    <input type="number" name="esprit" value={currentCharacter.esprit} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>Essence :</label>
-                    <input type="number" name="essence" value={currentCharacter.essence} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>PV Max :</label>
-                    <input type="number" name="pvMax" value={currentCharacter.pvMax} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>PF Max :</label>
-                    <input type="number" name="pfMax" value={currentCharacter.pfMax} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>PP Max :</label>
-                    <input type="number" name="ppMax" value={currentCharacter.ppMax} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>Arcanes Max :</label>
-                    <input type="number" name="arcanesMax" value={currentCharacter.arcanesMax} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>Lux :</label>
-                    <input type="text" name="lux" value={currentCharacter.lux} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>Umbra :</label>
-                    <input type="text" name="umbra" value={currentCharacter.umbra} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>Secunda :</label>
-                    <input type="text" name="secunda" value={currentCharacter.secunda} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>Portrait :</label>
-                    <input type="text" name="portrait" value={currentCharacter.picture} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>Portrait apothéose :</label>
-                    <input type="text" name="portraitApotheose" value={currentCharacter.pictureApotheose} onChange={handleInputChange} />
-                </div>
-                <div>
-                    <label>Background :</label>
-                    <Input name="background" value={currentCharacter.background} onChange={handleInputChange} />
-                </div>
+        {/* pvMax */}
+        <label>
+          PV Max:
+          <input
+            type="number"
+            value={character.pvMax}
+            onChange={(e) =>
+              setCharacter({ ...character, pvMax: e.target.valueAsNumber })
+            }
+          />
+          <br />
+        </label>
 
-                <Button type="submit">Mettre à jour</Button>
-            </Form>
-        </EditCharacterContainer>
-    );
-     */
-    return <div>TODO</div>
+        {/* pfMax */}
+        <label>
+          PF Max:
+          <input
+            type="number"
+            value={character.pfMax}
+            onChange={(e) =>
+              setCharacter({ ...character, pfMax: e.target.valueAsNumber })
+            }
+          />
+          <br />
+        </label>
+
+        {/* ppMax */}
+        <label>
+          PP Max:
+          <input
+            type="number"
+            value={character.ppMax}
+            onChange={(e) =>
+              setCharacter({ ...character, ppMax: e.target.valueAsNumber })
+            }
+          />
+          <br />
+        </label>
+
+        {/* arcanesMax */}
+        <label>
+          Arcanes Max:
+          <input
+            type="number"
+            value={character.arcanesMax}
+            onChange={(e) =>
+              setCharacter({ ...character, arcanesMax: e.target.valueAsNumber })
+            }
+          />
+          <br />
+        </label>
+
+        {/* etherMax */}
+        <label>
+          Ether Max:
+          <input
+            type="number"
+            value={character.etherMax}
+            onChange={(e) =>
+              setCharacter({ ...character, etherMax: e.target.valueAsNumber })
+            }
+          />
+          <br />
+        </label>
+
+        {/* arcanePrimesMax */}
+        <label>
+          Arcane Primes Max:
+          <input
+            type="number"
+            value={character.arcanePrimesMax}
+            onChange={(e) =>
+              setCharacter({
+                ...character,
+                arcanePrimesMax: e.target.valueAsNumber,
+              })
+            }
+          />
+          <br />
+        </label>
+
+        {/* munitionsMax */}
+        <label>
+          Munitions Max:
+          <input
+            type="number"
+            value={character.munitionsMax}
+            onChange={(e) =>
+              setCharacter({
+                ...character,
+                munitionsMax: e.target.valueAsNumber,
+              })
+            }
+          />
+          <br />
+        </label>
+
+        {/* Niveau */}
+        <label>
+          Niveau:
+          <input
+            type="number"
+            value={character.niveau}
+            onChange={(e) =>
+              setCharacter({ ...character, niveau: e.target.valueAsNumber })
+            }
+          />
+          <br />
+        </label>
+
+        {/* Lux */}
+        <label>
+          Lux:
+          <input
+            type="text"
+            value={character.lux}
+            onChange={(e) =>
+              setCharacter({ ...character, lux: e.target.value })
+            }
+          />
+          <br />
+        </label>
+
+        {/* Umbra */}
+        <label>
+          Umbra:
+          <input
+            type="text"
+            value={character.umbra}
+            onChange={(e) =>
+              setCharacter({ ...character, umbra: e.target.value })
+            }
+          />
+          <br />
+        </label>
+
+        {/* Secunda */}
+        <label>
+          Secunda:
+          <input
+            type="text"
+            value={character.secunda}
+            onChange={(e) =>
+              setCharacter({ ...character, secunda: e.target.value })
+            }
+          />
+          <br />
+        </label>
+
+        {/* Picture */}
+        <label>
+          Picture:
+          <input
+            type="text"
+            value={character.picture || ""}
+            onChange={(e) =>
+              setCharacter({ ...character, picture: e.target.value })
+            }
+          />
+          <br />
+        </label>
+
+        {/* Picture Apotheose */}
+        <label>
+          Picture Apotheose:
+          <input
+            type="text"
+            value={character.pictureApotheose || ""}
+            onChange={(e) =>
+              setCharacter({ ...character, pictureApotheose: e.target.value })
+            }
+          />
+          <br />
+        </label>
+
+        {/* Button to save */}
+        <SaveButton onClick={handleSave}>Save</SaveButton>
+      </form>
+    </EditContainer>
+  );
 }
 
-const EditCharacterContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 80%;
-  margin: auto;
+const EditContainer = styled.div`
   padding: 20px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ccc;
   border-radius: 5px;
+  margin: 20px auto;
+  width: 60%;
 `;
 
-const Form = styled.form`
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-`;
-
-const Input = styled.input`
-    padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-`;
-
-const Button = styled.button`
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-        background-color: #0056b3;
-    }
+const SaveButton = styled.button`
+  margin-top: 20px;
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #0056b3;
+  }
 `;

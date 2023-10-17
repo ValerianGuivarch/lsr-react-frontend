@@ -7,6 +7,7 @@ import { CharacterUpdateRequest } from "./CharacterUpdateRequest";
 import { RollRaw } from "./RollRaw";
 import { Roll } from "../../domain/models/Roll";
 import { CharacterPreview } from "../../domain/models/CharacterPreview";
+import { SkillRaw } from "./SkillRaw";
 
 export class L7RApi {
   static async sendNewTurn(): Promise<void> {
@@ -52,6 +53,8 @@ export class L7RApi {
     characterName: string,
     characterUpdateRequest: CharacterUpdateRequest,
   ): Promise<CharacterRaw> {
+    console.log(characterName);
+    console.log(characterUpdateRequest);
     const response = await axios.put(
       `${config.BASE_URL}/characters/` + characterName,
       characterUpdateRequest,
@@ -133,15 +136,26 @@ export class L7RApi {
 
   static async updateCharacterSkillsAttribution(
     characterName: string,
-    skillName: string,
+    skillId: string,
     dailyUse: number,
+    dailyUseMax: number | undefined,
+    affected: boolean,
   ): Promise<void> {
     await axios.put(
       `${config.BASE_URL}/characters/` + characterName + `/skills`,
       {
-        skillName: skillName,
+        skillId: skillId,
         dailyUse: dailyUse,
+        dailyUseMax: dailyUseMax,
+        affected: affected,
       },
     );
+  }
+
+  static async getArcanePrimes(name: string): Promise<SkillRaw[]> {
+    const response = await axios.get(
+      `${config.BASE_URL}/characters/${name}/arcane-primes`,
+    );
+    return response.data;
   }
 }

@@ -64,7 +64,10 @@ export function CharacterPanel(props: {
           character.apotheoses.find(
             (apotheose: Apotheose) => apotheose.name === apotheoseName,
           ) ?? null,
-        apotheoseState: ApotheoseState.COST_TO_PAY,
+        apotheoseState:
+          character.apotheoseState === ApotheoseState.NONE
+            ? ApotheoseState.COST_PAID
+            : ApotheoseState.COST_TO_PAY,
       });
     }
   }
@@ -76,6 +79,7 @@ export function CharacterPanel(props: {
     }
   }
   function handleLongRest() {
+    props.rest?.();
     props.updateCharacter({
       ...character,
       pv: character.pvMax,

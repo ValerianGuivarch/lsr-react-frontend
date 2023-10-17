@@ -7,6 +7,7 @@ import { Character } from "../../domain/models/Character";
 import { CharacterUpdateRequest } from "./CharacterUpdateRequest";
 import { CharacterRaw } from "./CharacterRaw";
 import { Skill } from "../../domain/models/Skill";
+import { SkillRaw } from "./SkillRaw";
 
 export interface ApiResponse {
   error: boolean;
@@ -63,10 +64,8 @@ export class ApiL7RProvider {
         message: "Roll sent",
       };
     } catch (e: any) {
-      return {
-        error: true,
-        message: e.response.data.message,
-      };
+      console.error("ERRORR");
+      throw e.response.data.message;
     }
   }
   static async getRolls(name: string): Promise<Roll[]> {
@@ -140,13 +139,24 @@ export class ApiL7RProvider {
 
   static async updateCharacterSkillsAttribution(
     characterName: string,
-    skillName: string,
+    skillId: string,
     dailyUse: number,
+    dailyUseMax: number | undefined,
+    affected: boolean,
   ): Promise<void> {
     await L7RApi.updateCharacterSkillsAttribution(
       characterName,
-      skillName,
+      skillId,
       dailyUse,
+      dailyUseMax,
+      affected,
     );
+  }
+
+  static async getArcanePrimes(name: string): Promise<Skill[]> {
+    const response = await L7RApi.getArcanePrimes(name);
+    return response.map((skill: SkillRaw) => {
+      return new Skill(skill);
+    });
   }
 }

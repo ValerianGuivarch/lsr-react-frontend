@@ -40,12 +40,9 @@ export function CharacterCartouchesSheet() {
     },
   });
 
-  async function handleCartouchesEvolution(
-    cartoucheName: string,
-    evolution: number,
-  ) {
+  async function handleCartouchesEvolution(skillId: string, evolution: number) {
     const cartouche = cartouchesList.find(
-      (cartouche) => cartouche.name === cartoucheName,
+      (cartouche) => cartouche.id === skillId,
     );
     if (
       character &&
@@ -56,8 +53,10 @@ export function CharacterCartouchesSheet() {
       const dailyUse = cartouche.dailyUse + evolution;
       await ApiL7RProvider.updateCharacterSkillsAttribution(
         characterName ?? "",
-        cartoucheName,
+        skillId,
         dailyUse,
+        undefined,
+        true,
       );
       fetchCharacter().then(() => {});
     }
@@ -80,10 +79,10 @@ export function CharacterCartouchesSheet() {
                 cardDisplay={false}
                 name={cartouches.name + " : " + cartouches.dailyUse}
                 onClickDecr={() => {
-                  handleCartouchesEvolution(cartouches.name, -1);
+                  handleCartouchesEvolution(cartouches.id, -1);
                 }}
                 onClickIncr={() => {
-                  handleCartouchesEvolution(cartouches.name, 1);
+                  handleCartouchesEvolution(cartouches.id, 1);
                 }}
                 large={true}
               />

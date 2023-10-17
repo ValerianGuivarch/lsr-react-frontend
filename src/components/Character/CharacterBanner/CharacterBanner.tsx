@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { FaGear, FaGun, FaPenToSquare, FaPeopleGroup } from "react-icons/fa6";
+import {
+  FaGear,
+  FaGun,
+  FaPenToSquare,
+  FaPeopleGroup,
+  FaHatWizard,
+} from "react-icons/fa6";
 import { Character } from "../../../domain/models/Character";
 import { IconType } from "react-icons";
 
@@ -47,6 +53,17 @@ export function CharacterBanner(props: { character: Character }) {
                     window.location.href = `/characters/${props.character.controlledBy}/invocation`;
                   } else {
                     window.location.href = `/characters/${props.character.name}/invocation`;
+                  }
+                }}
+              />
+              <EditCharacterIcon
+                icon={FaHatWizard}
+                onClick={() => {
+                  console.log(props.character.controlledBy);
+                  if (props.character.controlledBy) {
+                    window.location.href = `/characters/${props.character.controlledBy}/arcane-primes`;
+                  } else {
+                    window.location.href = `/characters/${props.character.name}/arcane-primes`;
                   }
                 }}
               />
@@ -142,8 +159,9 @@ interface EditCharacterIconProps {
 const EditCharacterIcon = styled(
   ({ icon: Icon, ...props }: EditCharacterIconProps) => <Icon {...props} />,
 )`
-  padding: 0.5rem;
+  padding: 0.25rem;
   margin-top: 0;
+  height: 1rem;
   border-radius: 0.5rem;
   background-color: #ccc;
 `;

@@ -108,7 +108,9 @@ export function CharacterSheet() {
         });
       }
     } catch (error) {
+      console.error("ERROR");
       console.error("Error sending roll:", error);
+      alert(error);
     }
   }
 
@@ -203,6 +205,7 @@ export function CharacterSheet() {
         });
       }
     } catch (error) {
+      console.error("ERROR");
       console.error("Error sending resist roll:", error);
     }
   }
