@@ -100,9 +100,15 @@ export default function RollCard(props: RollCardProps) {
               {"."}
             </span>
           ) : roll.success !== null ? (
-            <span>
+            <span
+              title={
+                roll.displayDices || props.mjDisplay
+                  ? "Juge12 : " + roll.juge12 + ", Juge34 : " + roll.juge34
+                  : undefined
+              }
+            >
               {" et obtient "}
-              <em>{roll.success}</em>
+              <em>{roll.success ? roll.success : 0}</em>
               {" succès."}
             </span>
           ) : (

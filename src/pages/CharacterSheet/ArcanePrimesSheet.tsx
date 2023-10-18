@@ -76,10 +76,14 @@ export function ArcanePrimesSheet() {
         );
         return (
           <SkillRow key={arcanePrime.id}>
-            <span>{arcanePrime.name}</span>
-            <button onClick={() => handleSkillToggle(arcanePrime.id, hasSkill)}>
+            <Title>{arcanePrime.name}</Title>
+            <Description>{arcanePrime.description}</Description>
+            <ActionButton
+              hasSkill={hasSkill}
+              onClick={() => handleSkillToggle(arcanePrime.id, hasSkill)}
+            >
               {hasSkill ? "Enlever" : "Ajouter"}
-            </button>
+            </ActionButton>
           </SkillRow>
         );
       })}
@@ -98,10 +102,44 @@ const Container = styled.div`
   flex-direction: column;
   padding: 20px;
 `;
-
 const SkillRow = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  flex-direction: column;
+  padding: 5px 10px; /* réduit le padding */
+  margin-bottom: 15px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08); /* ombre plus douce */
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.015); /* fond plus léger au survol */
+  }
+`;
+
+const Title = styled.span`
+  font-size: 16px; /* taille de police légèrement réduite */
+  font-weight: 500; /* poids moins audacieux */
+  margin-bottom: 6px; /* espacement réduit */
+  color: #444;
+`;
+
+const Description = styled.p`
+  font-size: 12px; /* taille de police réduite */
+  color: #777;
+  margin-bottom: 6px;
+`;
+
+const ActionButton = styled.button<{ hasSkill: boolean }>`
+  padding: 6px 12px; /* padding réduit */
+  font-size: 12px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  background-color: ${(props) => (props.hasSkill ? "#f44336" : "#4CAF50")};
+  color: white;
+
+  &:hover {
+    opacity: 0.9;
+  }
 `;
