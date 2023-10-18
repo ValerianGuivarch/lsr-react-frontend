@@ -63,6 +63,28 @@ export function CharacterBlockBtn(props: {
     return (
       <ButtonsRow cardDisplay={cardDisplay} key={startIndex}>
         {elements.slice(startIndex, startIndex + count).map((element) => {
+          function getStars(name: string, character: Character) {
+            console.log("*****");
+            console.log(name);
+            console.log(name);
+            console.log(name);
+            console.log(character.name);
+            if (
+              character.name === "esther" &&
+              (name === "corbeau" ||
+                name === "luciole" ||
+                name === "empoisonneur" ||
+                name === "chauvesouris" ||
+                name === "rat" ||
+                name === "chaperon" ||
+                name === "araignée")
+            ) {
+              return "*";
+            } else {
+              return "";
+            }
+          }
+
           if (element instanceof Skill) {
             // C'est un Skill
             const skill = element;
@@ -77,6 +99,7 @@ export function CharacterBlockBtn(props: {
                   (cardDisplay
                     ? skill.shortName
                     : skill.longName || skill.name) +
+                  getStars(skill.name, character) +
                   (skill.dailyUse !== undefined
                     ? ` (${skill.dailyUse}${
                         skill.dailyUseMax !== undefined

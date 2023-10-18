@@ -34,16 +34,12 @@ export class L7RApi {
   static async getCharacterByName(
     characterName: string,
   ): Promise<CharacterRaw> {
-    console.log("kik1");
-    console.log(characterName);
     try {
       const response = await axios.get(
         `${config.BASE_URL}/characters/` + characterName,
       );
-      console.log("kik2");
       return response.data;
     } catch (e: any) {
-      console.log("kik3");
       console.log(e);
       throw e;
     }

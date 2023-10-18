@@ -19,6 +19,7 @@ interface CharacterButtonProps {
   onClickIncr?: () => void;
   large?: boolean;
   skillStat: SkillStat;
+  star?: boolean;
 }
 
 export function CharacterButton(props: CharacterButtonProps) {
@@ -53,9 +54,9 @@ export function CharacterButton(props: CharacterButtonProps) {
     newText: string;
     size: number;
   } {
-    const minFontSize = 12;
-    const aveFontSize = 14;
-    const maxFontSize = 16;
+    const minFontSize = 11;
+    const aveFontSize = 13;
+    const maxFontSize = 15;
 
     if (props.large) {
       return { newText: text, size: maxFontSize };
@@ -103,7 +104,7 @@ export function CharacterButton(props: CharacterButtonProps) {
   }
 
   const preparedText = prepareTextButtonToDisplay(
-    props.name,
+    props.name + (props.star ? " *" : ""),
     props.value,
     props.bonusValue,
     props.maxValue,
