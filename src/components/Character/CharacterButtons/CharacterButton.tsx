@@ -72,8 +72,6 @@ export function CharacterButton(props: CharacterButtonProps) {
         fullText += ` / ${maxValue}`;
       }
     }
-    console.log("fullText");
-    console.log(fullText);
     /*
     magie : pas de dailyUse ni dailyUseMax
     munition : dailyUse (le nb utilisable) mais pas de dailyUseMax car ça recharge pas
@@ -82,22 +80,16 @@ export function CharacterButton(props: CharacterButtonProps) {
      */
 
     if (fullText.length < 12) {
-      console.log("fullText.length < 12");
       return { newText: text, size: maxFontSize };
     } else if (!fullText.includes(" ") && fullText.length < 20) {
-      console.log("!fullText.includes(' ') && fullText.length < 20");
       return { newText: text, size: aveFontSize };
     } else if (!fullText.includes(" ") && fullText.length >= 20) {
-      console.log("!fullText.includes(' ') && fullText.length >= 20");
       return { newText: text, size: minFontSize };
     } else {
       const split = insertNewlineNearMiddle(fullText);
-      console.log(split);
       if (split.size < 12) {
-        console.log("split.size < 20");
         return { newText: text, size: aveFontSize };
       } else {
-        console.log("split.size >= 20");
         return { newText: text, size: minFontSize };
       }
     }

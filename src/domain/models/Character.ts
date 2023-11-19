@@ -65,6 +65,7 @@ export class Character {
   apotheoseState: ApotheoseState;
   rest: number;
   longRest: number;
+  boulet: boolean;
 
   constructor(p: CharacterRaw) {
     this.controlledBy = p.controlledBy;
@@ -76,6 +77,7 @@ export class Character {
     this.currentApotheose = p.currentApotheose
       ? new Apotheose(p.currentApotheose)
       : null;
+    this.boulet = p.boulet;
     this.name = p.name;
     this.classe = p.classe;
     this.bloodline = p.bloodline;

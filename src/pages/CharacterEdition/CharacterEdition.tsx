@@ -25,16 +25,10 @@ export function CharacterEdition() {
 
   async function handleSave(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
-    console.log(character);
-    console.log("A");
     if (character) {
-      console.log("B");
       try {
-        console.log("C");
         await ApiL7RProvider.updateCharacter(character);
-        console.log("D");
         window.location.href = `/characters/${characterName}`;
-        console.log("E");
       } catch (error) {
         console.error("Error updating character:", error);
       }

@@ -14,6 +14,7 @@ export interface CharacterRaw {
     name: string;
     display: string;
   };
+  boulet: boolean;
   rest: number;
   longRest: number;
   chair: number;

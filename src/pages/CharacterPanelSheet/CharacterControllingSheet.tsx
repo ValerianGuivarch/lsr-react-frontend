@@ -133,7 +133,6 @@ export function CharacterControllingSheet() {
     characterName: string,
     newCharacter: Character,
   ) {
-    console.log("update character", characterName, newCharacter.pv);
     await ApiL7RProvider.updateCharacter(newCharacter);
   }
 

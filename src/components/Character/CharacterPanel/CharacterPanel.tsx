@@ -17,6 +17,7 @@ import { Skill } from "../../../domain/models/Skill";
 import { Proficiency } from "../../../domain/models/Proficiency";
 import { CharacterBlockBtn } from "./CharacterBlockBtn";
 import { SkillStat } from "../../../domain/models/SkillStat";
+import { BouletModal } from "./BouletModal";
 
 export function CharacterPanel(props: {
   cardDisplay: boolean;
@@ -32,6 +33,7 @@ export function CharacterPanel(props: {
   const [isLongRestModalOpen, setIsLongRestModalOpen] = useState(false);
   const [isEmpiriqueRollModalOpen, setIsEmpiriqueRollModalOpen] =
     useState(false);
+  const [isBouletModalOpen, setBouletModalOpen] = useState(false);
 
   const { cardDisplay, character, characterState } = props;
 
@@ -42,7 +44,6 @@ export function CharacterPanel(props: {
         apotheoseState: ApotheoseState.COST_PAID,
       });
     } else {
-      console.log("stop apotheose");
       props.updateCharacter({
         ...character,
         currentApotheose: null,
@@ -53,7 +54,6 @@ export function CharacterPanel(props: {
   }
 
   function handleOnClickApotheose(apotheoseName: string) {
-    console.log("handleOnClickApotheose", apotheoseName);
     const apotheose = character.apotheoses.find(
       (apotheose: Apotheose) => apotheose.name === apotheoseName,
     );
@@ -102,24 +102,39 @@ export function CharacterPanel(props: {
       });
     }
   }
-  function handleOnClickSkill(skill: Skill | undefined) {
-    if (skill) {
-      props.sendRoll({ skillId: skill.id });
-      characterState.proficiencies.forEach((value, key) => {
-        characterState.proficiencies.set(key, false);
-      });
-      props.updateState({
-        ...characterState,
-        focusActivated: false,
-        powerActivated: false,
-        lux: false,
-        secunda: false,
-        umbra: false,
-        proficiencies: characterState.proficiencies,
-        bonus: characterState.bonusActivated ? characterState.bonus : 0,
-        malus: characterState.malusActivated ? characterState.malus : 0,
-      });
+
+  function handleOnClickSkill(
+    skill: Skill | undefined,
+    itsOk: boolean = false,
+  ) {
+    if (!skill) return;
+
+    const isEssenceSkill = skill.name === "essence";
+    const isCharacterBoulet = character.boulet;
+
+    if (isEssenceSkill && isCharacterBoulet && !itsOk) {
+      setBouletModalOpen(true);
+    } else {
+      proceedWithSkill(skill);
     }
+  }
+
+  function proceedWithSkill(skill: Skill) {
+    props.sendRoll({ skillId: skill.id });
+    characterState.proficiencies.forEach((value, key) => {
+      characterState.proficiencies.set(key, false);
+    });
+    props.updateState({
+      ...characterState,
+      focusActivated: false,
+      powerActivated: false,
+      lux: false,
+      secunda: false,
+      umbra: false,
+      proficiencies: characterState.proficiencies,
+      bonus: characterState.bonusActivated ? characterState.bonus : 0,
+      malus: characterState.malusActivated ? characterState.malus : 0,
+    });
   }
 
   const apotheose = character.currentApotheose
@@ -563,6 +578,23 @@ export function CharacterPanel(props: {
           }}
         />
       )}
+      <BouletModal
+        isOpen={isBouletModalOpen}
+        onRequestClose={() => setBouletModalOpen(false)}
+        proceedWithSkillEssence={() => {
+          const essence = character.skills.find(
+            (skill: Skill) => skill.name === "essence",
+          );
+
+          handleOnClickSkill(essence, true);
+        }}
+        proceedWithSkillMagie={() => {
+          const magie = character.skills.find(
+            (skill: Skill) => skill.name === "magie",
+          );
+          handleOnClickSkill(magie);
+        }}
+      />
       <LongRestModal
         character={character}
         isOpen={isLongRestModalOpen}

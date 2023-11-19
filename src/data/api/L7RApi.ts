@@ -49,8 +49,6 @@ export class L7RApi {
     characterName: string,
     characterUpdateRequest: CharacterUpdateRequest,
   ): Promise<CharacterRaw> {
-    console.log(characterName);
-    console.log(characterUpdateRequest);
     const response = await axios.put(
       `${config.BASE_URL}/characters/` + characterName,
       characterUpdateRequest,

@@ -218,21 +218,23 @@ export default function RollCard(props: RollCardProps) {
           props.charactersSession && (
             <div>
               Soin [{props.roll.healPoint}/{props.roll.success}] :
-              {props.charactersSession.map((characterPreview) => (
-                <HealingButton
-                  key={characterPreview.name}
-                  onClick={() =>
-                    props.onHealClick &&
-                    props.onHealClick({
-                      characterName: characterPreview.name,
-                      roll: roll,
-                    })
-                  }
-                >
-                  {characterPreview.name} ({characterPreview.pv}/
-                  {characterPreview.pvMax})
-                </HealingButton>
-              ))}
+              {props.charactersSession
+                .filter((characterPreview) => characterPreview.isAlly)
+                .map((characterPreview) => (
+                  <HealingButton
+                    key={characterPreview.name}
+                    onClick={() =>
+                      props.onHealClick &&
+                      props.onHealClick({
+                        characterName: characterPreview.name,
+                        roll: roll,
+                      })
+                    }
+                  >
+                    {characterPreview.name} ({characterPreview.pv}/
+                    {characterPreview.pvMax})
+                  </HealingButton>
+                ))}
             </div>
           )}
         <Rolls>

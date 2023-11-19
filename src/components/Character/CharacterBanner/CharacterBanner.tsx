@@ -48,7 +48,6 @@ export function CharacterBanner(props: { character: Character }) {
               <EditCharacterIcon
                 icon={FaPeopleGroup}
                 onClick={() => {
-                  console.log(props.character.controlledBy);
                   if (props.character.controlledBy) {
                     window.location.href = `/characters/${props.character.controlledBy}/invocation`;
                   } else {
@@ -59,7 +58,6 @@ export function CharacterBanner(props: { character: Character }) {
               <EditCharacterIcon
                 icon={FaHatWizard}
                 onClick={() => {
-                  console.log(props.character.controlledBy);
                   if (props.character.controlledBy) {
                     window.location.href = `/characters/${props.character.controlledBy}/arcane-primes`;
                   } else {

@@ -132,7 +132,6 @@ export function MjSheet() {
     characterName: string,
     newCharacter: Character,
   ) {
-    console.log("update character", characterName, newCharacter.pv);
     await ApiL7RProvider.updateCharacter(newCharacter);
   }
 

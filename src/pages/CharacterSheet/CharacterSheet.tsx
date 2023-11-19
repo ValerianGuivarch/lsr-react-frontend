@@ -212,7 +212,6 @@ export function CharacterSheet() {
 
   function handleUpdateCharacterNotes(text: string) {
     if (character) {
-      console.log("Update character notes:", text);
       ApiL7RProvider.updateCharacter({
         ...character,
         notes: text,

@@ -52,7 +52,6 @@ export function CharacterBlockBtn(props: {
   const baseElementsPerLine = Math.floor(nbElement / numberOfLines);
   const remainder = nbElement % numberOfLines;
   let elementsPerLine = Array(numberOfLines).fill(baseElementsPerLine);
-  console.log(elementsPerLine);
   for (let i = 0; i < remainder; i++) {
     elementsPerLine[i]++;
   }
@@ -64,11 +63,6 @@ export function CharacterBlockBtn(props: {
       <ButtonsRow cardDisplay={cardDisplay} key={startIndex}>
         {elements.slice(startIndex, startIndex + count).map((element) => {
           function getStars(name: string, character: Character) {
-            console.log("*****");
-            console.log(name);
-            console.log(name);
-            console.log(name);
-            console.log(character.name);
             if (
               character.name === "esther" &&
               (name === "corbeau" ||
@@ -141,7 +135,6 @@ export function CharacterBlockBtn(props: {
                 description={apotheose.description}
                 name={cardDisplay ? apotheose.shortName : apotheose.name}
                 onClickBtn={() => {
-                  console.log(apotheose.name);
                   props.onClickApotheose(apotheose.name);
                 }}
               />
