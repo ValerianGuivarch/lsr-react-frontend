@@ -23,7 +23,7 @@ export function CharacterBanner(props: { character: Character }) {
 
   return (
     <CharacterBannerBox>
-      <CharacterBackground src={props.character.background} alt="Background" />
+      <CharacterBackground src={props.character.background} alt="" />
       <CharacterBannerContainer>
         {props.character.currentApotheose?.name ? (
           <CharacterAvatar
