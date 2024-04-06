@@ -30,6 +30,7 @@ export interface CharacterRaw {
   pp: number;
   ppMax: number;
   dettes: number;
+  dragonDettes: number;
   arcanes: number;
   arcanesMax: number;
   ether: number;

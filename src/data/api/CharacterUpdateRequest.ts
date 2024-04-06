@@ -11,6 +11,7 @@ export class CharacterUpdateRequest {
   pp: number;
   ppMax: number;
   dettes: number;
+  dragonDettes: number;
   arcanes: number;
   arcanesMax: number;
   ether: number;
@@ -44,6 +45,7 @@ export class CharacterUpdateRequest {
     this.pp = character.pp;
     this.ppMax = character.ppMax;
     this.dettes = character.dettes;
+    this.dragonDettes = character.dragonDettes;
     this.arcanes = character.arcanes;
     this.arcanesMax = character.arcanesMax;
     this.ether = character.ether;

@@ -37,6 +37,10 @@ export function CharacterPanel(props: {
 
   const { cardDisplay, character, characterState } = props;
 
+  const hasDragon = character.skills.find(
+    (skill: Skill) => skill.name === "dragon",
+  );
+
   function handleApotheoseModalClose(continueApotheose: boolean) {
     if (continueApotheose) {
       props.updateCharacter({
@@ -420,6 +424,34 @@ export function CharacterPanel(props: {
                 });
               }}
             />
+            {hasDragon && (
+              <CharacterButton
+                cardDisplay={cardDisplay}
+                skillStat={SkillStat.ESSENCE}
+                name={cardDisplay ? "drc" : "dragon"}
+                selected={false}
+                value={character.dragonDettes}
+                onClickBtn={() => {
+                  handleOnClickSkill(
+                    character.skills.find(
+                      (skill: Skill) => skill.name === "dragon",
+                    ),
+                  );
+                }}
+                onClickIncr={() => {
+                  props.updateCharacter({
+                    ...character,
+                    dragonDettes: character.dragonDettes + 1,
+                  });
+                }}
+                onClickDecr={() => {
+                  props.updateCharacter({
+                    ...character,
+                    dragonDettes: character.dragonDettes - 1,
+                  });
+                }}
+              />
+            )}
           </ButtonsRow>
         )}
         <ButtonsRow cardDisplay={cardDisplay}>
