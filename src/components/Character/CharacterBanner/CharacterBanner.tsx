@@ -119,11 +119,13 @@ const CharacterBannerContainer = styled.div`
 `;
 
 const CharacterAvatar = styled.img`
-  width: 6rem;
+  width: 10rem;
   height: 6rem;
   margin: 1rem;
   border-radius: 50%;
   border: 3px solid #fff;
+  object-fit: cover;
+  object-position: center top;
 `;
 
 const CharacterListInfo = styled.div`
