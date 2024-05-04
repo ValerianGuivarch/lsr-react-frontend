@@ -2,11 +2,8 @@ import axios from "axios";
 import config from "../../config/config";
 import { CharacterRaw } from "./CharacterRaw";
 import { CharacterPreviewRaw } from "./CharacterPreviewRaw";
-import { Character } from "../../domain/models/Character";
 import { CharacterUpdateRequest } from "./CharacterUpdateRequest";
 import { RollRaw } from "./RollRaw";
-import { Roll } from "../../domain/models/Roll";
-import { CharacterPreview } from "../../domain/models/CharacterPreview";
 import { SkillRaw } from "./SkillRaw";
 
 export class L7RApi {
@@ -131,9 +128,10 @@ export class L7RApi {
   static async updateCharacterSkillsAttribution(
     characterName: string,
     skillId: string,
-    dailyUse: number,
+    dailyUse: number | undefined,
     dailyUseMax: number | undefined,
     affected: boolean,
+    arcaneDetteToDecrease: number | undefined,
   ): Promise<void> {
     await axios.put(
       `${config.BASE_URL}/characters/` + characterName + `/skills`,
@@ -142,6 +140,7 @@ export class L7RApi {
         dailyUse: dailyUse,
         dailyUseMax: dailyUseMax,
         affected: affected,
+        arcaneDetteToDecrease: arcaneDetteToDecrease,
       },
     );
   }

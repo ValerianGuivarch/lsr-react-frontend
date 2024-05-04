@@ -12,6 +12,7 @@ interface CharacterButtonProps {
   selected?: boolean;
   value?: number;
   maxValue?: number;
+  arcaneDette?: number;
   bonusValue?: number;
   icon?: IconType;
   onClickDecr?: () => void;
@@ -49,6 +50,7 @@ export function CharacterButton(props: CharacterButtonProps) {
     value: number | undefined,
     bonusValue: number | undefined,
     maxValue: number | undefined,
+    arcaneDette: number | undefined,
     reducDisplay: boolean,
   ): {
     newText: string;
@@ -70,6 +72,9 @@ export function CharacterButton(props: CharacterButtonProps) {
       }
       if (maxValue) {
         fullText += ` / ${maxValue}`;
+      }
+      if (arcaneDette !== undefined) {
+        fullText += ` [${arcaneDette}]`;
       }
     }
     /*
@@ -100,6 +105,7 @@ export function CharacterButton(props: CharacterButtonProps) {
     props.value,
     props.bonusValue,
     props.maxValue,
+    props.arcaneDette,
     !!props.onClickDecr,
   );
   const colors = ["#D6EAAF", "#D9AED9", "#A8DADC", "#F4E1D2"];
@@ -158,6 +164,7 @@ export function CharacterButton(props: CharacterButtonProps) {
               {props.value}
               {props.bonusValue ? `+${props.bonusValue}` : ""}
               {props.maxValue && ` / ${props.maxValue}`}
+              {props.arcaneDette && ` [${props.arcaneDette}]`}
             </div>
           </>
         )}

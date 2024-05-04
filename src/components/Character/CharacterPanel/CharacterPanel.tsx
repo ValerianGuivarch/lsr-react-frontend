@@ -18,6 +18,7 @@ import { Proficiency } from "../../../domain/models/Proficiency";
 import { CharacterBlockBtn } from "./CharacterBlockBtn";
 import { SkillStat } from "../../../domain/models/SkillStat";
 import { BouletModal } from "./BouletModal";
+import { ApiL7RProvider } from "../../../data/api/ApiL7RProvider";
 
 export function CharacterPanel(props: {
   cardDisplay: boolean;
@@ -27,6 +28,7 @@ export function CharacterPanel(props: {
   updateState: (newState: CharacterState) => void;
   updateCharacter: (newCharacter: Character) => void;
   rest?: () => void;
+  clickArcaneDette?: (characterName: string, skill: Skill) => void;
 }) {
   const [isApotheoseModalOpen, setIsApotheoseModalOpen] = useState(false);
   const [isRestModalOpen, setIsRestModalOpen] = useState(false);
@@ -533,6 +535,7 @@ export function CharacterPanel(props: {
             onClickProficiency={handleOnClickProficiency}
             onClickApotheose={handleOnClickApotheose}
             updateState={props.updateState}
+            onClickDecr={props.clickArcaneDette}
           />
         )}
       {!cardDisplay &&

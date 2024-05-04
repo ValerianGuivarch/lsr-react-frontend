@@ -272,6 +272,8 @@ const Avatar = styled.img`
   height: 50px;
   border-radius: 50%;
   margin-right: 20px;
+  object-fit: cover;
+  object-position: center top;
 `;
 
 const RollDisplay = styled.div``;

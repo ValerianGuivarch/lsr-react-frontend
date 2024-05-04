@@ -14,6 +14,7 @@ import { Character } from "../../domain/models/Character";
 import { CharacterState } from "../../domain/models/CharacterState";
 import { useSSECharactersPreviewSession } from "../../data/api/useSSECharactersPreview";
 import { CharacterPreview } from "../../domain/models/CharacterPreview";
+import { Skill } from "../../domain/models/Skill";
 
 export function CharacterSheet() {
   const { characterName } = useParams();
@@ -116,6 +117,17 @@ export function CharacterSheet() {
 
   async function handleUpdateState(newState: CharacterState) {
     setCharacterState(newState);
+  }
+
+  async function handleArcaneDette(characterName: string, skill: Skill) {
+    await ApiL7RProvider.updateCharacterSkillsAttribution(
+      characterName,
+      skill.id,
+      skill.dailyUse,
+      skill.dailyUseMax,
+      true,
+      skill.arcaneDette ? skill.arcaneDette - 1 : 0,
+    );
   }
 
   async function handleRest() {
@@ -238,6 +250,7 @@ export function CharacterSheet() {
             updateCharacter={handleUpdateCharacter}
             updateState={handleUpdateState}
             rest={handleRest}
+            clickArcaneDette={handleArcaneDette}
           />
           <Rolls>
             {rolls.map((roll: Roll) => (

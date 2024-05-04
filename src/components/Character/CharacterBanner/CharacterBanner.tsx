@@ -119,7 +119,7 @@ const CharacterBannerContainer = styled.div`
 `;
 
 const CharacterAvatar = styled.img`
-  width: 10rem;
+  width: 6rem;
   height: 6rem;
   margin: 1rem;
   border-radius: 50%;

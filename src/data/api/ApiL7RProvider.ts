@@ -140,9 +140,10 @@ export class ApiL7RProvider {
   static async updateCharacterSkillsAttribution(
     characterName: string,
     skillId: string,
-    dailyUse: number,
+    dailyUse: number | undefined,
     dailyUseMax: number | undefined,
     affected: boolean,
+    arcaneDetteToDecrease?: number | undefined,
   ): Promise<void> {
     await L7RApi.updateCharacterSkillsAttribution(
       characterName,
@@ -150,6 +151,7 @@ export class ApiL7RProvider {
       dailyUse,
       dailyUseMax,
       affected,
+      arcaneDetteToDecrease,
     );
   }
 

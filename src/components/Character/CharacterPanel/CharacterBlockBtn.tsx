@@ -20,6 +20,7 @@ export function CharacterBlockBtn(props: {
   onClickProficiency: (proficiencyName: string) => void;
   onClickApotheose: (apotheoseName: string) => void;
   updateState: (newState: CharacterState) => void;
+  onClickDecr?: (characterName: string, skill: Skill) => void;
 }) {
   const {
     characterState,
@@ -89,6 +90,7 @@ export function CharacterBlockBtn(props: {
                 key={skill.name}
                 skillStat={skill.stat}
                 description={skill.description}
+                arcaneDette={skill.arcaneDette}
                 name={
                   (cardDisplay
                     ? skill.shortName
@@ -105,6 +107,11 @@ export function CharacterBlockBtn(props: {
                 onClickBtn={() => {
                   props.onClickSkill(skill);
                 }}
+                onClickDecr={
+                  props.onClickDecr
+                    ? () => props.onClickDecr!(character.name, skill)
+                    : undefined
+                }
               />
             );
           } else if (element instanceof Proficiency) {

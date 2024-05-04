@@ -17,7 +17,11 @@ export function CharacterCard(props: {
     empiriqueRoll?: string;
   }) => void;
   updateState: (characterName: string, newState: CharacterState) => void;
-  updateCharacter: (characterName: string, newCharacter: Character) => void;
+  updateCharacter: (
+    characterName: string,
+    newCharacter: Character,
+    arcaneDetteToDecrease?: string,
+  ) => void;
   onSelect: (characterName: string) => void;
   onChange?: (battleState: BattleState) => void;
   onDelete?: (characterNameToDelete: string) => void;
@@ -79,8 +83,15 @@ export function CharacterCard(props: {
                 empiriqueRoll: p.empiriqueRoll,
               });
             }}
-            updateCharacter={(newCharacter: Character) => {
-              props.updateCharacter(props.character.name, newCharacter);
+            updateCharacter={(
+              newCharacter: Character,
+              arcaneDetteToDecrease?: string,
+            ) => {
+              props.updateCharacter(
+                props.character.name,
+                newCharacter,
+                arcaneDetteToDecrease,
+              );
             }}
             updateState={(newState: CharacterState) => {
               props.updateState(props.character.name, newState);

@@ -13,12 +13,14 @@ export class Skill {
   dailyUse?: number;
   dailyUseMax?: number;
   soldatCost: number;
+  arcaneDette?: number;
   isHeal: boolean;
   blessure: boolean;
   resistance: boolean;
   constructor(p: SkillRaw) {
     this.id = p.id;
     this.name = p.name;
+    this.arcaneDette = p.arcaneDette;
     this.stat = SkillStat[p.stat as keyof typeof SkillStat];
     this.shortName = p.shortName;
     this.longName = p.longName;

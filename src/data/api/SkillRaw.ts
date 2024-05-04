@@ -8,6 +8,7 @@ export interface SkillRaw {
   displayCategory: string;
   dailyUse?: number;
   dailyUseMax?: number;
+  arcaneDette?: number;
   soldatCost: number;
   isHeal: boolean;
   blessure: boolean;
