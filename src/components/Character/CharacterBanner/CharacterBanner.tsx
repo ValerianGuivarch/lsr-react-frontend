@@ -31,7 +31,10 @@ export function CharacterBanner(props: { character: Character }) {
             alt="Avatar"
           />
         ) : (
-          <CharacterAvatar src={props.character.picture} alt="Avatar" />
+          <CharacterAvatar
+            src={"/l7r/" + props.character.name + ".png"}
+            alt="Avatar"
+          />
         )}
         <CharacterListInfo
           onMouseEnter={handleMouseEnter}
