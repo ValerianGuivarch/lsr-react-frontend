@@ -256,7 +256,12 @@ export default function RollCard(props: RollCardProps) {
         </Rolls>
         <>
           {roll.pictureUrl && (
-            <img src={roll.pictureUrl} alt="Image" width={200} height={200} />
+            <img
+              src={roll.pictureUrl}
+              alt="ImageBonus"
+              width={200}
+              height={200}
+            />
           )}
         </>
       </RollDisplay>
