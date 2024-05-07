@@ -561,6 +561,20 @@ export function CharacterPanel(props: {
           />
         )}
       {!cardDisplay &&
+        Character.hasDisplayCategory(character, DisplayCategory.PAROLIERS) && (
+          <CharacterBlockBtn
+            characterState={characterState}
+            character={character}
+            cardDisplay={cardDisplay}
+            displayCategoryName={"Paroliers"}
+            displayCategory={DisplayCategory.PAROLIERS}
+            onClickSkill={handleOnClickSkill}
+            onClickProficiency={handleOnClickProficiency}
+            onClickApotheose={handleOnClickApotheose}
+            updateState={props.updateState}
+          />
+        )}
+      {!cardDisplay &&
         Character.hasDisplayCategory(
           character,
           DisplayCategory.PACIFICATEURS,
