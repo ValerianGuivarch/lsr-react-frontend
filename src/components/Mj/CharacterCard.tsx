@@ -27,11 +27,22 @@ export function CharacterCard(props: {
   onDelete?: (characterNameToDelete: string) => void;
 }) {
   return (
-    <CardContainer selected={props.selected} url={props.character.picture}>
+    <CardContainer
+      selected={props.selected}
+      url={
+        props.character.currentApotheose === null
+          ? "/l7r/" + props.character.name + ".png"
+          : "/l7r/" + props.character.name + "-apotheose.png"
+      }
+    >
       <CardContent>
         <TitleContainer allie={props.allie}>
           <ProfilePicture
-            src={props.character.picture}
+            src={
+              props.character.currentApotheose === null
+                ? "/l7r/" + props.character.name + ".png"
+                : "/l7r/" + props.character.name + "-apotheose.png"
+            }
             alt="Profile Picture"
             onClick={() => props.onSelect(props.character.name)}
             selected={props.selected}

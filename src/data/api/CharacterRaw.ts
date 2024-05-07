@@ -51,8 +51,6 @@ export interface CharacterRaw {
   genre: string;
   relance: number;
   playerName?: string;
-  picture?: string;
-  pictureApotheose?: string;
   background?: string;
   buttonColor?: string;
   textColor?: string;

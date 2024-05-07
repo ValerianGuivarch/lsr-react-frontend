@@ -54,8 +54,6 @@ export class Character {
   genre: Genre;
   relance: number;
   playerName?: string;
-  picture?: string;
-  pictureApotheose?: string;
   background?: string;
   buttonColor?: string;
   textColor?: string;
@@ -118,8 +116,6 @@ export class Character {
     this.genre = Genre[p.genre as keyof typeof Genre];
     this.relance = p.relance;
     this.playerName = p.playerName;
-    this.picture = p.picture;
-    this.pictureApotheose = p.pictureApotheose;
     this.background = p.background;
     this.buttonColor = p.buttonColor;
     this.textColor = p.textColor;

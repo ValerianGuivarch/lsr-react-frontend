@@ -27,7 +27,7 @@ export function CharacterBanner(props: { character: Character }) {
       <CharacterBannerContainer>
         {props.character.currentApotheose?.name ? (
           <CharacterAvatar
-            src={props.character.pictureApotheose}
+            src={"/l7r/" + props.character.name + "-apotheose.png"}
             alt="Avatar"
           />
         ) : (

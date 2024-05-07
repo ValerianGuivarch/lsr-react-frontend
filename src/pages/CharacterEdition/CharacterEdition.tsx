@@ -235,32 +235,6 @@ export function CharacterEdition() {
           <br />
         </label>
 
-        {/* Picture */}
-        <label>
-          Picture:
-          <input
-            type="text"
-            value={character.picture || ""}
-            onChange={(e) =>
-              setCharacter({ ...character, picture: e.target.value })
-            }
-          />
-          <br />
-        </label>
-
-        {/* Picture Apotheose */}
-        <label>
-          Picture Apotheose:
-          <input
-            type="text"
-            value={character.pictureApotheose || ""}
-            onChange={(e) =>
-              setCharacter({ ...character, pictureApotheose: e.target.value })
-            }
-          />
-          <br />
-        </label>
-
         {/* Button to save */}
         <SaveButton onClick={handleSave}>Save</SaveButton>
       </form>
