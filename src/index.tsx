@@ -13,6 +13,7 @@ import { CharacterControllingSheet } from "./pages/CharacterPanelSheet/Character
 import { CharacterMunitionsSheet } from "./pages/CharacterSheet/CharacterMunitionsSheet";
 import { CharacterCartouchesSheet } from "./pages/CharacterSheet/CharacterCartoucheSheet";
 import { ArcanePrimesSheet } from "./pages/CharacterSheet/ArcanePrimesSheet";
+import DateTool from "./pages/CharacterSelection/DateTool";
 
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -27,6 +28,7 @@ root.render(
             path="/characters/:characterName"
             element={<CharacterSheet />}
           />
+          <Route path="/date" element={<DateTool />} />
           <Route
             path="/characters/:characterName/invocation"
             element={<CharacterControllingSheet />}

@@ -48,8 +48,13 @@ export function CharacterMunitionsSheet() {
   });
 
   async function handleMunitionsEvolution(skillId: string, evolution: number) {
+    console.log("handleMunitionsEvolution ", skillId, evolution);
     const munition = munitionsList.find((munition) => munition.id === skillId);
     const evolutionEffective = evolution * (munition?.soldatCost ?? 0);
+    console.log(character);
+    console.log(munition);
+    console.log(munition?.dailyUse);
+    console.log(munitionMax);
     if (
       character &&
       munition &&
@@ -57,6 +62,7 @@ export function CharacterMunitionsSheet() {
       munitionMax - evolutionEffective >= 0 &&
       munition.dailyUse + evolution >= 0
     ) {
+      console.log("handleMunitionsEvodddlution", skillId, evolution);
       const dailyUse = munition.dailyUse + evolution;
       await ApiL7RProvider.updateCharacterSkillsAttribution(
         characterName ?? "",
@@ -96,10 +102,10 @@ export function CharacterMunitionsSheet() {
                   "]"
                 }
                 onClickDecr={() => {
-                  handleMunitionsEvolution(munitions.name, -1);
+                  handleMunitionsEvolution(munitions.id, -1);
                 }}
                 onClickIncr={() => {
-                  handleMunitionsEvolution(munitions.name, 1);
+                  handleMunitionsEvolution(munitions.id, 1);
                 }}
                 large={true}
               />

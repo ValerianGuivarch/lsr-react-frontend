@@ -607,6 +607,51 @@ export function CharacterPanel(props: {
             updateState={props.updateState}
           />
         )}
+      {!cardDisplay &&
+        Character.hasDisplayCategory(
+          character,
+          DisplayCategory.TECHNOMANCIE,
+        ) && (
+          <CharacterBlockBtn
+            characterState={characterState}
+            character={character}
+            cardDisplay={cardDisplay}
+            displayCategoryName={"Technomancie"}
+            displayCategory={DisplayCategory.TECHNOMANCIE}
+            onClickSkill={handleOnClickSkill}
+            onClickProficiency={handleOnClickProficiency}
+            onClickApotheose={handleOnClickApotheose}
+            updateState={props.updateState}
+          />
+        )}
+      {!cardDisplay &&
+        Character.hasDisplayCategory(character, DisplayCategory.BONUS) && (
+          <CharacterBlockBtn
+            characterState={characterState}
+            character={character}
+            cardDisplay={cardDisplay}
+            displayCategoryName={"Bonus"}
+            displayCategory={DisplayCategory.BONUS}
+            onClickSkill={handleOnClickSkill}
+            onClickProficiency={handleOnClickProficiency}
+            onClickApotheose={handleOnClickApotheose}
+            updateState={props.updateState}
+          />
+        )}
+      {!cardDisplay &&
+        Character.hasDisplayCategory(character, DisplayCategory.SOUTIENS) && (
+          <CharacterBlockBtn
+            characterState={characterState}
+            character={character}
+            cardDisplay={cardDisplay}
+            displayCategoryName={"Souvenirs"}
+            displayCategory={DisplayCategory.SOUTIENS}
+            onClickSkill={handleOnClickSkill}
+            onClickProficiency={handleOnClickProficiency}
+            onClickApotheose={handleOnClickApotheose}
+            updateState={props.updateState}
+          />
+        )}
       <RestModal
         character={character}
         isOpen={isRestModalOpen}

@@ -153,7 +153,10 @@ export function CharacterSheet() {
   async function handleSubir(p: { roll: Roll; originRoll?: Roll }) {
     try {
       if (character) {
-        const degats = UtilsRules.getDegats(p.roll, p.originRoll);
+        let degats = UtilsRules.getDegats(p.roll, p.originRoll);
+        if (character.name === "Aeryl" && degats > 0) {
+          degats = degats - 1;
+        }
         await ApiL7RProvider.updateCharacter({
           ...character,
           pv: Math.max(character.pv - degats, 0),
