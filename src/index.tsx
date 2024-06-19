@@ -14,6 +14,7 @@ import { CharacterMunitionsSheet } from "./pages/CharacterSheet/CharacterMunitio
 import { CharacterCartouchesSheet } from "./pages/CharacterSheet/CharacterCartoucheSheet";
 import { ArcanePrimesSheet } from "./pages/CharacterSheet/ArcanePrimesSheet";
 import DateTool from "./pages/CharacterSelection/DateTool";
+import Diary from "./components/Diary";
 
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -24,6 +25,7 @@ root.render(
       <Routes>
         <Route path="/" element={<App />}>
           <Route path="/" element={<CharacterSelection />} />
+          <Route path="/diary" element={<Diary />} />
           <Route
             path="/characters/:characterName"
             element={<CharacterSheet />}
