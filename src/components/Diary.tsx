@@ -7,7 +7,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import axios from "axios";
 
-const API_URL = "http://localhost:8081/api/v1/diaries";
+const API_URL = "https://l7r.fr/api/v1/diaries";
 
 interface Entry {
   id?: string;
