@@ -8,6 +8,7 @@ import "react-calendar/dist/Calendar.css";
 import axios from "axios";
 
 const API_URL = "https://l7r.fr/api/v1/diaries";
+const CHARACTER_LIMIT = 300;
 
 interface Entry {
   id?: string;
@@ -197,6 +198,9 @@ const Diary: React.FC = () => {
             {editingYear === year ? (
               <>
                 <TextArea value={newText} onChange={handleTextChange} />
+                <CharCount>
+                  {newText.length} / {CHARACTER_LIMIT} caractères
+                </CharCount>
                 <EditButton onClick={() => handleSaveClick(year)}>
                   Sauvegarder
                 </EditButton>
@@ -275,6 +279,13 @@ const EditButton = styled.button`
 const TextArea = styled.textarea`
   width: 100%;
   height: 100px;
+`;
+
+const CharCount = styled.div`
+  font-size: 12px;
+  color: ${(props) => props.color || "gray"};
+  margin-top: 5px;
+  text-align: right;
 `;
 
 export default Diary;
