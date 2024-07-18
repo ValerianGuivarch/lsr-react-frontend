@@ -128,6 +128,10 @@ export function MjSheet() {
     }
   }
 
+  async function handleSpeaking(characterName: string) {
+    await ApiL7RProvider.putSpeaking(characterName);
+  }
+
   async function handleUpdateCharacter(
     characterName: string,
     newCharacter: Character,
@@ -315,6 +319,7 @@ export function MjSheet() {
                   updateCharacter={handleUpdateCharacter}
                   updateState={handleUpdateState}
                   onSelect={handleSelectCharacter}
+                  onSpeaking={handleSpeaking}
                 />
               ))
           ) : (

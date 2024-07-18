@@ -1,5 +1,5 @@
 import React from "react";
-import { FaIdBadge, FaSyncAlt, FaTrashAlt } from "react-icons/fa";
+import { FaCamera, FaIdBadge, FaSyncAlt, FaTrashAlt } from "react-icons/fa";
 import { BattleState } from "../../domain/models/BattleState";
 import { CharacterPanel } from "../Character/CharacterPanel/CharacterPanel";
 import styled from "styled-components";
@@ -25,6 +25,7 @@ export function CharacterCard(props: {
   onSelect: (characterName: string) => void;
   onChange?: (battleState: BattleState) => void;
   onDelete?: (characterNameToDelete: string) => void;
+  onSpeaking?: (characterNameToSpeak: string) => void;
 }) {
   return (
     <CardContainer
@@ -79,6 +80,15 @@ export function CharacterCard(props: {
               }
             >
               <FaTrashAlt size={14} />
+            </IconWrapper>
+          )}
+          {props.onSpeaking && (
+            <IconWrapper
+              onClick={() =>
+                props.onSpeaking && props.onSpeaking(props.character.name)
+              }
+            >
+              <FaCamera size={14} />
             </IconWrapper>
           )}
         </TitleContainer>

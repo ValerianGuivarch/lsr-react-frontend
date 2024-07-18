@@ -151,4 +151,16 @@ export class L7RApi {
     );
     return response.data;
   }
+
+  static async getSpeaking(): Promise<string> {
+    const response = await axios.get(`${config.BASE_URL}/characters/speaking`);
+    return response.data;
+  }
+
+  static async putSpeaking(characterName: string): Promise<string> {
+    const response = await axios.put(
+      `${config.BASE_URL}/mj/speaking/${characterName}`,
+    );
+    return response.data;
+  }
 }

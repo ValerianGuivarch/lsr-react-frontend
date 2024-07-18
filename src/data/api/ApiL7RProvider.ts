@@ -161,4 +161,12 @@ export class ApiL7RProvider {
       return new Skill(skill);
     });
   }
+
+  static async getSpeaking() {
+    return await L7RApi.getSpeaking();
+  }
+
+  static async putSpeaking(characterName: string) {
+    await L7RApi.putSpeaking(characterName);
+  }
 }
