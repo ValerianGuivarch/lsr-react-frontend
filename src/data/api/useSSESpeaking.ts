@@ -10,7 +10,8 @@ export function useSSESpeaking(props: {
 
     eventSource.onmessage = (event) => {
       try {
-        const speaking = event.data.substring(6);
+        const speaking = event.data.substring(7);
+        speaking.substring(0, speaking.length - 1);
         props.callback(speaking);
       } catch (error) {
         console.error("Error parsing SSE data:", error);
