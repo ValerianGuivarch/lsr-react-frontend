@@ -3,6 +3,8 @@ import { ApiL7RProvider } from "../../data/api/ApiL7RProvider";
 import { SpeakingState } from "../../domain/models/SpeakingState";
 import { useSSESpeaking } from "../../data/api/useSSESpeaking";
 import styled from "styled-components";
+import { useSSECharacterByName } from "../../data/api/useSSECharacterByName";
+import { Character } from "../../domain/models/Character";
 
 export function SpeakingSheet() {
   const [speakingState, setSpeakingState] = useState<SpeakingState>(
@@ -12,6 +14,12 @@ export function SpeakingSheet() {
   useEffect(() => {
     fetchSpeaking().then(() => {});
   }, []);
+
+  useSSESpeaking({
+    callback: (speaking: string) => {
+      setSpeakingState(new SpeakingState(speaking));
+    },
+  });
 
   async function fetchSpeaking() {
     try {
@@ -31,7 +39,7 @@ export function SpeakingSheet() {
         <CharacterSpeakingWrapper>
           <CharacterSpeaking
             src={"/l7r/" + speakingState.speaking + ".png"}
-            alt="Avatar"
+            alt={speakingState.speaking}
           />
         </CharacterSpeakingWrapper>
       )}

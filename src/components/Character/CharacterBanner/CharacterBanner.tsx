@@ -28,12 +28,12 @@ export function CharacterBanner(props: { character: Character }) {
         {props.character.currentApotheose?.name ? (
           <CharacterAvatar
             src={"/l7r/" + props.character.name + "-apotheose.png"}
-            alt="Avatar"
+            alt={props.character.name}
           />
         ) : (
           <CharacterAvatar
             src={"/l7r/" + props.character.name + ".png"}
-            alt="Avatar"
+            alt={props.character.name}
           />
         )}
         <CharacterListInfo
