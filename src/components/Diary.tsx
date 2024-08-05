@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { format, isSameDay, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import Modal from "react-modal";
 import Calendar from "react-calendar";
@@ -193,14 +193,11 @@ const Diary: React.FC = () => {
       </DateNavigation>
       <DiaryEntry>
         {years.map((year) => (
-          <div key={year}>
+          <EntryContainer key={year}>
             <EntryYear>{year}</EntryYear>
             {editingYear === year ? (
               <>
                 <TextArea value={newText} onChange={handleTextChange} />
-                <CharCount>
-                  {newText.length} / {CHARACTER_LIMIT} caractères
-                </CharCount>
                 <EditButton onClick={() => handleSaveClick(year)}>
                   Sauvegarder
                 </EditButton>
@@ -217,7 +214,7 @@ const Diary: React.FC = () => {
                 </EditButton>
               </>
             )}
-          </div>
+          </EntryContainer>
         ))}
       </DiaryEntry>
       <Modal
@@ -242,22 +239,38 @@ const DiaryContainer = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 `;
 
 const DateNavigation = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
 `;
 
 const DateDisplay = styled.span`
   margin: 0 10px;
+  @media (max-width: 768px) {
+    margin: 5px 0;
+  }
 `;
 
 const DiaryEntry = styled.div`
   margin-bottom: 20px;
   width: 100%;
   max-width: 600px;
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+`;
+
+const EntryContainer = styled.div`
+  margin-bottom: 10px;
 `;
 
 const EntryYear = styled.h2`
@@ -270,6 +283,10 @@ const EntryText = styled.p`
 
 const Button = styled.button`
   margin: 0 5px;
+  @media (max-width: 768px) {
+    margin: 5px 0;
+    width: 100%;
+  }
 `;
 
 const EditButton = styled.button`
@@ -279,13 +296,6 @@ const EditButton = styled.button`
 const TextArea = styled.textarea`
   width: 100%;
   height: 100px;
-`;
-
-const CharCount = styled.div`
-  font-size: 12px;
-  color: ${(props) => props.color || "gray"};
-  margin-top: 5px;
-  text-align: right;
 `;
 
 export default Diary;
