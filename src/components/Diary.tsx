@@ -49,14 +49,11 @@ const Diary: React.FC = () => {
 
   const fetchEntries = async () => {
     try {
-      /*const response = await axios.get(
+      const response = await axios.get(
         `${API_URL}?day=${date.getDate()}&month=${date.getMonth() + 1}`,
       );
-      const data = response.data;*/
-      const data =
-        '[{"id":"013211e3-3dae-472b-b757-dfa759537f66","text":"Bon cette fois, pas de technique spéciale hier, du coup gueule de bois la journée. Je recommence Avatar (c’est trop bien) et je continue les The Good Place avec Chéri, rien de nouveau donc… BlastoDice avec Nico et Flo le soir, on kiffe même un jeu basé sur les couleurs !","day":7,"month":8,"year":2021,"lastUpdate":"2024-06-15T12:24:37.000Z"},{"id":"7a144318-9214-49ce-9c9f-7c6083da298a","text":"Dernier petit dej à Tivoli, on se pose un peu en bord de piscine puis on finit par partir. Etrangement, pas de souci de checkout avec l’hôtel ! On prend un “Uberto”, puis sous 40° on atteint l’aéroport, on mange des pasteis de nata, on attend, et enfin vol puis on rejoint la famille de Chéri !","day":7,"month":8,"year":2023,"lastUpdate":"2024-06-15T12:24:38.000Z"},{"id":"62100e76-1214-417c-8869-edb78a241202","text":"Dès le réveil, c’est parti : je finis Smallville ! Un sentiment étrange, après 10 saisons… Mais c’était quand même pas ouf ^^ Et on continue l’installation de la chambre d’amis, avec des boîtes dans des boîtes dans des boîtes.. Mais ça rend bien :) Roi Lion 2 le soir avec Chéri !","day":7,"month":8,"year":2022,"lastUpdate":"2024-06-15T12:39:37.000Z"},{"id":"b778834b-aa43-4804-847b-5044204bcabc","text":"journée efficace au boulot, me suis lancé dans la généricité du système d\'annonces et messages, quelle usine à gazes... Je tue Séphitoth à KH1 en rentrant, et je me lance dans le leveling du 2. Soirée Umbrella avec Chéri, il a enfin fini par accrocher à la série !","day":7,"month":8,"year":2020,"lastUpdate":"2024-06-23T08:24:01.000Z"}]';
-      const dataJson = JSON.parse(data);
-      const entriesByYear = dataJson.reduce(
+      const data = response.data;
+      const entriesByYear = data.reduce(
         (acc: { [key: number]: Entry }, entry: Entry) => {
           acc[entry.year] = entry;
           return acc;
