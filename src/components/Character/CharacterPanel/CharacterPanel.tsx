@@ -566,7 +566,9 @@ export function CharacterPanel(props: {
             characterState={characterState}
             character={character}
             cardDisplay={cardDisplay}
-            displayCategoryName={"Paroliers"}
+            displayCategoryName={
+              "Paroliers" + character.arcanes + "/" + character.arcanesMax
+            }
             displayCategory={DisplayCategory.PAROLIERS}
             onClickSkill={handleOnClickSkill}
             onClickProficiency={handleOnClickProficiency}

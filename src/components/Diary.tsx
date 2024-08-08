@@ -6,6 +6,14 @@ import Modal from "react-modal";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import axios from "axios";
+import {
+  FaCalendar,
+  FaChevronLeft,
+  FaChevronRight,
+  FaDAndD,
+} from "react-icons/fa";
+import { MdEdit, MdSave } from "react-icons/md";
+import { GiReturnArrow } from "react-icons/gi";
 
 const API_URL = "https://l7r.fr/api/v1/diaries";
 const CHARACTER_LIMIT = 300;
@@ -41,11 +49,14 @@ const Diary: React.FC = () => {
 
   const fetchEntries = async () => {
     try {
-      const response = await axios.get(
+      /*const response = await axios.get(
         `${API_URL}?day=${date.getDate()}&month=${date.getMonth() + 1}`,
       );
-      const data = response.data;
-      const entriesByYear = data.reduce(
+      const data = response.data;*/
+      const data =
+        '[{"id":"013211e3-3dae-472b-b757-dfa759537f66","text":"Bon cette fois, pas de technique spéciale hier, du coup gueule de bois la journée. Je recommence Avatar (c’est trop bien) et je continue les The Good Place avec Chéri, rien de nouveau donc… BlastoDice avec Nico et Flo le soir, on kiffe même un jeu basé sur les couleurs !","day":7,"month":8,"year":2021,"lastUpdate":"2024-06-15T12:24:37.000Z"},{"id":"7a144318-9214-49ce-9c9f-7c6083da298a","text":"Dernier petit dej à Tivoli, on se pose un peu en bord de piscine puis on finit par partir. Etrangement, pas de souci de checkout avec l’hôtel ! On prend un “Uberto”, puis sous 40° on atteint l’aéroport, on mange des pasteis de nata, on attend, et enfin vol puis on rejoint la famille de Chéri !","day":7,"month":8,"year":2023,"lastUpdate":"2024-06-15T12:24:38.000Z"},{"id":"62100e76-1214-417c-8869-edb78a241202","text":"Dès le réveil, c’est parti : je finis Smallville ! Un sentiment étrange, après 10 saisons… Mais c’était quand même pas ouf ^^ Et on continue l’installation de la chambre d’amis, avec des boîtes dans des boîtes dans des boîtes.. Mais ça rend bien :) Roi Lion 2 le soir avec Chéri !","day":7,"month":8,"year":2022,"lastUpdate":"2024-06-15T12:39:37.000Z"},{"id":"b778834b-aa43-4804-847b-5044204bcabc","text":"journée efficace au boulot, me suis lancé dans la généricité du système d\'annonces et messages, quelle usine à gazes... Je tue Séphitoth à KH1 en rentrant, et je me lance dans le leveling du 2. Soirée Umbrella avec Chéri, il a enfin fini par accrocher à la série !","day":7,"month":8,"year":2020,"lastUpdate":"2024-06-23T08:24:01.000Z"}]';
+      const dataJson = JSON.parse(data);
+      const entriesByYear = dataJson.reduce(
         (acc: { [key: number]: Entry }, entry: Entry) => {
           acc[entry.year] = entry;
           return acc;
@@ -184,12 +195,22 @@ const Diary: React.FC = () => {
   return (
     <DiaryContainer>
       <DateNavigation>
-        <Button onClick={goToLastMissingDate}>Dernière date manquante</Button>
-        <Button onClick={openModal}>📅</Button>
-        <Button onClick={handlePrevDay}>←</Button>
+        <Button onClick={goToLastMissingDate}>
+          <GiReturnArrow />
+        </Button>
+        <Button onClick={openModal}>
+          <FaCalendar />
+        </Button>
+        <Button onClick={handlePrevDay}>
+          <FaChevronLeft />
+        </Button>
         <DateDisplay>{formattedDate}</DateDisplay>
-        <Button onClick={handleNextDay}>→</Button>
-        <Button onClick={handleToday}>Aujourd'hui</Button>
+        <Button onClick={handleNextDay}>
+          <FaChevronRight />
+        </Button>
+        <Button onClick={handleToday}>
+          <FaDAndD />
+        </Button>
       </DateNavigation>
       <DiaryEntry>
         {years.map((year) => (
@@ -199,7 +220,7 @@ const Diary: React.FC = () => {
               <>
                 <TextArea value={newText} onChange={handleTextChange} />
                 <EditButton onClick={() => handleSaveClick(year)}>
-                  Sauvegarder
+                  <MdSave />
                 </EditButton>
               </>
             ) : (
@@ -210,7 +231,7 @@ const Diary: React.FC = () => {
                     handleEditClick(year, entries[year]?.text || "")
                   }
                 >
-                  Éditer
+                  <MdEdit />
                 </EditButton>
               </>
             )}
@@ -239,6 +260,8 @@ const DiaryContainer = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  max-width: 100vw;
+  overflow-x: hidden;
   @media (max-width: 768px) {
     padding: 10px;
   }
@@ -250,12 +273,22 @@ const DateNavigation = styled.div`
   margin-bottom: 20px;
   flex-wrap: wrap;
   justify-content: center;
+  width: 100%;
+
+  button {
+    flex: 1;
+    min-width: 40px;
+    max-width: 80px;
+    white-space: pre-wrap; /* Allow button text to wrap */
+  }
 `;
 
 const DateDisplay = styled.span`
   margin: 0 10px;
   @media (max-width: 768px) {
     margin: 5px 0;
+    flex-basis: 100%;
+    text-align: center;
   }
 `;
 
@@ -271,6 +304,7 @@ const DiaryEntry = styled.div`
 
 const EntryContainer = styled.div`
   margin-bottom: 10px;
+  word-break: break-word; /* Ensure text does not overflow */
 `;
 
 const EntryYear = styled.h2`
@@ -279,6 +313,7 @@ const EntryYear = styled.h2`
 
 const EntryText = styled.p`
   white-space: pre-wrap; /* preserve whitespace */
+  word-break: break-word; /* Ensure text does not overflow */
 `;
 
 const Button = styled.button`
@@ -291,11 +326,19 @@ const Button = styled.button`
 
 const EditButton = styled.button`
   margin-left: 10px;
+  @media (max-width: 768px) {
+    margin: 10px 0;
+    width: 100%;
+  }
 `;
 
 const TextArea = styled.textarea`
   width: 100%;
   height: 100px;
+  @media (max-width: 768px) {
+    width: calc(100% - 20px);
+    padding: 10px;
+  }
 `;
 
 export default Diary;
