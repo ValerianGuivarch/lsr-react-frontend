@@ -10,6 +10,7 @@ import { ApotheoseState } from "./ApotheoseState";
 
 export class Character {
   name: string;
+  picture: string;
   controlledBy?: string;
   classe: {
     name: string;
@@ -32,6 +33,7 @@ export class Character {
   pp: number;
   ppMax: number;
   canUsePp: boolean;
+  isInvocation: boolean;
   dettes: number;
   dragonDettes: number;
   arcanes: number;
@@ -68,6 +70,7 @@ export class Character {
 
   constructor(p: CharacterRaw) {
     this.controlledBy = p.controlledBy;
+    this.picture = p.picture;
     this.apotheoseState =
       ApotheoseState[p.apotheoseState as keyof typeof ApotheoseState];
     this.skills = p.skills.map((s) => new Skill(s));
@@ -95,6 +98,7 @@ export class Character {
     this.pp = p.pp;
     this.ppMax = p.ppMax;
     this.canUsePp = p.classe.canUsePp;
+    this.isInvocation = p.isInvocation;
     this.dettes = p.dettes;
     this.dragonDettes = p.dragonDettes;
     this.arcanes = p.arcanes;

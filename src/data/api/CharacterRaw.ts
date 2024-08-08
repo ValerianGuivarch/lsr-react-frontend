@@ -14,6 +14,8 @@ export interface CharacterRaw {
     name: string;
     display: string;
   };
+  isInvocation: boolean;
+  picture: string;
   boulet: boolean;
   rest: number;
   longRest: number;

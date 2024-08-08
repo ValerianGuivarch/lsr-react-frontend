@@ -30,6 +30,11 @@ export function CharacterBanner(props: { character: Character }) {
             src={"/l7r/" + props.character.name + "-apotheose.png"}
             alt={props.character.name}
           />
+        ) : props.character.isInvocation ? (
+          <CharacterAvatar
+            src={props.character.picture}
+            alt={props.character.name}
+          />
         ) : (
           <CharacterAvatar
             src={"/l7r/" + props.character.name + ".png"}
