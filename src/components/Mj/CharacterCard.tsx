@@ -31,7 +31,9 @@ export function CharacterCard(props: {
     <CardContainer
       selected={props.selected}
       url={
-        props.character.currentApotheose === null
+        props.character.isInvocation
+          ? props.character.picture
+          : props.character.currentApotheose === null
           ? "/l7r/" + props.character.name + ".png"
           : "/l7r/" + props.character.name + "-apotheose.png"
       }
@@ -40,7 +42,9 @@ export function CharacterCard(props: {
         <TitleContainer allie={props.allie}>
           <ProfilePicture
             src={
-              props.character.currentApotheose === null
+              props.character.isInvocation
+                ? props.character.picture
+                : props.character.currentApotheose === null
                 ? "/l7r/" + props.character.name + ".png"
                 : "/l7r/" + props.character.name + "-apotheose.png"
             }

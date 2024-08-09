@@ -72,10 +72,7 @@ export default function RollCard(props: RollCardProps) {
   const displayParts = roll.display.split("*");
   return (
     <Container>
-      <Avatar
-        src={"/l7r/" + roll.rollerName + ".png"}
-        alt={props.roll.rollerName}
-      />
+      <Avatar src={roll.picture} alt={props.roll.rollerName} />
       <RollDisplay>
         <TextPartOne>
           <span>{roll.secret ? "(secret) " : ""} </span>
