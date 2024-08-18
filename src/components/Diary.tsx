@@ -216,6 +216,9 @@ const Diary: React.FC = () => {
             {editingYear === year ? (
               <>
                 <TextArea value={newText} onChange={handleTextChange} />
+                <CharCount>
+                  {newText.length} / {CHARACTER_LIMIT} caractères
+                </CharCount>
                 <EditButton onClick={() => handleSaveClick(year)}>
                   <MdSave />
                 </EditButton>
@@ -336,6 +339,13 @@ const TextArea = styled.textarea`
     width: calc(100% - 20px);
     padding: 10px;
   }
+`;
+
+const CharCount = styled.div`
+  font-size: 12px;
+  color: ${(props) => props.color || "gray"};
+  margin-top: 5px;
+  text-align: right;
 `;
 
 export default Diary;
