@@ -5,6 +5,14 @@ import { CharacterPreviewRaw } from "./CharacterPreviewRaw";
 import { CharacterUpdateRequest } from "./CharacterUpdateRequest";
 import { RollRaw } from "./RollRaw";
 import { SkillRaw } from "./SkillRaw";
+import { WizardRaw } from "./WizardRaw";
+import { FlipRaw } from "./FlipRaw";
+import { Wizard } from "../../domain/models/Wizard";
+import { WizardStatRaw } from "./WizardStatRaw";
+import { StatRaw } from "./StatRaw";
+import { KnowledgeRaw } from "./KnowledgeRaw";
+import { Category } from "../../domain/models/Category";
+import { SchoolCategory } from "../../domain/models/SchoolCategory";
 
 export class L7RApi {
   static async sendNewTurn(): Promise<void> {
@@ -162,5 +170,52 @@ export class L7RApi {
       `${config.BASE_URL}/mj/speaking/${characterName}`,
     );
     return response.data;
+  }
+
+  static async getWizardByName(name: string): Promise<WizardRaw> {
+    const response = await axios.get(
+      `${config.BASE_URL}/hp/wizards/name/${name}`,
+    );
+    return response.data;
+  }
+
+  static async getFlips(): Promise<FlipRaw[]> {
+    const response = await axios.get(`${config.BASE_URL}/hp/flips`);
+    return response.data;
+  }
+
+  static async sendFlip(param: {
+    knowledgeId: string | undefined;
+    statId: string | undefined;
+    wizardId: string;
+  }) {
+    await axios.post(`${config.BASE_URL}/hp/flips`, {
+      wizardId: param.wizardId,
+      knowledgeId: param.knowledgeId,
+      statId: param.statId,
+    });
+  }
+
+  static async updateWizard(newWizard: Wizard) {
+    await axios.put(`${config.BASE_URL}/hp/wizards`, newWizard);
+  }
+
+  static async getStats(): Promise<StatRaw[]> {
+    const response = await axios.get(`${config.BASE_URL}/hp/stats`);
+    return response.data;
+  }
+
+  static async getKnowledges(): Promise<KnowledgeRaw[]> {
+    const response = await axios.get(`${config.BASE_URL}/hp/knowledges`);
+    return response.data;
+  }
+
+  static async createWizard(toCreate: {
+    stats: { level: number; id: string }[];
+    name: string;
+    category: string;
+    knowledges: { level: number; id: string }[];
+  }) {
+    await axios.post(`${config.BASE_URL}/hp/wizards`, toCreate);
   }
 }

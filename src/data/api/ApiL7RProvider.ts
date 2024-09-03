@@ -8,6 +8,14 @@ import { CharacterUpdateRequest } from "./CharacterUpdateRequest";
 import { CharacterRaw } from "./CharacterRaw";
 import { Skill } from "../../domain/models/Skill";
 import { SkillRaw } from "./SkillRaw";
+import { Wizard } from "../../domain/models/Wizard";
+import { Stat } from "../../domain/models/Stat";
+import { WizardStat } from "../../domain/models/WizardStat";
+import { WizardKnowledge } from "../../domain/models/WizardKnowledge";
+import { Flip } from "../../domain/models/Flip";
+import { Knowledge } from "../../domain/models/Knowledge";
+import { Category } from "../../domain/models/Category";
+import { SchoolCategory } from "../../domain/models/SchoolCategory";
 
 export interface ApiResponse {
   error: boolean;
@@ -168,5 +176,68 @@ export class ApiL7RProvider {
 
   static async putSpeaking(characterName: string) {
     await L7RApi.putSpeaking(characterName);
+  }
+
+  static async getWizardByName(name: string) {
+    const wizardRaw = await L7RApi.getWizardByName(name);
+    return new Wizard({
+      id: wizardRaw.id,
+      name: wizardRaw.name,
+      category: wizardRaw.category,
+      stats: wizardRaw.stats.map((stat) => new WizardStat(stat)),
+      knowledges: wizardRaw.knowledges.map(
+        (knowledge) =>
+          new WizardKnowledge({
+            knowledge: knowledge.knowledge,
+            level: knowledge.level,
+          }),
+      ),
+    });
+  }
+
+  static async getFlips() {
+    return (await L7RApi.getFlips()).map((flip) => {
+      return new Flip({
+        id: flip.id,
+        wizardName: flip.wizardName,
+        text: flip.text,
+        result: flip.result,
+        base: flip.base,
+        modif: flip.modif,
+      });
+    });
+  }
+
+  static async sendFlip(param: {
+    knowledgeId: string | undefined;
+    statId: string | undefined;
+    wizardId: string;
+  }) {
+    await L7RApi.sendFlip(param);
+  }
+
+  static async updateWizard(newWizard: Wizard) {
+    await L7RApi.updateWizard(newWizard);
+  }
+
+  static async getStats() {
+    return (await L7RApi.getStats()).map((stat) => {
+      return new Stat(stat);
+    });
+  }
+
+  static async getKnowledges() {
+    return (await L7RApi.getKnowledges()).map((knowledge) => {
+      return new Knowledge(knowledge);
+    });
+  }
+
+  static async createWizard(toCreate: {
+    stats: { level: number; id: string }[];
+    name: string;
+    category: string;
+    knowledges: { level: number; id: string }[];
+  }) {
+    await L7RApi.createWizard(toCreate);
   }
 }

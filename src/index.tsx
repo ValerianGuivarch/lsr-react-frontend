@@ -16,6 +16,8 @@ import { ArcanePrimesSheet } from "./pages/CharacterSheet/ArcanePrimesSheet";
 import DateTool from "./pages/CharacterSelection/DateTool";
 import Diary from "./components/Diary";
 import { SpeakingSheet } from "./pages/CharacterSheet/SpeakingSheet";
+import { WizardSheet } from "./pages/Hp/WizardSheet";
+import { WizardForm } from "./pages/Hp/WizardForm";
 
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -26,6 +28,8 @@ root.render(
       <Routes>
         <Route path="/" element={<App />}>
           <Route path="/" element={<CharacterSelection />} />
+          <Route path="/hp/:wizardName" element={<WizardSheet />} />
+          <Route path="/hp/create" element={<WizardForm />} />
           <Route path="/diary" element={<Diary />} />
           <Route
             path="/characters/:characterName"
