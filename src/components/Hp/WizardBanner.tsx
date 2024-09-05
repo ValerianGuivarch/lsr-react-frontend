@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import {
-  FaGear,
-  FaGun,
-  FaPenToSquare,
-  FaPeopleGroup,
-  FaHatWizard,
-} from "react-icons/fa6";
+import { FaPenToSquare } from "react-icons/fa6";
 import { IconType } from "react-icons";
 import { Wizard } from "../../domain/models/Wizard";
 
@@ -25,7 +19,7 @@ export function WizardBanner(props: { wizard: Wizard }) {
     <WizardBannerBox>
       <WizardBackground
         src={
-          "https://i-mom.unimedias.fr/2021/10/21/poudlard_harry_potter_0.jpg?auto=format%2Ccompress&crop=faces&cs=tinysrgb&fit=crop&h=501&w=890"
+          "https://www.avenuedelabrique.com/img/categories/thumbs/harry-potter-banniere_1280x220.jpg"
         }
         alt=""
       />
@@ -67,7 +61,7 @@ const WizardBannerBox = styled.div`
 `;
 
 const WizardBackground = styled.img`
-  width: 100%;
+  width: 700px;
   height: 8rem;
   object-fit: cover;
 `;

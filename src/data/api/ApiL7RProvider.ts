@@ -14,8 +14,10 @@ import { WizardStat } from "../../domain/models/WizardStat";
 import { WizardKnowledge } from "../../domain/models/WizardKnowledge";
 import { Flip } from "../../domain/models/Flip";
 import { Knowledge } from "../../domain/models/Knowledge";
-import { Category } from "../../domain/models/Category";
-import { SchoolCategory } from "../../domain/models/SchoolCategory";
+import { WizardRaw } from "./WizardRaw";
+import { WizardSpell } from "../../domain/models/WizardSpell";
+import { Spell } from "../../domain/models/Spell";
+import { Difficulty } from "../../domain/models/Difficulty";
 
 export interface ApiResponse {
   error: boolean;
@@ -178,19 +180,20 @@ export class ApiL7RProvider {
     await L7RApi.putSpeaking(characterName);
   }
 
+  ////////////////////////// POUDLARD //////////////////////////
+
   static async getWizardByName(name: string) {
-    const wizardRaw = await L7RApi.getWizardByName(name);
+    const wizardRaw: WizardRaw = await L7RApi.getWizardByName(name);
     return new Wizard({
       id: wizardRaw.id,
       name: wizardRaw.name,
       category: wizardRaw.category,
       stats: wizardRaw.stats.map((stat) => new WizardStat(stat)),
+      spells: wizardRaw.spells.map((spell) => {
+        return new WizardSpell(spell);
+      }),
       knowledges: wizardRaw.knowledges.map(
-        (knowledge) =>
-          new WizardKnowledge({
-            knowledge: knowledge.knowledge,
-            level: knowledge.level,
-          }),
+        (knowledge) => new WizardKnowledge(knowledge),
       ),
     });
   }
@@ -232,11 +235,18 @@ export class ApiL7RProvider {
     });
   }
 
+  static async getSpells(): Promise<Spell[]> {
+    return (await L7RApi.getSpells()).map((spell) => {
+      return new Spell(spell);
+    });
+  }
+
   static async createWizard(toCreate: {
     stats: { level: number; id: string }[];
     name: string;
     category: string;
     knowledges: { level: number; id: string }[];
+    spells: { difficulty: Difficulty; id: string }[];
   }) {
     await L7RApi.createWizard(toCreate);
   }

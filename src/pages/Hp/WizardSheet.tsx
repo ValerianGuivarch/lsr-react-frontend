@@ -118,6 +118,14 @@ export function WizardSheet() {
   );
 }
 
-const MainContainer = styled.div``;
+const MainContainer = styled.div`
+  width: 700px;
+  max-width: 100%; // Évite toute limitation de largeur
+  padding: 20px;
+  margin: 0 auto; // Centrer si nécessaire
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
 const Flips = styled.div``;

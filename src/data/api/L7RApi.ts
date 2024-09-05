@@ -13,6 +13,8 @@ import { StatRaw } from "./StatRaw";
 import { KnowledgeRaw } from "./KnowledgeRaw";
 import { Category } from "../../domain/models/Category";
 import { SchoolCategory } from "../../domain/models/SchoolCategory";
+import { SpellRaw } from "./SpellRaw";
+import { Difficulty } from "../../domain/models/Difficulty";
 
 export class L7RApi {
   static async sendNewTurn(): Promise<void> {
@@ -215,7 +217,13 @@ export class L7RApi {
     name: string;
     category: string;
     knowledges: { level: number; id: string }[];
+    spells: { difficulty: Difficulty; id: string }[];
   }) {
     await axios.post(`${config.BASE_URL}/hp/wizards`, toCreate);
+  }
+
+  static async getSpells(): Promise<SpellRaw[]> {
+    const response = await axios.get(`${config.BASE_URL}/hp/spells`);
+    return response.data;
   }
 }

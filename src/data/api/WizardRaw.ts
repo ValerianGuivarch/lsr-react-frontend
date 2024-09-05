@@ -1,5 +1,6 @@
 import { WizardStatRaw } from "./WizardStatRaw";
 import { WizardKnowledgeRaw } from "./WizardKnowledgeRaw";
+import { WizardSpellRaw } from "./WizardSpellRaw";
 
 export interface WizardRaw {
   id: string;
@@ -7,4 +8,5 @@ export interface WizardRaw {
   category: string;
   stats: WizardStatRaw[];
   knowledges: WizardKnowledgeRaw[];
+  spells: WizardSpellRaw[];
 }

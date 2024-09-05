@@ -1,5 +1,6 @@
 import { WizardStat } from "./WizardStat";
 import { WizardKnowledge } from "./WizardKnowledge";
+import { WizardSpell } from "./WizardSpell";
 
 export class Wizard {
   id: string;
@@ -7,6 +8,7 @@ export class Wizard {
   category: string;
   stats: WizardStat[];
   knowledges: WizardKnowledge[];
+  spells: WizardSpell[];
 
   constructor(wizard: {
     id: string;
@@ -14,12 +16,14 @@ export class Wizard {
     category: string;
     stats: WizardStat[];
     knowledges: WizardKnowledge[];
+    spells: WizardSpell[];
   }) {
     this.id = wizard.id;
     this.name = wizard.name;
     this.category = wizard.category;
     this.stats = wizard.stats;
     this.knowledges = wizard.knowledges;
+    this.spells = wizard.spells;
   }
 
   static getDisplayNameAndDescription(wizard: Wizard) {
