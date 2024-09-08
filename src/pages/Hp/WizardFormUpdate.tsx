@@ -12,6 +12,7 @@ export function WizardFormUpdate() {
     async function fetchWizard() {
       try {
         const wizard = await ApiL7RProvider.getWizardByName(wizardName ?? "");
+        console.log("Wizard", wizard);
         setInitialData({
           name: wizard.name,
           category: wizard.category,

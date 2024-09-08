@@ -1,3 +1,5 @@
+import { Difficulty } from "../../../domain/models/hp/Difficulty";
+
 export interface FlipRaw {
   id: string;
   wizardName: string;
@@ -5,4 +7,6 @@ export interface FlipRaw {
   result: number;
   base: number;
   modif: number;
+  difficulty: Difficulty;
+  resultBis?: number;
 }

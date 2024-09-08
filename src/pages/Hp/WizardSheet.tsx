@@ -80,6 +80,7 @@ export function WizardSheet() {
     knowledgeName?: string;
     spellName?: string;
     statName?: string;
+    difficulty: Difficulty;
   }) {
     try {
       if (wizard) {
@@ -88,6 +89,7 @@ export function WizardSheet() {
           statName: p.statName,
           spellName: p.spellName,
           wizardName: wizard.name,
+          difficulty: p.difficulty,
         });
       }
     } catch (error) {

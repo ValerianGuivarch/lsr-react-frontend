@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { FaPenToSquare } from "react-icons/fa6";
+import { FaUser } from "react-icons/fa6";
 import { IconType } from "react-icons";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { Wizard } from "../../domain/models/hp/Wizard";
 
 export function WizardBanner(props: { wizard: Wizard }) {
   const [isButtonsVisible, setIsButtonsVisible] = useState(false);
+  const navigate = useNavigate(); // Hook pour naviguer
 
   const handleMouseEnter = () => {
     setIsButtonsVisible(true);
@@ -13,6 +15,11 @@ export function WizardBanner(props: { wizard: Wizard }) {
 
   const handleMouseLeave = () => {
     setIsButtonsVisible(false);
+  };
+
+  const handleAdvantageClick = () => {
+    // Redirection vers la page /hp/update/:wizardName
+    navigate(`/hp/update/${props.wizard.name}`);
   };
 
   return (
@@ -34,11 +41,10 @@ export function WizardBanner(props: { wizard: Wizard }) {
         >
           {isButtonsVisible && (
             <ButtonsContainer>
-              <EditWizardIcon
-                icon={FaPenToSquare}
-                onClick={() => {
-                  window.location.href = `/wizards/${props.wizard.name}/edit`;
-                }}
+              <AdvantageIcon
+                icon={FaUser}
+                title="Avantage"
+                onClick={handleAdvantageClick}
               />
             </ButtonsContainer>
           )}
@@ -102,31 +108,35 @@ const WizardListInfo = styled.div`
 const ButtonsContainer = styled.div`
   position: absolute;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   top: 1rem;
   right: 1rem;
   justify-content: flex-start;
+  gap: 0.5rem;
 `;
 
-interface EditWizardIconProps {
+interface IconProps {
   icon: IconType;
-  onClick?: () => void; // Add the onClick prop here
+  title?: string;
+  onClick?: () => void;
 }
 
-const EditWizardIcon = styled(
-  ({ icon: Icon, ...props }: EditWizardIconProps) => <Icon {...props} />,
-)`
-  padding: 0.25rem;
-  margin-top: 0;
-  height: 1rem;
-  border-radius: 0.5rem;
-  background-color: #ccc;
+// Icône pour l'Avantage
+const AdvantageIcon = styled(({ icon: Icon, ...props }: IconProps) => (
+  <Icon {...props} />
+))`
+  padding: 0.5rem;
+  height: 1.5rem;
+  width: 1.5rem;
+  color: green;
+  border-radius: 50%;
+  background-color: #d4f7d4;
+  cursor: pointer;
+  &:hover {
+    background-color: #aef0ae;
+  }
 `;
 
 const WizardName = styled.div`
   font-weight: bold;
-`;
-
-const WizardInfo = styled.div`
-  /* Ajoutez les styles CSS nécessaires */
 `;

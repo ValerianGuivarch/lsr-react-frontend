@@ -191,12 +191,14 @@ export class L7RApi {
     statName: string | undefined;
     spellName: string | undefined;
     wizardName: string;
+    difficulty: Difficulty;
   }) {
     await axios.post(`${config.BASE_URL}/hp/flips`, {
       wizardName: param.wizardName,
       knowledgeName: param.knowledgeName,
       statName: param.statName,
       spellName: param.spellName,
+      difficulty: param.difficulty,
     });
   }
 
@@ -210,7 +212,7 @@ export class L7RApi {
       spells: { difficulty: Difficulty; name: string }[];
     },
   ) {
-    await axios.put(`${config.BASE_URL}/hp/wizards/` + name, newWizard);
+    await axios.patch(`${config.BASE_URL}/hp/wizards/` + name, newWizard);
   }
 
   static async getStats(): Promise<StatRaw[]> {

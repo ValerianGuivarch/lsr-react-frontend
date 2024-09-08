@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { FaStarHalf, FaStar } from "react-icons/fa";
 import { Wizard } from "../../../domain/models/hp/Wizard";
-import { Difficulty } from "../../../domain/models/hp/Difficulty"; // Icons for difficulty
+import { Difficulty } from "../../../domain/models/hp/Difficulty";
+import { GiBrokenHeart } from "react-icons/gi"; // Icons for difficulty
 
 export function WizardPanel({
   wizard,
@@ -13,13 +14,13 @@ export function WizardPanel({
     knowledgeName?: string;
     statName?: string;
     spellName?: string;
-    difficulty: string;
+    difficulty: Difficulty;
   }) => void;
 }) {
   function handleClick(
     skillName: string,
     type: "stat" | "knowledge" | "spell",
-    difficulty: string,
+    difficulty: Difficulty,
   ) {
     if (type === "spell") {
       sendFlip({ spellName: skillName, difficulty });
@@ -41,24 +42,28 @@ export function WizardPanel({
           <TripleButton key={statWizard.stat.name}>
             <ActionButton
               onClick={() =>
-                handleClick(statWizard.stat.name, "stat", "DESAVANTAGE")
+                handleClick(
+                  statWizard.stat.name,
+                  "stat",
+                  Difficulty.DESAVANTAGE,
+                )
               }
             >
-              <FaArrowLeft />
+              <GiBrokenHeart />
             </ActionButton>
             <MainButton
               onClick={() =>
-                handleClick(statWizard.stat.name, "stat", "NORMAL")
+                handleClick(statWizard.stat.name, "stat", Difficulty.NORMAL)
               }
             >
               {statWizard.stat.name} {statWizard.level} ({statWizard.xp})
             </MainButton>
             <ActionButton
               onClick={() =>
-                handleClick(statWizard.stat.name, "stat", "AVANTAGE")
+                handleClick(statWizard.stat.name, "stat", Difficulty.AVANTAGE)
               }
             >
-              <FaArrowRight />
+              <FaStar />
             </ActionButton>
           </TripleButton>
         ))}
@@ -74,19 +79,19 @@ export function WizardPanel({
                 handleClick(
                   knowledgeWizard.knowledge.name,
                   "knowledge",
-                  "DESAVANTAGE",
+                  Difficulty.DESAVANTAGE,
                 )
               }
               style={{ backgroundColor: knowledgeWizard.knowledge.color }}
             >
-              <FaArrowLeft />
+              <GiBrokenHeart />
             </ActionButton>
             <MainButton
               onClick={() =>
                 handleClick(
                   knowledgeWizard.knowledge.name,
                   "knowledge",
-                  "NORMAL",
+                  Difficulty.NORMAL,
                 )
               }
               style={{ backgroundColor: knowledgeWizard.knowledge.color }}
@@ -99,12 +104,12 @@ export function WizardPanel({
                 handleClick(
                   knowledgeWizard.knowledge.name,
                   "knowledge",
-                  "AVANTAGE",
+                  Difficulty.AVANTAGE,
                 )
               }
               style={{ backgroundColor: knowledgeWizard.knowledge.color }}
             >
-              <FaArrowRight />
+              <FaStar />
             </ActionButton>
           </TripleButton>
         ))}
@@ -114,33 +119,30 @@ export function WizardPanel({
       <Section>
         <h3>Spells</h3>
         {wizard.spells.map((spellWizard) => (
-          <TripleButton key={spellWizard.spell.name}>
-            <ActionButton
-              onClick={() =>
-                handleClick(spellWizard.spell.name, "spell", "DESAVANTAGE")
-              }
-            >
-              <FaArrowLeft />
-            </ActionButton>
+          <SpellItem key={spellWizard.spell.name}>
             <MainButton
               onClick={() =>
-                handleClick(spellWizard.spell.name, "spell", "NORMAL")
+                handleClick(spellWizard.spell.name, "spell", Difficulty.NORMAL)
               }
             >
-              {spellWizard.spell.name} ({spellWizard.difficulty})
+              {spellWizard.spell.name}
+              {getDifficultyIcon(spellWizard.difficulty)}
             </MainButton>
-            <ActionButton
-              onClick={() =>
-                handleClick(spellWizard.spell.name, "spell", "AVANTAGE")
-              }
-            >
-              <FaArrowRight />
-            </ActionButton>
-          </TripleButton>
+          </SpellItem>
         ))}
       </Section>
     </PanelContainer>
   );
+}
+
+// Fonction pour retourner l'icône appropriée en fonction de la difficulté
+function getDifficultyIcon(difficulty: Difficulty) {
+  if (difficulty === Difficulty.NORMAL) {
+    return <FaStarHalf />;
+  } else if (difficulty === Difficulty.AVANTAGE) {
+    return <FaStar />;
+  }
+  return null;
 }
 
 const PanelContainer = styled.div`
@@ -216,4 +218,10 @@ const MainButton = styled.button<{ color?: string }>`
   &:hover {
     background-color: #ddd;
   }
+`;
+
+const SpellItem = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
 `;

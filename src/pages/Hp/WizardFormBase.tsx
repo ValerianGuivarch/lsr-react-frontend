@@ -51,20 +51,20 @@ export function WizardFormBase({
     fetchStats();
     fetchKnowledges();
     fetchSpells();
-  }, []);
+  }, [initialData]);
 
   async function fetchStats() {
     try {
       const statsData = await ApiL7RProvider.getStats();
       setStats(statsData);
-      if (!initialData) {
-        setWizardStats(
-          statsData.reduce((acc: Record<string, number>, stat: any) => {
-            acc[stat.name] = 0;
-            return acc;
-          }, {}),
-        );
-      }
+
+      // Si initialData est fourni, on le complète avec les stats manquantes initialisées à 0
+      setWizardStats((prevStats) => {
+        return statsData.reduce((acc: Record<string, number>, stat: any) => {
+          acc[stat.name] = prevStats?.[stat.name] ?? 0; // Valeur par défaut à 0
+          return acc;
+        }, {});
+      });
     } catch (error) {
       console.error("Error fetching stats:", error);
     }
@@ -74,17 +74,17 @@ export function WizardFormBase({
     try {
       const knowledgesData = await ApiL7RProvider.getKnowledges();
       setKnowledges(knowledgesData);
-      if (!initialData) {
-        setWizardKnowledges(
-          knowledgesData.reduce(
-            (acc: Record<string, number>, knowledge: any) => {
-              acc[knowledge.name] = 0;
-              return acc;
-            },
-            {},
-          ),
+
+      // Si initialData est fourni, on le complète avec les knowledges manquantes initialisées à 0
+      setWizardKnowledges((prevKnowledges) => {
+        return knowledgesData.reduce(
+          (acc: Record<string, number>, knowledge: any) => {
+            acc[knowledge.name] = prevKnowledges?.[knowledge.name] ?? 0; // Valeur par défaut à 0
+            return acc;
+          },
+          {},
         );
-      }
+      });
     } catch (error) {
       console.error("Error fetching knowledges:", error);
     }
@@ -260,20 +260,23 @@ const MainContainer = styled.div`
 const FormSection = styled.div`
   margin-bottom: 20px;
 `;
-
 const FormRow = styled.div`
   margin-bottom: 10px;
   display: flex;
   align-items: center;
+  flex-wrap: wrap; /* Pour forcer le retour à la ligne si l'espace est insuffisant */
 
   label {
     margin-right: 10px;
+    min-width: 100px; /* Définit une largeur minimale pour les labels */
+    white-space: nowrap; /* Empêche les labels de se diviser sur plusieurs lignes */
   }
 
   input[type="text"],
   input[type="number"],
   select {
-    flex: 1; // Make inputs take up available space
+    flex: 1;
+    min-width: 150px; /* Ajoute une largeur minimale pour les inputs */
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;

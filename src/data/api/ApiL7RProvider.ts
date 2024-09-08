@@ -206,6 +206,8 @@ export class ApiL7RProvider {
         result: flip.result,
         base: flip.base,
         modif: flip.modif,
+        difficulty: flip.difficulty,
+        resultBis: flip.resultBis,
       });
     });
   }
@@ -215,6 +217,7 @@ export class ApiL7RProvider {
     statName: string | undefined;
     spellName: string | undefined;
     wizardName: string;
+    difficulty: Difficulty;
   }) {
     await L7RApi.sendFlip(param);
   }

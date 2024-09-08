@@ -18,21 +18,87 @@ export default function FlipCard(props: FlipCardProps) {
         <span>{props.flip.text}</span>
         <Result>
           <FaDiceD20 size="1.5em" />
-          <ResultValue>{getTextFromFlip(props.flip)}</ResultValue>
+          <ResultValue flipResult={getFinalResult(props.flip)}>
+            {getTextFromFlip(props.flip)}
+          </ResultValue>
         </Result>
       </FlipDisplay>
     </Container>
   );
 }
 
-function getTextFromFlip(flip: Flip) {
-  if (flip.base === 1) {
-    return "Echec critique";
-  } else if (flip.base === 20) {
-    return "Succès critique";
+// Nouvelle fonction pour obtenir le résultat final en fonction de la difficulté
+function getFinalResult(flip: Flip): number {
+  if (flip.difficulty === "AVANTAGE") {
+    return Math.max(flip.result, flip.resultBis ?? flip.result);
+  } else if (flip.difficulty === "DESAVANTAGE") {
+    return Math.min(flip.result, flip.resultBis ?? flip.result);
   } else {
-    return flip.base + "+" + flip.modif + "=" + flip.result;
+    return flip.result;
   }
+}
+
+function getTextFromFlip(flip: Flip) {
+  let resultText;
+
+  // Affichage du résultat selon la difficulté
+  if (flip.difficulty === "NORMAL") {
+    resultText = <BoldText>{flip.result}</BoldText>;
+  } else if (flip.difficulty === "AVANTAGE") {
+    const highestResult = Math.max(flip.result, flip.resultBis ?? flip.result);
+
+    // On garde flip.resultBis en premier mais on stylise en fonction de la plus grande valeur
+    resultText = (
+      <span>
+        (
+        {flip.resultBis === highestResult ? (
+          <BoldText>{flip.resultBis}</BoldText>
+        ) : (
+          <NonBoldText>{flip.resultBis}</NonBoldText>
+        )}{" "}
+        |{" "}
+        {flip.result === highestResult ? (
+          <BoldText>{flip.result}</BoldText>
+        ) : (
+          <NonBoldText>{flip.result}</NonBoldText>
+        )}
+        )
+      </span>
+    );
+  } else if (flip.difficulty === "DESAVANTAGE") {
+    const lowestResult = Math.min(flip.result, flip.resultBis ?? flip.result);
+
+    // On garde flip.resultBis en premier mais on stylise en fonction de la plus petite valeur
+    resultText = (
+      <span>
+        (
+        {flip.resultBis === lowestResult ? (
+          <BoldText>{flip.resultBis}</BoldText>
+        ) : (
+          <NonBoldText>{flip.resultBis}</NonBoldText>
+        )}{" "}
+        |{" "}
+        {flip.result === lowestResult ? (
+          <BoldText>{flip.result}</BoldText>
+        ) : (
+          <NonBoldText>{flip.result}</NonBoldText>
+        )}
+        )
+      </span>
+    );
+  }
+
+  // Ajouter le modificateur et le résultat final
+  return (
+    <span>
+      {resultText} + <BoldText>{flip.modif}</BoldText> ={" "}
+      <FinalResult flipResult={getFinalResult(flip)}>
+        {getFinalResult(flip)}
+      </FinalResult>
+      {flip.base === 1 && " -> ÉCHEC CRITIQUE"}
+      {flip.base === 20 && " -> SUCCÈS MAJEUR"}
+    </span>
+  );
 }
 
 const Container = styled.div`
@@ -63,8 +129,25 @@ const Result = styled.div`
   margin-top: 5px;
 `;
 
-const ResultValue = styled.span`
+const ResultValue = styled.span<{ flipResult: number }>`
   font-size: 1.5em;
   margin-left: 8px;
   font-weight: bold;
+  color: ${({ flipResult }) => (flipResult < 12 ? "red" : "green")};
+`;
+
+// Composant pour le texte en gras (par défaut tout est gras)
+const BoldText = styled.span`
+  font-weight: bold;
+`;
+
+// Composant pour le texte en non-gras (pour les valeurs faibles)
+const NonBoldText = styled.span`
+  font-weight: normal;
+`;
+
+// Composant qui change la couleur du résultat final en fonction de la valeur
+const FinalResult = styled.span<{ flipResult: number }>`
+  font-weight: bold;
+  color: ${({ flipResult }) => (flipResult < 12 ? "red" : "green")};
 `;
