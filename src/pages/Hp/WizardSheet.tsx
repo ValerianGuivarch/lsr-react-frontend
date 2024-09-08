@@ -9,15 +9,18 @@ import { WizardPanel } from "../../components/Character/CharacterPanel/WizardPan
 import FlipCard from "../../components/Hp/FlipCard";
 import { Difficulty } from "../../domain/models/hp/Difficulty";
 import { useSSEFlips } from "../../data/api/useSSEFlips";
+import { House } from "../../domain/models/hp/House";
 
 export function WizardSheet() {
   const { wizardName } = useParams();
   const [flips, setFlips] = useState<Flip[]>([]);
   const [wizard, setWizard] = useState<Wizard | undefined>(undefined);
+  const [houses, setHouses] = useState<House[] | undefined>(undefined);
 
   useEffect(() => {
     fetchWizard().then(() => {});
     fetchFlips().then(() => {});
+    fetchHouses().then(() => {});
   }, []);
 
   async function fetchWizard() {
@@ -54,6 +57,16 @@ export function WizardSheet() {
       setFlips(flips);
     } catch (error) {
       console.error("Error fetching flips:", error);
+    }
+  }
+
+  async function fetchHouses() {
+    try {
+      const houses = await ApiL7RProvider.getHouses();
+      console.log("houses", houses);
+      setHouses(houses);
+    } catch (error) {
+      console.error("Error fetching houses:", error);
     }
   }
 
@@ -112,11 +125,25 @@ export function WizardSheet() {
  */
   return (
     <>
-      {!wizard ? (
+      {!wizard || !houses ? (
         <p>Loading...</p>
       ) : (
         <MainContainer>
-          <WizardBanner wizard={wizard} />
+          <WizardBanner
+            wizard={wizard}
+            poufsouffle={
+              houses?.find((house) => house.name === "Poufsouffle")?.points ?? 8
+            }
+            serdaigle={
+              houses?.find((house) => house.name === "Serdaigle")?.points ?? 0
+            }
+            gryffondor={
+              houses?.find((house) => house.name === "Gryffondor")?.points ?? 0
+            }
+            serpentard={
+              houses?.find((house) => house.name === "Serpentard")?.points ?? 0
+            }
+          />
           <WizardPanel wizard={wizard} sendFlip={handleSendFlip} />
           <Flips>
             {flips.map((flip: Flip) => (

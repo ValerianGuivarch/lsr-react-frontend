@@ -5,10 +5,11 @@ export class Flip {
   wizardName: string;
   text: string;
   result: number;
-  resultBis?: number;
+  baseBis?: number;
   difficulty: Difficulty;
   base: number;
   modif: number;
+  success: boolean;
 
   constructor(p: Flip) {
     this.id = p.id;
@@ -18,6 +19,7 @@ export class Flip {
     this.base = p.base;
     this.modif = p.modif;
     this.difficulty = p.difficulty;
-    this.resultBis = p.resultBis;
+    this.baseBis = p.baseBis;
+    this.success = p.success;
   }
 }

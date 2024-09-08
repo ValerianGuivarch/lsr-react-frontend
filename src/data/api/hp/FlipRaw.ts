@@ -8,5 +8,6 @@ export interface FlipRaw {
   base: number;
   modif: number;
   difficulty: Difficulty;
-  resultBis?: number;
+  baseBis?: number;
+  success: boolean;
 }

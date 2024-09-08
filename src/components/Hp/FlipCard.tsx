@@ -18,24 +18,13 @@ export default function FlipCard(props: FlipCardProps) {
         <span>{props.flip.text}</span>
         <Result>
           <FaDiceD20 size="1.5em" />
-          <ResultValue flipResult={getFinalResult(props.flip)}>
+          <ResultValue flipResult={props.flip.result}>
             {getTextFromFlip(props.flip)}
           </ResultValue>
         </Result>
       </FlipDisplay>
     </Container>
   );
-}
-
-// Nouvelle fonction pour obtenir le résultat final en fonction de la difficulté
-function getFinalResult(flip: Flip): number {
-  if (flip.difficulty === "AVANTAGE") {
-    return Math.max(flip.result, flip.resultBis ?? flip.result);
-  } else if (flip.difficulty === "DESAVANTAGE") {
-    return Math.min(flip.result, flip.resultBis ?? flip.result);
-  } else {
-    return flip.result;
-  }
 }
 
 function getTextFromFlip(flip: Flip) {
@@ -45,43 +34,37 @@ function getTextFromFlip(flip: Flip) {
   if (flip.difficulty === "NORMAL") {
     resultText = <BoldText>{flip.result}</BoldText>;
   } else if (flip.difficulty === "AVANTAGE") {
-    const highestResult = Math.max(flip.result, flip.resultBis ?? flip.result);
-
-    // On garde flip.resultBis en premier mais on stylise en fonction de la plus grande valeur
     resultText = (
       <span>
         (
-        {flip.resultBis === highestResult ? (
-          <BoldText>{flip.resultBis}</BoldText>
+        {flip.base + flip.modif === flip.result ? (
+          <BoldText>{flip.base}</BoldText>
         ) : (
-          <NonBoldText>{flip.resultBis}</NonBoldText>
+          <NonBoldText>{flip.base}</NonBoldText>
         )}{" "}
         |{" "}
-        {flip.result === highestResult ? (
-          <BoldText>{flip.result}</BoldText>
+        {flip.baseBis! + flip.modif === flip.result ? (
+          <BoldText>{flip.baseBis}</BoldText>
         ) : (
-          <NonBoldText>{flip.result}</NonBoldText>
+          <NonBoldText>{flip.baseBis}</NonBoldText>
         )}
         )
       </span>
     );
   } else if (flip.difficulty === "DESAVANTAGE") {
-    const lowestResult = Math.min(flip.result, flip.resultBis ?? flip.result);
-
-    // On garde flip.resultBis en premier mais on stylise en fonction de la plus petite valeur
     resultText = (
       <span>
         (
-        {flip.resultBis === lowestResult ? (
-          <BoldText>{flip.resultBis}</BoldText>
+        {flip.base + flip.modif === flip.result ? (
+          <BoldText>{flip.base}</BoldText>
         ) : (
-          <NonBoldText>{flip.resultBis}</NonBoldText>
+          <NonBoldText>{flip.base}</NonBoldText>
         )}{" "}
         |{" "}
-        {flip.result === lowestResult ? (
-          <BoldText>{flip.result}</BoldText>
+        {flip.baseBis! + flip.modif === flip.result ? (
+          <BoldText>{flip.baseBis}</BoldText>
         ) : (
-          <NonBoldText>{flip.result}</NonBoldText>
+          <NonBoldText>{flip.baseBis}</NonBoldText>
         )}
         )
       </span>
@@ -92,9 +75,7 @@ function getTextFromFlip(flip: Flip) {
   return (
     <span>
       {resultText} + <BoldText>{flip.modif}</BoldText> ={" "}
-      <FinalResult flipResult={getFinalResult(flip)}>
-        {getFinalResult(flip)}
-      </FinalResult>
+      <FinalResult success={flip.success}>{flip.result}</FinalResult>
       {flip.base === 1 && " -> ÉCHEC CRITIQUE"}
       {flip.base === 20 && " -> SUCCÈS MAJEUR"}
     </span>
@@ -147,7 +128,7 @@ const NonBoldText = styled.span`
 `;
 
 // Composant qui change la couleur du résultat final en fonction de la valeur
-const FinalResult = styled.span<{ flipResult: number }>`
+const FinalResult = styled.span<{ success: boolean }>`
   font-weight: bold;
-  color: ${({ flipResult }) => (flipResult < 12 ? "red" : "green")};
+  color: ${({ success }) => (success ? "red" : "green")};
 `;

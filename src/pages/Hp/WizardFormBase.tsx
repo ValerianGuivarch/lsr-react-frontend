@@ -34,6 +34,7 @@ export function WizardFormBase({
   const [category, setCategory] = useState<SchoolCategory>(
     initialData?.category || SchoolCategory.YEAR1,
   );
+  const [house, setHouse] = useState<string>("Poufsouffle");
   const [stats, setStats] = useState<any[]>([]);
   const [knowledges, setKnowledges] = useState<any[]>([]);
   const [spells, setSpells] = useState<any[]>([]);
@@ -103,6 +104,7 @@ export function WizardFormBase({
     const wizardData = {
       name,
       category: category as string,
+      house: house as string,
       stats: Object.entries(wizardStats).map(([name, level]) => ({
         name,
         level,
@@ -176,6 +178,25 @@ export function WizardFormBase({
           onChange={(e) => setCategory(e.target.value as SchoolCategory)}
         >
           {Object.values(SchoolCategory).map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+      </FormRow>
+      <FormRow>
+        <label>Maison:</label>
+        <select
+          value={house}
+          onChange={(e) => setHouse(e.target.value as string)}
+        >
+          {Object.values([
+            undefined,
+            "Poufsouffle",
+            "Gryffondor",
+            "Serdaigle",
+            "Serpentard",
+          ]).map((cat) => (
             <option key={cat} value={cat}>
               {cat}
             </option>

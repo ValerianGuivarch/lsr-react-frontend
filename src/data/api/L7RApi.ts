@@ -15,6 +15,7 @@ import { Category } from "../../domain/models/Category";
 import { SchoolCategory } from "../../domain/models/SchoolCategory";
 import { SpellRaw } from "./hp/SpellRaw";
 import { Difficulty } from "../../domain/models/hp/Difficulty";
+import { HouseRaw } from "./hp/HouseRaw";
 
 export class L7RApi {
   static async sendNewTurn(): Promise<void> {
@@ -237,6 +238,11 @@ export class L7RApi {
 
   static async getSpells(): Promise<SpellRaw[]> {
     const response = await axios.get(`${config.BASE_URL}/hp/spells`);
+    return response.data;
+  }
+
+  static async getHouses(): Promise<HouseRaw[]> {
+    const response = await axios.get(`${config.BASE_URL}/hp/houses`);
     return response.data;
   }
 }

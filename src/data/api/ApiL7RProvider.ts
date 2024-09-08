@@ -18,6 +18,7 @@ import { WizardRaw } from "./hp/WizardRaw";
 import { WizardSpell } from "../../domain/models/hp/WizardSpell";
 import { Spell } from "../../domain/models/hp/Spell";
 import { Difficulty } from "../../domain/models/hp/Difficulty";
+import { House } from "../../domain/models/hp/House";
 
 export interface ApiResponse {
   error: boolean;
@@ -186,6 +187,7 @@ export class ApiL7RProvider {
     const wizardRaw: WizardRaw = await L7RApi.getWizardByName(name);
     return new Wizard({
       name: wizardRaw.name,
+      familyName: wizardRaw.familyName,
       category: wizardRaw.category,
       stats: wizardRaw.stats.map((stat) => new WizardStat(stat)),
       spells: wizardRaw.spells.map((spell) => {
@@ -194,6 +196,12 @@ export class ApiL7RProvider {
       knowledges: wizardRaw.knowledges.map(
         (knowledge) => new WizardKnowledge(knowledge),
       ),
+      xp: wizardRaw.xp,
+      house: wizardRaw.house,
+      baguette: wizardRaw.baguette,
+      coupDePouce: wizardRaw.coupDePouce,
+      crochePatte: wizardRaw.crochePatte,
+      text: wizardRaw.text,
     });
   }
 
@@ -207,7 +215,8 @@ export class ApiL7RProvider {
         base: flip.base,
         modif: flip.modif,
         difficulty: flip.difficulty,
-        resultBis: flip.resultBis,
+        baseBis: flip.baseBis,
+        success: flip.success,
       });
     });
   }
@@ -261,5 +270,11 @@ export class ApiL7RProvider {
     spells: { difficulty: Difficulty; name: string }[];
   }) {
     await L7RApi.createWizard(toCreate);
+  }
+
+  static async getHouses(): Promise<House[]> {
+    return (await L7RApi.getHouses()).map((house) => {
+      return new House(house);
+    });
   }
 }
