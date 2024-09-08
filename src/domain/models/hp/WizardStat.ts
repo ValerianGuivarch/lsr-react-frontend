@@ -1,5 +1,10 @@
 import { Stat } from "./Stat";
 
+export interface WizardStatToUpdate {
+  statName: string;
+  level: number;
+}
+
 export class WizardStat {
   stat: Stat;
   level: number;

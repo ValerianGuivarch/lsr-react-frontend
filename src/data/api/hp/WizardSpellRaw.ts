@@ -1,4 +1,4 @@
-import { Difficulty } from "../../domain/models/Difficulty";
+import { Difficulty } from "../../../domain/models/hp/Difficulty";
 import { SpellRaw } from "./SpellRaw";
 
 export interface WizardSpellRaw {

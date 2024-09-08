@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { FaPenToSquare } from "react-icons/fa6";
 import { IconType } from "react-icons";
-import { Wizard } from "../../domain/models/Wizard";
+import { Wizard } from "../../domain/models/hp/Wizard";
 
 export function WizardBanner(props: { wizard: Wizard }) {
   const [isButtonsVisible, setIsButtonsVisible] = useState(false);

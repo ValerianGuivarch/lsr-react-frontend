@@ -5,16 +5,16 @@ import { CharacterPreviewRaw } from "./CharacterPreviewRaw";
 import { CharacterUpdateRequest } from "./CharacterUpdateRequest";
 import { RollRaw } from "./RollRaw";
 import { SkillRaw } from "./SkillRaw";
-import { WizardRaw } from "./WizardRaw";
-import { FlipRaw } from "./FlipRaw";
-import { Wizard } from "../../domain/models/Wizard";
-import { WizardStatRaw } from "./WizardStatRaw";
-import { StatRaw } from "./StatRaw";
+import { WizardRaw } from "./hp/WizardRaw";
+import { FlipRaw } from "./hp/FlipRaw";
+import { Wizard } from "../../domain/models/hp/Wizard";
+import { WizardStatRaw } from "./hp/WizardStatRaw";
+import { StatRaw } from "./hp/StatRaw";
 import { KnowledgeRaw } from "./KnowledgeRaw";
 import { Category } from "../../domain/models/Category";
 import { SchoolCategory } from "../../domain/models/SchoolCategory";
-import { SpellRaw } from "./SpellRaw";
-import { Difficulty } from "../../domain/models/Difficulty";
+import { SpellRaw } from "./hp/SpellRaw";
+import { Difficulty } from "../../domain/models/hp/Difficulty";
 
 export class L7RApi {
   static async sendNewTurn(): Promise<void> {
@@ -187,19 +187,30 @@ export class L7RApi {
   }
 
   static async sendFlip(param: {
-    knowledgeId: string | undefined;
-    statId: string | undefined;
-    wizardId: string;
+    knowledgeName: string | undefined;
+    statName: string | undefined;
+    spellName: string | undefined;
+    wizardName: string;
   }) {
     await axios.post(`${config.BASE_URL}/hp/flips`, {
-      wizardId: param.wizardId,
-      knowledgeId: param.knowledgeId,
-      statId: param.statId,
+      wizardName: param.wizardName,
+      knowledgeName: param.knowledgeName,
+      statName: param.statName,
+      spellName: param.spellName,
     });
   }
 
-  static async updateWizard(newWizard: Wizard) {
-    await axios.put(`${config.BASE_URL}/hp/wizards`, newWizard);
+  static async updateWizard(
+    name: string,
+    newWizard: {
+      stats: { level: number; name: string }[];
+      name: string;
+      category: string;
+      knowledges: { level: number; name: string }[];
+      spells: { difficulty: Difficulty; name: string }[];
+    },
+  ) {
+    await axios.put(`${config.BASE_URL}/hp/wizards/` + name, newWizard);
   }
 
   static async getStats(): Promise<StatRaw[]> {
@@ -213,11 +224,11 @@ export class L7RApi {
   }
 
   static async createWizard(toCreate: {
-    stats: { level: number; id: string }[];
+    stats: { level: number; name: string }[];
     name: string;
     category: string;
-    knowledges: { level: number; id: string }[];
-    spells: { difficulty: Difficulty; id: string }[];
+    knowledges: { level: number; name: string }[];
+    spells: { difficulty: Difficulty; name: string }[];
   }) {
     await axios.post(`${config.BASE_URL}/hp/wizards`, toCreate);
   }

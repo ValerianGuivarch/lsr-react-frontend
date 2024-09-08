@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ApiL7RProvider } from "../../data/api/ApiL7RProvider";
 import styled from "styled-components";
-import { Wizard } from "../../domain/models/Wizard";
-import { Flip } from "../../domain/models/Flip";
+import { Wizard } from "../../domain/models/hp/Wizard";
+import { Flip } from "../../domain/models/hp/Flip";
 import { WizardBanner } from "../../components/Hp/WizardBanner";
 import { WizardPanel } from "../../components/Character/CharacterPanel/WizardPanel";
 import FlipCard from "../../components/Hp/FlipCard";
+import { Difficulty } from "../../domain/models/hp/Difficulty";
+import { useSSEFlips } from "../../data/api/useSSEFlips";
 
 export function WizardSheet() {
   const { wizardName } = useParams();
@@ -27,10 +29,19 @@ export function WizardSheet() {
     }
   }
 
-  async function handleUpdateWizard(newWizard: Wizard) {
+  async function handleUpdateWizard(
+    name: string,
+    newWizard: {
+      stats: { level: number; name: string }[];
+      name: string;
+      category: string;
+      knowledges: { level: number; name: string }[];
+      spells: { difficulty: Difficulty; name: string }[];
+    },
+  ) {
     try {
       if (wizard) {
-        await ApiL7RProvider.updateWizard(newWizard);
+        await ApiL7RProvider.updateWizard(name, newWizard);
       }
     } catch (error) {
       console.error("Error updating wizard:", error);
@@ -57,22 +68,26 @@ export function WizardSheet() {
     callback: (wizardsPreview: WizardPreview[]) => {
       setWizardsSession(wizardsPreview);
     },
-  });
+  });*/
 
   useSSEFlips({
-    name: wizardName || "",
     callback: (flips: Flip[]) => {
       setFlips(flips);
     },
-  });*/
+  });
 
-  async function handleSendFlip(p: { knowledgeId?: string; statId?: string }) {
+  async function handleSendFlip(p: {
+    knowledgeName?: string;
+    spellName?: string;
+    statName?: string;
+  }) {
     try {
       if (wizard) {
         await ApiL7RProvider.sendFlip({
-          knowledgeId: p.knowledgeId,
-          statId: p.statId,
-          wizardId: wizard.id,
+          knowledgeName: p.knowledgeName,
+          statName: p.statName,
+          spellName: p.spellName,
+          wizardName: wizard.name,
         });
       }
     } catch (error) {
@@ -100,11 +115,7 @@ export function WizardSheet() {
       ) : (
         <MainContainer>
           <WizardBanner wizard={wizard} />
-          <WizardPanel
-            wizard={wizard}
-            sendFlip={handleSendFlip}
-            updateWizard={handleUpdateWizard}
-          />
+          <WizardPanel wizard={wizard} sendFlip={handleSendFlip} />
           <Flips>
             {flips.map((flip: Flip) => (
               <div key={flip.id}>

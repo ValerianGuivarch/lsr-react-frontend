@@ -1,5 +1,10 @@
 import { Knowledge } from "./Knowledge";
 
+export interface WizardKnowledgeToUpdate {
+  knowledgeName: string;
+  level: number;
+}
+
 export class WizardKnowledge {
   knowledge: Knowledge;
   level: number;

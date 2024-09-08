@@ -1,5 +1,5 @@
 import React from "react";
-import { Flip } from "../../domain/models/Flip";
+import { Flip } from "../../domain/models/hp/Flip";
 import { FaDiceD20 } from "react-icons/fa6";
 import styled from "styled-components";
 

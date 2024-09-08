@@ -8,16 +8,16 @@ import { CharacterUpdateRequest } from "./CharacterUpdateRequest";
 import { CharacterRaw } from "./CharacterRaw";
 import { Skill } from "../../domain/models/Skill";
 import { SkillRaw } from "./SkillRaw";
-import { Wizard } from "../../domain/models/Wizard";
-import { Stat } from "../../domain/models/Stat";
-import { WizardStat } from "../../domain/models/WizardStat";
-import { WizardKnowledge } from "../../domain/models/WizardKnowledge";
-import { Flip } from "../../domain/models/Flip";
-import { Knowledge } from "../../domain/models/Knowledge";
-import { WizardRaw } from "./WizardRaw";
-import { WizardSpell } from "../../domain/models/WizardSpell";
-import { Spell } from "../../domain/models/Spell";
-import { Difficulty } from "../../domain/models/Difficulty";
+import { Wizard } from "../../domain/models/hp/Wizard";
+import { Stat } from "../../domain/models/hp/Stat";
+import { WizardStat } from "../../domain/models/hp/WizardStat";
+import { WizardKnowledge } from "../../domain/models/hp/WizardKnowledge";
+import { Flip } from "../../domain/models/hp/Flip";
+import { Knowledge } from "../../domain/models/hp/Knowledge";
+import { WizardRaw } from "./hp/WizardRaw";
+import { WizardSpell } from "../../domain/models/hp/WizardSpell";
+import { Spell } from "../../domain/models/hp/Spell";
+import { Difficulty } from "../../domain/models/hp/Difficulty";
 
 export interface ApiResponse {
   error: boolean;
@@ -185,7 +185,6 @@ export class ApiL7RProvider {
   static async getWizardByName(name: string) {
     const wizardRaw: WizardRaw = await L7RApi.getWizardByName(name);
     return new Wizard({
-      id: wizardRaw.id,
       name: wizardRaw.name,
       category: wizardRaw.category,
       stats: wizardRaw.stats.map((stat) => new WizardStat(stat)),
@@ -212,15 +211,25 @@ export class ApiL7RProvider {
   }
 
   static async sendFlip(param: {
-    knowledgeId: string | undefined;
-    statId: string | undefined;
-    wizardId: string;
+    knowledgeName: string | undefined;
+    statName: string | undefined;
+    spellName: string | undefined;
+    wizardName: string;
   }) {
     await L7RApi.sendFlip(param);
   }
 
-  static async updateWizard(newWizard: Wizard) {
-    await L7RApi.updateWizard(newWizard);
+  static async updateWizard(
+    name: string,
+    newWizard: {
+      stats: { level: number; name: string }[];
+      name: string;
+      category: string;
+      knowledges: { level: number; name: string }[];
+      spells: { difficulty: Difficulty; name: string }[];
+    },
+  ) {
+    await L7RApi.updateWizard(name, newWizard);
   }
 
   static async getStats() {
@@ -242,11 +251,11 @@ export class ApiL7RProvider {
   }
 
   static async createWizard(toCreate: {
-    stats: { level: number; id: string }[];
+    stats: { level: number; name: string }[];
     name: string;
     category: string;
-    knowledges: { level: number; id: string }[];
-    spells: { difficulty: Difficulty; id: string }[];
+    knowledges: { level: number; name: string }[];
+    spells: { difficulty: Difficulty; name: string }[];
   }) {
     await L7RApi.createWizard(toCreate);
   }

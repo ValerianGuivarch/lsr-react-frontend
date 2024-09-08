@@ -1,4 +1,4 @@
-import { KnowledgeRaw } from "./KnowledgeRaw";
+import { KnowledgeRaw } from "../KnowledgeRaw";
 
 export interface WizardKnowledgeRaw {
   knowledge: KnowledgeRaw;

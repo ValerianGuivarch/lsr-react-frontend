@@ -17,7 +17,8 @@ import DateTool from "./pages/CharacterSelection/DateTool";
 import Diary from "./components/Diary";
 import { SpeakingSheet } from "./pages/CharacterSheet/SpeakingSheet";
 import { WizardSheet } from "./pages/Hp/WizardSheet";
-import { WizardForm } from "./pages/Hp/WizardForm";
+import { WizardFormCreate } from "./pages/Hp/WizardFormCreate";
+import { WizardFormUpdate } from "./pages/Hp/WizardFormUpdate";
 
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -29,7 +30,8 @@ root.render(
         <Route path="/" element={<App />}>
           <Route path="/" element={<CharacterSelection />} />
           <Route path="/hp/:wizardName" element={<WizardSheet />} />
-          <Route path="/hp/create" element={<WizardForm />} />
+          <Route path="/hp/create" element={<WizardFormCreate />} />
+          <Route path="/hp/update/:wizardName" element={<WizardFormUpdate />} />
           <Route path="/diary" element={<Diary />} />
           <Route
             path="/characters/:characterName"

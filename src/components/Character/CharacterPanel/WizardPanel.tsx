@@ -1,32 +1,35 @@
 import React from "react";
 import styled from "styled-components";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
-import { Wizard } from "../../../domain/models/Wizard"; // Icons for difficulty
+import { Wizard } from "../../../domain/models/hp/Wizard";
+import { Difficulty } from "../../../domain/models/hp/Difficulty"; // Icons for difficulty
 
 export function WizardPanel({
   wizard,
   sendFlip,
-  updateWizard,
 }: {
   wizard: Wizard;
   sendFlip: (p: {
-    knowledgeId?: string;
-    statId?: string;
-    spellId?: string;
+    knowledgeName?: string;
+    statName?: string;
+    spellName?: string;
     difficulty: string;
   }) => void;
-  updateWizard: (newWizard: Wizard) => void;
 }) {
   function handleClick(
-    id: string,
+    skillName: string,
     type: "stat" | "knowledge" | "spell",
     difficulty: string,
   ) {
-    const payload =
-      type === "stat"
-        ? { statId: id, difficulty }
-        : { knowledgeId: id, difficulty };
-    sendFlip(payload);
+    if (type === "spell") {
+      sendFlip({ spellName: skillName, difficulty });
+    } else if (type === "stat") {
+      sendFlip({ statName: skillName, difficulty });
+    } else if (type === "knowledge") {
+      sendFlip({ knowledgeName: skillName, difficulty });
+    } else {
+      console.error("Unknown type");
+    }
   }
 
   return (
@@ -35,22 +38,24 @@ export function WizardPanel({
       <Section>
         <h3>Stats</h3>
         {wizard.stats.map((statWizard) => (
-          <TripleButton key={statWizard.stat.id}>
+          <TripleButton key={statWizard.stat.name}>
             <ActionButton
               onClick={() =>
-                handleClick(statWizard.stat.id, "stat", "DESAVANTAGE")
+                handleClick(statWizard.stat.name, "stat", "DESAVANTAGE")
               }
             >
               <FaArrowLeft />
             </ActionButton>
             <MainButton
-              onClick={() => handleClick(statWizard.stat.id, "stat", "NORMAL")}
+              onClick={() =>
+                handleClick(statWizard.stat.name, "stat", "NORMAL")
+              }
             >
               {statWizard.stat.name} {statWizard.level} ({statWizard.xp})
             </MainButton>
             <ActionButton
               onClick={() =>
-                handleClick(statWizard.stat.id, "stat", "AVANTAGE")
+                handleClick(statWizard.stat.name, "stat", "AVANTAGE")
               }
             >
               <FaArrowRight />
@@ -63,11 +68,11 @@ export function WizardPanel({
       <Section>
         <h3>Knowledges</h3>
         {wizard.knowledges.map((knowledgeWizard) => (
-          <TripleButton key={knowledgeWizard.knowledge.id}>
+          <TripleButton key={knowledgeWizard.knowledge.name}>
             <ActionButton
               onClick={() =>
                 handleClick(
-                  knowledgeWizard.knowledge.id,
+                  knowledgeWizard.knowledge.name,
                   "knowledge",
                   "DESAVANTAGE",
                 )
@@ -78,7 +83,11 @@ export function WizardPanel({
             </ActionButton>
             <MainButton
               onClick={() =>
-                handleClick(knowledgeWizard.knowledge.id, "knowledge", "NORMAL")
+                handleClick(
+                  knowledgeWizard.knowledge.name,
+                  "knowledge",
+                  "NORMAL",
+                )
               }
               style={{ backgroundColor: knowledgeWizard.knowledge.color }}
             >
@@ -88,7 +97,7 @@ export function WizardPanel({
             <ActionButton
               onClick={() =>
                 handleClick(
-                  knowledgeWizard.knowledge.id,
+                  knowledgeWizard.knowledge.name,
                   "knowledge",
                   "AVANTAGE",
                 )
@@ -105,24 +114,24 @@ export function WizardPanel({
       <Section>
         <h3>Spells</h3>
         {wizard.spells.map((spellWizard) => (
-          <TripleButton key={spellWizard.spell.id}>
+          <TripleButton key={spellWizard.spell.name}>
             <ActionButton
               onClick={() =>
-                handleClick(spellWizard.spell.id, "spell", "DESAVANTAGE")
+                handleClick(spellWizard.spell.name, "spell", "DESAVANTAGE")
               }
             >
               <FaArrowLeft />
             </ActionButton>
             <MainButton
               onClick={() =>
-                handleClick(spellWizard.spell.id, "spell", "NORMAL")
+                handleClick(spellWizard.spell.name, "spell", "NORMAL")
               }
             >
               {spellWizard.spell.name} ({spellWizard.difficulty})
             </MainButton>
             <ActionButton
               onClick={() =>
-                handleClick(spellWizard.spell.id, "spell", "AVANTAGE")
+                handleClick(spellWizard.spell.name, "spell", "AVANTAGE")
               }
             >
               <FaArrowRight />
