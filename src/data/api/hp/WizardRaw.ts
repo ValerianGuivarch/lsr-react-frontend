@@ -12,8 +12,11 @@ export interface WizardRaw {
   spells: WizardSpellRaw[];
   house: HouseRaw;
   xp: number;
+  pv: number;
+  pvMax: number;
   baguette: string;
   coupDePouce: string;
   crochePatte: string;
   text: string;
+  traits: string[];
 }

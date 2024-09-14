@@ -10,4 +10,5 @@ export interface FlipRaw {
   difficulty: Difficulty;
   baseBis?: number;
   success: boolean;
+  xpOk: boolean;
 }

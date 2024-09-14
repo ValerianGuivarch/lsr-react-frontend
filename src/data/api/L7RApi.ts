@@ -205,13 +205,14 @@ export class L7RApi {
 
   static async updateWizard(
     name: string,
-    newWizard: {
+    newWizard: Partial<{
       stats: { level: number; name: string }[];
       name: string;
       category: string;
       knowledges: { level: number; name: string }[];
       spells: { difficulty: Difficulty; name: string }[];
-    },
+      text: string;
+    }>,
   ) {
     await axios.patch(`${config.BASE_URL}/hp/wizards/` + name, newWizard);
   }
@@ -226,13 +227,15 @@ export class L7RApi {
     return response.data;
   }
 
-  static async createWizard(toCreate: {
-    stats: { level: number; name: string }[];
-    name: string;
-    category: string;
-    knowledges: { level: number; name: string }[];
-    spells: { difficulty: Difficulty; name: string }[];
-  }) {
+  static async createWizard(
+    toCreate: Partial<{
+      stats: { level: number; name: string }[];
+      name: string;
+      category: string;
+      knowledges: { level: number; name: string }[];
+      spells: { difficulty: Difficulty; name: string }[];
+    }>,
+  ) {
     await axios.post(`${config.BASE_URL}/hp/wizards`, toCreate);
   }
 
@@ -244,5 +247,9 @@ export class L7RApi {
   static async getHouses(): Promise<HouseRaw[]> {
     const response = await axios.get(`${config.BASE_URL}/hp/houses`);
     return response.data;
+  }
+
+  static levelUp(id: string) {
+    axios.put(`${config.BASE_URL}/hp/flips/level-up/${id}`);
   }
 }

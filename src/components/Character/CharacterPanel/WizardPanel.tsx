@@ -3,7 +3,8 @@ import styled from "styled-components";
 import { FaStarHalf, FaStar } from "react-icons/fa";
 import { Wizard } from "../../../domain/models/hp/Wizard";
 import { Difficulty } from "../../../domain/models/hp/Difficulty";
-import { GiBrokenHeart } from "react-icons/gi"; // Icons for difficulty
+import { GiBrokenHeart, GiHearts } from "react-icons/gi"; // Icons for difficulty
+import { FaRegStar } from "react-icons/fa6";
 
 export function WizardPanel({
   wizard,
@@ -33,6 +34,18 @@ export function WizardPanel({
     }
   }
 
+  const MAX_XP = 5;
+
+  function renderXpIcons(xp: number) {
+    return [...Array(MAX_XP)].map((_, index) =>
+      index < xp ? (
+        <FaStar key={index} size="0.7em" />
+      ) : (
+        <FaRegStar key={index} size="0.7em" />
+      ),
+    );
+  }
+
   return (
     <PanelContainer>
       {/* Stats */}
@@ -56,22 +69,27 @@ export function WizardPanel({
                 handleClick(statWizard.stat.name, "stat", Difficulty.NORMAL)
               }
             >
-              {statWizard.stat.name} {statWizard.level} ({statWizard.xp})
+              <div>
+                {statWizard.stat.name} {statWizard.level}
+              </div>
+              <div>
+                <XpContainer>{renderXpIcons(statWizard.xp)}</XpContainer>{" "}
+              </div>
             </MainButton>
             <ActionButton
               onClick={() =>
                 handleClick(statWizard.stat.name, "stat", Difficulty.AVANTAGE)
               }
             >
-              <FaStar />
+              <GiHearts />
             </ActionButton>
           </TripleButton>
         ))}
       </Section>
 
-      {/* Knowledges */}
+      {/* Connaissances */}
       <Section>
-        <h3>Knowledges</h3>
+        <h3>Connaissances</h3>
         {wizard.knowledges.map((knowledgeWizard) => (
           <TripleButton key={knowledgeWizard.knowledge.name}>
             <ActionButton
@@ -96,8 +114,12 @@ export function WizardPanel({
               }
               style={{ backgroundColor: knowledgeWizard.knowledge.color }}
             >
-              {knowledgeWizard.knowledge.name} {knowledgeWizard.level} (
-              {knowledgeWizard.xp})
+              <div>
+                {knowledgeWizard.knowledge.name} {knowledgeWizard.level}
+              </div>
+              <div>
+                <XpContainer>{renderXpIcons(knowledgeWizard.xp)}</XpContainer>{" "}
+              </div>
             </MainButton>
             <ActionButton
               onClick={() =>
@@ -115,22 +137,58 @@ export function WizardPanel({
         ))}
       </Section>
 
-      {/* Spells */}
+      {/* Sorts */}
       <Section>
-        <h3>Spells</h3>
+        <h3>Sorts</h3>
         {wizard.spells.map((spellWizard) => (
-          <SpellItem key={spellWizard.spell.name}>
+          <TripleButton key={spellWizard.spell.name}>
+            <ActionButton
+              onClick={() =>
+                handleClick(
+                  spellWizard.spell.name,
+                  "spell",
+                  Difficulty.DESAVANTAGE,
+                )
+              }
+            >
+              <GiBrokenHeart />
+            </ActionButton>
             <MainButton
               onClick={() =>
                 handleClick(spellWizard.spell.name, "spell", Difficulty.NORMAL)
               }
             >
-              {spellWizard.spell.name}
-              {getDifficultyIcon(spellWizard.difficulty)}
+              <div>{spellWizard.spell.name}</div>
+              <div>
+                <XpContainer>{renderXpIcons(spellWizard.xp)}</XpContainer>{" "}
+              </div>
             </MainButton>
-          </SpellItem>
+            <ActionButton
+              onClick={() =>
+                handleClick(
+                  spellWizard.spell.name,
+                  "spell",
+                  Difficulty.AVANTAGE,
+                )
+              }
+            >
+              <GiHearts />
+            </ActionButton>
+          </TripleButton>
         ))}
       </Section>
+
+      {/* Traits */}
+      {wizard.traits[0].length > 1 && (
+        <Section>
+          <h3>Traits</h3>
+          <TraitContainer>
+            {wizard.traits.map((trait, index) => (
+              <TraitButton key={index}>{trait}</TraitButton>
+            ))}
+          </TraitContainer>
+        </Section>
+      )}
     </PanelContainer>
   );
 }
@@ -155,16 +213,22 @@ const PanelContainer = styled.div`
   align-items: center;
 `;
 
+const XpContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 2px; // Réduction de l'espace
+`;
+
 const Section = styled.div`
   width: 100%; // Assure que chaque section prend toute la largeur
   display: flex;
   flex-wrap: wrap;
-  gap: 10px; // Ajoute de l'espacement entre les boutons
+  gap: 8px; // Réduit l'espacement entre les boutons
   justify-content: center; // Centre les éléments dans la section
 
   h3 {
     flex-basis: 100%; // Le titre prend toute la largeur
-    margin-bottom: 10px;
+    margin-bottom: 6px; // Réduction de la marge entre le titre et les boutons
     text-align: center; // Centre le titre
   }
 `;
@@ -172,7 +236,7 @@ const Section = styled.div`
 const TripleButton = styled.div`
   display: inline-flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 6px; // Réduction de l'espace vertical entre les boutons
   gap: 0px;
   border-radius: 5px;
 `;
@@ -207,6 +271,7 @@ const MainButton = styled.button<{ color?: string }>`
   height: 40px;
   padding: 0 10px;
   border: none;
+  font-size: 1em;
   background-color: ${(props) =>
     props.color || "#eee"}; // Utilise la couleur prop si fournie
   cursor: pointer;
@@ -214,14 +279,25 @@ const MainButton = styled.button<{ color?: string }>`
   align-items: center;
   justify-content: center;
   white-space: nowrap;
+  flex-direction: column; // Force l'affichage du texte et des étoiles en colonne
 
   &:hover {
     background-color: #ddd;
   }
 `;
 
-const SpellItem = styled.div`
+const TraitContainer = styled.div`
   display: flex;
-  align-items: center;
-  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px; // Espace entre les traits
+  justify-content: center;
+`;
+
+const TraitButton = styled.button`
+  background-color: #ddd;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: default; // Désactive le curseur de clic
+  font-size: 1em;
 `;

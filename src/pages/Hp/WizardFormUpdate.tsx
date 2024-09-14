@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { WizardFormBase } from "./WizardFormBase";
 import { ApiL7RProvider } from "../../data/api/ApiL7RProvider";
 import { WizardSpell } from "../../domain/models/hp/WizardSpell";
+import { Difficulty } from "../../domain/models/hp/Difficulty";
 
 export function WizardFormUpdate() {
   const { wizardName } = useParams<{ wizardName: string }>();
@@ -35,6 +36,7 @@ export function WizardFormUpdate() {
               new WizardSpell({
                 spell,
                 difficulty: spell.difficulty,
+                xp: 0,
               }),
           ),
         });
@@ -46,7 +48,16 @@ export function WizardFormUpdate() {
     fetchWizard();
   }, [wizardName]);
 
-  async function handleUpdate(wizardData: any) {
+  async function handleUpdate(
+    wizardData: Partial<{
+      stats: { level: number; name: string }[];
+      name: string;
+      category: string;
+      knowledges: { level: number; name: string }[];
+      spells: { difficulty: Difficulty; name: string }[];
+      text: string;
+    }>,
+  ) {
     try {
       await ApiL7RProvider.updateWizard(wizardName ?? "", wizardData);
       alert("Wizard updated successfully!");

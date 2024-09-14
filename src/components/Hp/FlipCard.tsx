@@ -1,13 +1,22 @@
 import React from "react";
 import { Flip } from "../../domain/models/hp/Flip";
-import { FaDiceD20 } from "react-icons/fa6";
+import { FaDiceD20, FaStar } from "react-icons/fa6"; // Import FaStar
 import styled from "styled-components";
+import { ApiL7RProvider } from "../../data/api/ApiL7RProvider";
 
 export interface FlipCardProps {
   flip: Flip;
 }
 
 export default function FlipCard(props: FlipCardProps) {
+  function handleLevelUp() {
+    try {
+      ApiL7RProvider.levelUp(props.flip.id);
+      alert("Le niveau a été augmenté !");
+    } catch (error) {
+      console.error("Erreur lors de l'augmentation de niveau:", error);
+    }
+  }
   return (
     <Container>
       <Avatar
@@ -18,9 +27,17 @@ export default function FlipCard(props: FlipCardProps) {
         <span>{props.flip.text}</span>
         <Result>
           <FaDiceD20 size="1.5em" />
-          <ResultValue flipResult={props.flip.result}>
+          <ResultValue success={props.flip.success}>
             {getTextFromFlip(props.flip)}
           </ResultValue>
+          {!props.flip.success && !props.flip.xpOk && (
+            <FaStar
+              size="1.5em"
+              color="#FFD700"
+              style={{ cursor: "pointer" }}
+              onClick={handleLevelUp}
+            /> // Affiche une étoile jaune si échec et xpOk = false
+          )}
         </Result>
       </FlipDisplay>
     </Container>
@@ -110,11 +127,11 @@ const Result = styled.div`
   margin-top: 5px;
 `;
 
-const ResultValue = styled.span<{ flipResult: number }>`
+const ResultValue = styled.span<{ success: boolean }>`
   font-size: 1.5em;
   margin-left: 8px;
   font-weight: bold;
-  color: ${({ flipResult }) => (flipResult < 12 ? "red" : "green")};
+  color: ${({ success }) => (success ? "green" : "red")};
 `;
 
 // Composant pour le texte en gras (par défaut tout est gras)
@@ -130,5 +147,5 @@ const NonBoldText = styled.span`
 // Composant qui change la couleur du résultat final en fonction de la valeur
 const FinalResult = styled.span<{ success: boolean }>`
   font-weight: bold;
-  color: ${({ success }) => (success ? "red" : "green")};
+  color: ${({ success }) => (success ? "green" : "red")};
 `;

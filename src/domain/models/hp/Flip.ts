@@ -10,6 +10,7 @@ export class Flip {
   base: number;
   modif: number;
   success: boolean;
+  xpOk: boolean;
 
   constructor(p: Flip) {
     this.id = p.id;
@@ -21,5 +22,6 @@ export class Flip {
     this.difficulty = p.difficulty;
     this.baseBis = p.baseBis;
     this.success = p.success;
+    this.xpOk = p.xpOk;
   }
 }

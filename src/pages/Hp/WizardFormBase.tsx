@@ -16,13 +16,16 @@ interface WizardFormProps {
     spells: WizardSpell[];
   };
   isUpdating?: boolean;
-  onSubmit: (wizardData: {
-    stats: { level: number; name: string }[];
-    name: string;
-    category: string;
-    knowledges: { level: number; name: string }[];
-    spells: { difficulty: Difficulty; name: string }[];
-  }) => void;
+  onSubmit: (
+    wizardData: Partial<{
+      stats: { level: number; name: string }[];
+      name: string;
+      category: string;
+      knowledges: { level: number; name: string }[];
+      spells: { difficulty: Difficulty; name: string }[];
+      text: string;
+    }>,
+  ) => void;
 }
 
 export function WizardFormBase({
@@ -129,6 +132,7 @@ export function WizardFormBase({
       const newWizardSpell = new WizardSpell({
         spell: selectedSpell,
         difficulty: Difficulty.NORMAL,
+        xp: 0,
       });
       setSelectedWizardSpells((prev) => [...prev, newWizardSpell]);
     }

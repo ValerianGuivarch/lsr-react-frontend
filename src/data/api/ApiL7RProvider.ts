@@ -197,11 +197,14 @@ export class ApiL7RProvider {
         (knowledge) => new WizardKnowledge(knowledge),
       ),
       xp: wizardRaw.xp,
+      pv: wizardRaw.pv,
+      pvMax: wizardRaw.pvMax,
       house: wizardRaw.house,
       baguette: wizardRaw.baguette,
       coupDePouce: wizardRaw.coupDePouce,
       crochePatte: wizardRaw.crochePatte,
       text: wizardRaw.text,
+      traits: wizardRaw.traits,
     });
   }
 
@@ -217,6 +220,7 @@ export class ApiL7RProvider {
         difficulty: flip.difficulty,
         baseBis: flip.baseBis,
         success: flip.success,
+        xpOk: flip.xpOk,
       });
     });
   }
@@ -233,13 +237,15 @@ export class ApiL7RProvider {
 
   static async updateWizard(
     name: string,
-    newWizard: {
+    newWizard: Partial<{
       stats: { level: number; name: string }[];
       name: string;
       category: string;
       knowledges: { level: number; name: string }[];
       spells: { difficulty: Difficulty; name: string }[];
-    },
+      text: string;
+      pv: number;
+    }>,
   ) {
     await L7RApi.updateWizard(name, newWizard);
   }
@@ -262,13 +268,16 @@ export class ApiL7RProvider {
     });
   }
 
-  static async createWizard(toCreate: {
-    stats: { level: number; name: string }[];
-    name: string;
-    category: string;
-    knowledges: { level: number; name: string }[];
-    spells: { difficulty: Difficulty; name: string }[];
-  }) {
+  static async createWizard(
+    toCreate: Partial<{
+      stats: { level: number; name: string }[];
+      name: string;
+      category: string;
+      knowledges: { level: number; name: string }[];
+      spells: { difficulty: Difficulty; name: string }[];
+      text: string;
+    }>,
+  ) {
     await L7RApi.createWizard(toCreate);
   }
 
@@ -276,5 +285,9 @@ export class ApiL7RProvider {
     return (await L7RApi.getHouses()).map((house) => {
       return new House(house);
     });
+  }
+
+  static levelUp(id: string) {
+    return L7RApi.levelUp(id);
   }
 }

@@ -19,10 +19,13 @@ export class Wizard {
   spells: WizardSpell[];
   house: House;
   xp: number;
+  pv: number;
+  pvMax: number;
   baguette: string;
   coupDePouce: string;
   crochePatte: string;
   text: string;
+  traits: string[];
 
   constructor(wizard: {
     name: string;
@@ -33,10 +36,13 @@ export class Wizard {
     spells: WizardSpell[];
     house: House;
     xp: number;
+    pv: number;
+    pvMax: number;
     baguette: string;
     coupDePouce: string;
     crochePatte: string;
     text: string;
+    traits: string[];
   }) {
     this.name = wizard.name;
     this.familyName = wizard.familyName;
@@ -46,9 +52,12 @@ export class Wizard {
     this.spells = wizard.spells;
     this.house = wizard.house;
     this.xp = wizard.xp;
+    this.pv = wizard.pv;
+    this.pvMax = wizard.pvMax;
     this.baguette = wizard.baguette;
     this.coupDePouce = wizard.coupDePouce;
     this.crochePatte = wizard.crochePatte;
     this.text = wizard.text;
+    this.traits = wizard.traits;
   }
 }

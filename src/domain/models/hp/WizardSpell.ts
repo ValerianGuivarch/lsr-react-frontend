@@ -9,9 +9,15 @@ export interface WizardSpellToUpdate {
 export class WizardSpell {
   spell: Spell;
   difficulty: Difficulty;
+  xp: number;
 
-  constructor(wizardSpell: { spell: Spell; difficulty: Difficulty }) {
+  constructor(wizardSpell: {
+    spell: Spell;
+    difficulty: Difficulty;
+    xp: number;
+  }) {
     this.spell = wizardSpell.spell;
     this.difficulty = wizardSpell.difficulty;
+    this.xp = wizardSpell.xp;
   }
 }

@@ -13,6 +13,11 @@
   }
 }
 
+h3 {
+  flex-basis: 100%;
+  margin-top: 0px; /* Réduction de la marge en haut */
+  text-align: center;
+}
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
