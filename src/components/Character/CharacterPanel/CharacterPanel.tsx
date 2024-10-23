@@ -426,6 +426,26 @@ export function CharacterPanel(props: {
                 });
               }}
             />
+            <div>
+              <StyledSelect
+                id="rollAdvantage"
+                value={characterState.avantage}
+                selected={characterState.avantage !== "normal"}
+                onChange={(e) =>
+                  props.updateState({
+                    ...characterState,
+                    avantage: e.target.value as
+                      | "normal"
+                      | "avantage"
+                      | "désavantage",
+                  })
+                }
+              >
+                <option value="normal">Normal</option>
+                <option value="avantage">Avantage</option>
+                <option value="désavantage">Désavantage</option>
+              </StyledSelect>
+            </div>
             {hasDragon && (
               <CharacterButton
                 cardDisplay={cardDisplay}
@@ -741,6 +761,38 @@ const ButtonsRow = styled.div<{ cardDisplay: boolean }>`
   flex-wrap: wrap;
   justify-content: center;
   margin-bottom: ${(props) => (props.cardDisplay ? "0px" : "4px")};
+`;
+
+const StyledSelect = styled.select<{
+  selected?: boolean;
+}>`
+  display: flex;
+  width: 90%;
+  height: 90%;
+  align-items: center;
+  justify-content: center;
+  background-color: #f4e1d2;
+  padding: 8px;
+  border-radius: 4px;
+  margin: 4px;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+  outline: none;
+  box-shadow: ${(props) =>
+    props.selected ? "0 2px 4px rgba(F4E1D2)" : "0 2px 4px rgba(F4E1D2)"};
+  transition:
+    transform 0.3s ease,
+    background-color 0.2s ease;
+
+  &:hover {
+    background-color: #e6e6e6;
+  }
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  }
 `;
 
 const CharacterBlocks = styled.div``;

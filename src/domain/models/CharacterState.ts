@@ -12,6 +12,7 @@ export class CharacterState {
   umbra: boolean;
   secunda: boolean;
   secret: boolean;
+  avantage: "normal" | "avantage" | "désavantage";
 
   constructor(p: { state?: CharacterState; character?: Character }) {
     this.focusActivated =
@@ -33,5 +34,6 @@ export class CharacterState {
     this.umbra = p.state ? p.state.umbra : false;
     this.secunda = p.state ? p.state.secunda : false;
     this.secret = p.state ? p.state.secret : false;
+    this.avantage = p.state ? p.state.avantage : "normal";
   }
 }

@@ -106,6 +106,12 @@ export function CharacterSheet() {
           bonus: bonus,
           malus: malus,
           empiriqueRoll: p.empiriqueRoll,
+          avantage:
+            characterState.avantage === "avantage"
+              ? true
+              : characterState.avantage === "désavantage"
+              ? false
+              : undefined,
         });
       }
     } catch (error) {

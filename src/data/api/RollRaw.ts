@@ -13,6 +13,11 @@ export interface RollRaw {
   success: number | null;
   juge12: number | null;
   juge34: number | null;
+  resultBis: number[] | null;
+  successBis: number | null;
+  juge12Bis: number | null;
+  juge34Bis: number | null;
+  avantage: boolean | null;
   resistRoll?: string;
   picture?: string;
   data?: string;

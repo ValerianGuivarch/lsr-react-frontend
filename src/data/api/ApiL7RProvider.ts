@@ -67,6 +67,7 @@ export class ApiL7RProvider {
     malus: number;
     resistRoll?: string;
     empiriqueRoll?: string;
+    avantage?: boolean;
   }): Promise<ApiResponse> {
     try {
       await L7RApi.sendRoll(p);

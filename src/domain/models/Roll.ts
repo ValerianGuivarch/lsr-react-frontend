@@ -16,6 +16,11 @@ export class Roll {
   success: number | null;
   juge12: number | null;
   juge34: number | null;
+  resultBis: number[] | null;
+  successBis: number | null;
+  juge12Bis: number | null;
+  juge34Bis: number | null;
+  avantage: boolean | null;
   resistRoll?: string;
   picture?: string;
   data?: string;
@@ -45,6 +50,11 @@ export class Roll {
     this.success = p.success;
     this.juge12 = p.juge12;
     this.juge34 = p.juge34;
+    this.resultBis = p.resultBis;
+    this.successBis = p.successBis;
+    this.juge12Bis = p.juge12Bis;
+    this.juge34Bis = p.juge34Bis;
+    this.avantage = p.avantage;
     this.resistRoll = p.resistRoll;
     this.picture = p.picture;
     this.data = p.data;
