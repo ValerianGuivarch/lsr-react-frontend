@@ -70,6 +70,29 @@ function getRollEffectText(roll: Roll) {
 export default function RollCard(props: RollCardProps) {
   const roll = props.roll;
   const displayParts = roll.display.split("*");
+
+  // Détermination du texte pour avantage ou désavantage
+  let avantageText = "";
+  let avantageCalcul = "";
+  if (roll.avantage !== null) {
+    avantageText = roll.avantage ? " avec avantage" : " avec désavantage";
+    avantageCalcul = roll.avantage ? "Max" : "Min";
+  }
+
+  // Calcul du succès réel
+  let successReel = null;
+  let result = roll.result;
+  if (roll.avantage !== null) {
+    successReel = roll.avantage
+      ? Math.max(roll.success ?? 0, roll.successBis ?? 0)
+      : Math.min(roll.success ?? 0, roll.successBis ?? 0);
+    if (successReel === roll.success) {
+      result = roll.result;
+    } else {
+      result = roll.resultBis!;
+    }
+  }
+
   return (
     <Container>
       <Avatar src={roll.picture} alt={props.roll.rollerName} />
@@ -103,17 +126,26 @@ export default function RollCard(props: RollCardProps) {
             <span
               title={
                 roll.displayDices || props.mjDisplay
-                  ? "Juge12 : " + roll.juge12 + ", Juge34 : " + roll.juge34
+                  ? "Juge12 : " +
+                    roll.juge12 +
+                    ", Juge34 : " +
+                    roll.juge34 +
+                    (roll.avantage !== null
+                      ? `, Juge12Bis : ${roll.juge12Bis}, Juge34Bis : ${roll.juge34Bis}`
+                      : "")
                   : undefined
               }
             >
-              {" et obtient "}
-              <em>{roll.success ? roll.success : 0}</em>
-              {" succès."}
+              {avantageText} {" et obtient "} {avantageCalcul}
+              <em>
+                ({roll.success}, {roll.successBis})
+              </em>
+              , soit <em>{successReel}</em> succès.
             </span>
           ) : (
             "."
           )}
+
           {roll.stat && props.clickOnResist && roll.resistance && (
             <>
               <br />[
@@ -196,9 +228,11 @@ export default function RollCard(props: RollCardProps) {
             </>
           )}
         </TextPartOne>
+
+        {/* Affichage des dés en fonction de l'avantage */}
         {(roll.displayDices || props.mjDisplay) && (
           <DicesDisplay>
-            {roll.result.map((dice, index) => {
+            {result.map((dice, index) => {
               if (
                 roll.stat === SkillStat.CHAIR ||
                 roll.stat === SkillStat.ESPRIT ||
@@ -213,6 +247,7 @@ export default function RollCard(props: RollCardProps) {
             })}
           </DicesDisplay>
         )}
+
         {props.roll.healPoint !== null &&
           props.onHealClick &&
           props.charactersSession && (

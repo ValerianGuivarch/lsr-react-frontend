@@ -109,6 +109,7 @@ export class L7RApi {
     malus: number;
     resistRoll?: string;
     empiriqueRoll?: string;
+    avantage?: boolean;
   }): Promise<void> {
     await axios.post(`${config.BASE_URL}/rolls`, {
       skillId: "" + p.skillId,
@@ -121,6 +122,7 @@ export class L7RApi {
       malus: p.malus,
       empiriqueRoll: p.empiriqueRoll,
       resistRoll: p.resistRoll ? "" + p.resistRoll : undefined,
+      avantage: p.avantage,
     });
   }
 
