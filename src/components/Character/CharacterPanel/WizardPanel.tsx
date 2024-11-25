@@ -177,18 +177,6 @@ export function WizardPanel({
           </TripleButton>
         ))}
       </Section>
-
-      {/* Traits */}
-      {wizard.traits[0].length > 1 && (
-        <Section>
-          <h3>Traits</h3>
-          <TraitContainer>
-            {wizard.traits.map((trait, index) => (
-              <TraitButton key={index}>{trait}</TraitButton>
-            ))}
-          </TraitContainer>
-        </Section>
-      )}
     </PanelContainer>
   );
 }
@@ -284,20 +272,4 @@ const MainButton = styled.button<{ color?: string }>`
   &:hover {
     background-color: #ddd;
   }
-`;
-
-const TraitContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px; // Espace entre les traits
-  justify-content: center;
-`;
-
-const TraitButton = styled.button`
-  background-color: #ddd;
-  border: none;
-  border-radius: 5px;
-  padding: 8px 12px;
-  cursor: default; // Désactive le curseur de clic
-  font-size: 1em;
 `;

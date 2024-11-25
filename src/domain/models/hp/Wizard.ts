@@ -17,7 +17,7 @@ export class Wizard {
   stats: WizardStat[];
   knowledges: WizardKnowledge[];
   spells: WizardSpell[];
-  house: House;
+  houseName: string;
   xp: number;
   pv: number;
   pvMax: number;
@@ -34,7 +34,7 @@ export class Wizard {
     stats: WizardStat[];
     knowledges: WizardKnowledge[];
     spells: WizardSpell[];
-    house: House;
+    houseName: string;
     xp: number;
     pv: number;
     pvMax: number;
@@ -50,7 +50,7 @@ export class Wizard {
     this.stats = wizard.stats;
     this.knowledges = wizard.knowledges;
     this.spells = wizard.spells;
-    this.house = wizard.house;
+    this.houseName = wizard.houseName;
     this.xp = wizard.xp;
     this.pv = wizard.pv;
     this.pvMax = wizard.pvMax;

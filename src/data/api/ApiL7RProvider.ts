@@ -200,7 +200,7 @@ export class ApiL7RProvider {
       xp: wizardRaw.xp,
       pv: wizardRaw.pv,
       pvMax: wizardRaw.pvMax,
-      house: wizardRaw.house,
+      houseName: wizardRaw.houseName,
       baguette: wizardRaw.baguette,
       coupDePouce: wizardRaw.coupDePouce,
       crochePatte: wizardRaw.crochePatte,
@@ -277,6 +277,7 @@ export class ApiL7RProvider {
       knowledges: { level: number; name: string }[];
       spells: { difficulty: Difficulty; name: string }[];
       text: string;
+      houseName: string;
     }>,
   ) {
     await L7RApi.createWizard(toCreate);

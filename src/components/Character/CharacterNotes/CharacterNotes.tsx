@@ -80,6 +80,7 @@ const Container = styled.div`
   width: 100%;
   max-width: 520px; // Largeur maximale de 600px
   margin: 10px;
+  align-self: center;
   box-sizing: border-box; // Inclut les marges et les bordures dans la largeur totale
 `;
 

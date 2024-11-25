@@ -49,7 +49,7 @@ function getTextFromFlip(flip: Flip) {
 
   // Affichage du résultat selon la difficulté
   if (flip.difficulty === "NORMAL") {
-    resultText = <BoldText>{flip.result}</BoldText>;
+    resultText = <BoldText>{flip.base}</BoldText>;
   } else if (flip.difficulty === "AVANTAGE") {
     resultText = (
       <span>
@@ -103,6 +103,7 @@ const Container = styled.div`
   display: flex;
   border-top: 1px solid #ccc;
   padding: 6px 6px 2px 6px;
+  width: 500px;
 `;
 
 const Avatar = styled.img`

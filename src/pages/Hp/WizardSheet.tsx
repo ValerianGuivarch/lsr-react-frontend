@@ -123,92 +123,148 @@ export function WizardSheet() {
         <p>Loading...</p>
       ) : (
         <MainContainer>
-          <WizardBanner
-            wizard={wizard}
-            poufsouffle={
-              houses?.find((house) => house.name === "Poufsouffle")?.points ?? 8
-            }
-            serdaigle={
-              houses?.find((house) => house.name === "Serdaigle")?.points ?? 0
-            }
-            gryffondor={
-              houses?.find((house) => house.name === "Gryffondor")?.points ?? 0
-            }
-            serpentard={
-              houses?.find((house) => house.name === "Serpentard")?.points ?? 0
-            }
-          />
-          <CharacterNotes text={wizard.text} setText={handleUpdateWizardText} />
+          {/* Bannière */}
+          <BannerContainer>
+            <WizardBanner
+              wizard={wizard}
+              poufsouffle={
+                houses?.find((house) => house.name === "Poufsouffle")?.points ??
+                8
+              }
+              serdaigle={
+                houses?.find((house) => house.name === "Serdaigle")?.points ?? 0
+              }
+              gryffondor={
+                houses?.find((house) => house.name === "Gryffondor")?.points ??
+                0
+              }
+              serpentard={
+                houses?.find((house) => house.name === "Serpentard")?.points ??
+                0
+              }
+            />
+          </BannerContainer>
 
-          {/* Menu déroulant pour les traits */}
-          <WizardTraits>
-            {/* Avantages */}
-            <DropdownContainer>
-              <DropdownHeader onClick={toggleAdvantages}>
-                Avantages
-              </DropdownHeader>
-              {isAdvantagesOpen && (
-                <ul>
-                  {wizard.traits
-                    .filter((trait) => !trait.startsWith("-"))
-                    .map((advantage, index) => (
-                      <li key={index}>{advantage}</li>
-                    ))}
-                </ul>
-              )}
-            </DropdownContainer>
+          {/* Contenu principal */}
+          <ContentContainer>
+            {/* Colonne de gauche */}
+            <LeftColumn>
+              <CharacterNotes
+                text={wizard.text}
+                setText={handleUpdateWizardText}
+              />
+              <WizardTraits>
+                <DropdownContainer>
+                  <DropdownHeader onClick={toggleAdvantages}>
+                    Avantages
+                  </DropdownHeader>
+                  {isAdvantagesOpen && (
+                    <ul>
+                      {wizard.traits
+                        .filter((trait) => !trait.startsWith("-"))
+                        .map((advantage, index) => (
+                          <li key={index}>{advantage}</li>
+                        ))}
+                    </ul>
+                  )}
+                </DropdownContainer>
 
-            {/* Désavantages */}
-            <DropdownContainer>
-              <DropdownHeader onClick={toggleAdvantages}>
-                Désavantages
-              </DropdownHeader>
-              {isAdvantagesOpen && (
-                <ul>
-                  {wizard.traits
-                    .filter((trait) => trait.startsWith("-"))
-                    .map((disadvantage, index) => (
-                      <li key={index}>{disadvantage.substring(1)}</li>
-                    ))}
-                </ul>
-              )}
-            </DropdownContainer>
-          </WizardTraits>
-          <WizardPanel wizard={wizard} sendFlip={handleSendFlip} />
-          <Flips>
-            {flips.map((flip: Flip) => (
-              <div key={flip.id}>
-                <FlipCard flip={flip} />
-              </div>
-            ))}
-          </Flips>
+                <DropdownContainer>
+                  <DropdownHeader onClick={toggleAdvantages}>
+                    Désavantages
+                  </DropdownHeader>
+                  {isAdvantagesOpen && (
+                    <ul>
+                      {wizard.traits
+                        .filter((trait) => trait.startsWith("-"))
+                        .map((disadvantage, index) => (
+                          <li key={index}>{disadvantage.substring(1)}</li>
+                        ))}
+                    </ul>
+                  )}
+                </DropdownContainer>
+              </WizardTraits>
+              <WizardPanel wizard={wizard} sendFlip={handleSendFlip} />
+            </LeftColumn>
+
+            {/* Séparateur vertical */}
+            <VerticalSeparator />
+
+            {/* Colonne de droite */}
+            <RightColumn>
+              {flips.map((flip: Flip) => (
+                <FlipCardContainer key={flip.id}>
+                  <FlipCard flip={flip} />
+                </FlipCardContainer>
+              ))}
+            </RightColumn>
+          </ContentContainer>
         </MainContainer>
       )}
     </>
   );
 }
-
 const MainContainer = styled.div`
-  width: 700px;
-  max-width: 100%; // Évite toute limitation de largeur
+  max-width: 1200px;
   padding: 20px;
-  margin: 0 auto; // Centrer si nécessaire
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
 `;
 
-const Flips = styled.div``;
+const BannerContainer = styled.div`
+  max-width: 1200px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center; /* Centre parfaitement la bannière */
+`;
+
+const ContentContainer = styled.div`
+  display: flex;
+  margin-top: 20px;
+  border-top: 1px solid #ddd;
+  padding-top: 20px;
+  gap: 20px; /* Ajoute de l’espacement entre les colonnes */
+`;
+
+const LeftColumn = styled.div`
+  flex: 1;
+  padding-right: 20px;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Ajoute de l’espacement entre les éléments */
+`;
+
+const RightColumn = styled.div`
+  flex: 1.5; /* La colonne de droite est plus large pour les flips */
+  display: flex;
+  max-width: 500px;
+  flex-wrap: wrap; /* Permet aux flips de s’afficher en grille */
+  gap: 10px; /* Ajoute de l’espace entre les flips */
+  justify-content: center; /* Centre les flips horizontalement */
+`;
+
+const VerticalSeparator = styled.div`
+  width: 2px; /* Barre plus visible */
+  background-color: #ccc;
+`;
+
+const FlipCardContainer = styled.div`
+  flex: 1 1 calc(33% - 20px); /* Chaque carte occupe 1/3 de la largeur disponible, moins les marges */
+  max-width: 500px;
+`;
 
 const WizardTraits = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   width: 100%;
-  margin-bottom: 20px;
 `;
 
 const DropdownContainer = styled.div`
-  width: 48%;
+  max-width: 400px;
+  align-self: center;
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 8px;

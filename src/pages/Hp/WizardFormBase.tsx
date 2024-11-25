@@ -5,17 +5,11 @@ import { SchoolCategory } from "../../domain/models/SchoolCategory";
 import { Difficulty } from "../../domain/models/hp/Difficulty";
 import { Spell } from "../../domain/models/hp/Spell";
 import { WizardSpell } from "../../domain/models/hp/WizardSpell";
-import { SpellsList } from "./WizardForm"; // Ensure you import WizardSpell
+import { SpellsList } from "./WizardForm";
 
 interface WizardFormProps {
-  initialData?: {
-    name: string;
-    category: SchoolCategory;
-    stats: Record<string, number>;
-    knowledges: Record<string, number>;
-    spells: WizardSpell[];
-  };
-  isUpdating?: boolean;
+  wizardName?: string; // Nom du wizard pour mise à jour
+  isUpdating?: boolean; // Indique si on est en mode mise à jour
   onSubmit: (
     wizardData: Partial<{
       stats: { level: number; name: string }[];
@@ -24,51 +18,140 @@ interface WizardFormProps {
       knowledges: { level: number; name: string }[];
       spells: { difficulty: Difficulty; name: string }[];
       text: string;
+      houseName: string;
     }>,
   ) => void;
 }
 
 export function WizardFormBase({
-  initialData,
+  wizardName,
   isUpdating = false,
   onSubmit,
 }: WizardFormProps) {
-  const [name, setName] = useState(initialData?.name || "");
+  const [name, setName] = useState("");
   const [category, setCategory] = useState<SchoolCategory>(
-    initialData?.category || SchoolCategory.YEAR1,
+    SchoolCategory.YEAR1,
   );
-  const [house, setHouse] = useState<string>("Poufsouffle");
+  const [houseName, setHouseName] = useState<string>("Poufsouffle");
   const [stats, setStats] = useState<any[]>([]);
   const [knowledges, setKnowledges] = useState<any[]>([]);
   const [spells, setSpells] = useState<any[]>([]);
-  const [wizardStats, setWizardStats] = useState<Record<string, number>>(
-    initialData?.stats || {},
-  );
+  const [wizardStats, setWizardStats] = useState<Record<string, number>>({});
   const [wizardKnowledges, setWizardKnowledges] = useState<
     Record<string, number>
-  >(initialData?.knowledges || {});
+  >({});
   const [selectedWizardSpells, setSelectedWizardSpells] = useState<
     WizardSpell[]
-  >(initialData?.spells || []);
+  >([]);
+  const [isLoading, setIsLoading] = useState(true); // Nouveau drapeau pour le chargement
 
+  // Applique les données initiales si elles sont fournies
   useEffect(() => {
-    fetchStats();
-    fetchKnowledges();
-    fetchSpells();
-  }, [initialData]);
+    if (wizardName) {
+      fetchStats();
+      fetchKnowledges();
+      fetchSpells();
+      fetchWizard(wizardName);
+    } else {
+      fetchStats();
+      fetchKnowledges();
+      fetchSpells();
+      setIsLoading(false); // Les données par défaut sont prêtes
+    }
+  }, [wizardName]);
+
+  function handleSpellSelect(spellName: string) {
+    const selectedSpell = spells.find(
+      (spell: Spell) => spell.name === spellName,
+    );
+    if (selectedSpell) {
+      const newWizardSpell = new WizardSpell({
+        spell: selectedSpell,
+        difficulty: Difficulty.NORMAL, // Par défaut, difficulté normale
+        xp: 0, // Par défaut, XP initial à 0
+      });
+      setSelectedWizardSpells((prev) => [...prev, newWizardSpell]);
+    }
+  }
+  function handleSpellRemove(spellName: string) {
+    setSelectedWizardSpells((prev) =>
+      prev.filter((wizardSpell) => wizardSpell.spell.name !== spellName),
+    );
+  }
+  function handleDifficultyChange(spellName: string, difficulty: Difficulty) {
+    setSelectedWizardSpells((prev) =>
+      prev.map((wizardSpell) =>
+        wizardSpell.spell.name === spellName
+          ? { ...wizardSpell, difficulty } // Met à jour la difficulté
+          : wizardSpell,
+      ),
+    );
+  }
+  async function fetchWizard(name: string) {
+    try {
+      const wizard = await ApiL7RProvider.getWizardByName(name);
+      setName(wizard.name);
+      setCategory(
+        Object.values(SchoolCategory).includes(
+          wizard.category as SchoolCategory,
+        )
+          ? (wizard.category as SchoolCategory)
+          : SchoolCategory.OTHER,
+      );
+      setHouseName(wizard.houseName || "Poufsouffle");
+      setWizardStats(
+        wizard.stats.reduce((acc: Record<string, number>, stat: any) => {
+          console.log("Traitement de la stat :", stat); // Log chaque stat traitée
+          if (!stat.stat.name || stat.level === undefined) {
+            console.warn("Stat invalide détectée :", stat); // Log les stats invalides
+          } else {
+            console.log("Stat valide détectée :", stat); // Log les stats valides
+            acc[stat.stat.name] = stat.level;
+            console.log("Accumulateur après traitement :", acc); // Log l'accumulateur
+          }
+          return acc;
+        }, {}),
+      );
+
+      // Log après avoir appliqué les modifications
+      console.log("Wizard stats après traitement :", wizard.stats);
+      console.log("État final de wizardStats :", wizardStats);
+      setWizardKnowledges(
+        wizard.knowledges.reduce(
+          (acc: Record<string, number>, knowledge: any) => {
+            acc[knowledge.knowledge.name] = knowledge.level;
+            return acc;
+          },
+          {},
+        ),
+      );
+      setSelectedWizardSpells(
+        wizard.spells.map(
+          (spell: any) =>
+            new WizardSpell({
+              spell,
+              difficulty: spell.difficulty,
+              xp: 0,
+            }),
+        ),
+      );
+    } catch (error) {
+      console.error("Error fetching wizard:", error);
+    } finally {
+      setIsLoading(false); // Les données du wizard sont prêtes
+    }
+  }
 
   async function fetchStats() {
     try {
       const statsData = await ApiL7RProvider.getStats();
       setStats(statsData);
-
-      // Si initialData est fourni, on le complète avec les stats manquantes initialisées à 0
-      setWizardStats((prevStats) => {
-        return statsData.reduce((acc: Record<string, number>, stat: any) => {
-          acc[stat.name] = prevStats?.[stat.name] ?? 0; // Valeur par défaut à 0
+      setWizardStats(
+        statsData.reduce((acc: Record<string, number>, stat: any) => {
+          acc[stat.name] = 0;
           return acc;
-        }, {});
-      });
+        }, {}),
+      );
     } catch (error) {
       console.error("Error fetching stats:", error);
     }
@@ -78,17 +161,12 @@ export function WizardFormBase({
     try {
       const knowledgesData = await ApiL7RProvider.getKnowledges();
       setKnowledges(knowledgesData);
-
-      // Si initialData est fourni, on le complète avec les knowledges manquantes initialisées à 0
-      setWizardKnowledges((prevKnowledges) => {
-        return knowledgesData.reduce(
-          (acc: Record<string, number>, knowledge: any) => {
-            acc[knowledge.name] = prevKnowledges?.[knowledge.name] ?? 0; // Valeur par défaut à 0
-            return acc;
-          },
-          {},
-        );
-      });
+      setWizardKnowledges(
+        knowledgesData.reduce((acc: Record<string, number>, knowledge: any) => {
+          acc[knowledge.name] = 0;
+          return acc;
+        }, {}),
+      );
     } catch (error) {
       console.error("Error fetching knowledges:", error);
     }
@@ -103,11 +181,42 @@ export function WizardFormBase({
     }
   }
 
+  function generateRandomValues(
+    max: number,
+    names: string[],
+  ): Record<string, number> {
+    let values = Array.from({ length: names.length }, () =>
+      Math.max(-3, Math.floor(Math.random() * 14) - 3),
+    );
+
+    const currentSum = values.reduce((acc, val) => acc + val, 0);
+    let difference = max - currentSum;
+
+    while (difference !== 0) {
+      const index = Math.floor(Math.random() * names.length);
+      const adjustment = Math.sign(difference);
+      const newValue = values[index] + adjustment;
+
+      if (newValue >= -3 && newValue <= 10) {
+        values[index] = newValue;
+        difference -= adjustment;
+      }
+    }
+
+    return names.reduce(
+      (acc, name, index) => {
+        acc[name] = values[index];
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+  }
+
   function handleSubmit() {
     const wizardData = {
       name,
-      category: category as string,
-      house: house as string,
+      category,
+      houseName,
       stats: Object.entries(wizardStats).map(([name, level]) => ({
         name,
         level,
@@ -124,55 +233,30 @@ export function WizardFormBase({
     onSubmit(wizardData);
   }
 
-  function handleSpellSelect(spellName: string) {
-    const selectedSpell = spells.find(
-      (spell: Spell) => spell.name === spellName,
-    );
-    if (selectedSpell) {
-      const newWizardSpell = new WizardSpell({
-        spell: selectedSpell,
-        difficulty: Difficulty.NORMAL,
-        xp: 0,
-      });
-      setSelectedWizardSpells((prev) => [...prev, newWizardSpell]);
-    }
-  }
-
-  function handleSpellRemove(spellName: string) {
-    setSelectedWizardSpells((prev) =>
-      prev.filter((wizardSpell) => wizardSpell.spell.name !== spellName),
-    );
-  }
-
-  function handleDifficultyChange(spellName: string, difficulty: Difficulty) {
-    setSelectedWizardSpells((prev) =>
-      prev.map((wizardSpell) =>
-        wizardSpell.spell.name === spellName
-          ? { ...wizardSpell, difficulty }
-          : wizardSpell,
-      ),
-    );
-  }
-  // Remaining handlers like handleSpellSelect, handleSpellRemove, etc.
-
   const statsSum = Object.values(wizardStats).reduce(
     (acc, val) => acc + val,
     0,
   );
+  const maxStats = getMaxStatsForCategory(category);
   const knowledgesSum = Object.values(wizardKnowledges).reduce(
     (acc, val) => acc + val,
     0,
   );
+  const maxKnowledges = getMaxKnowledgesForCategory(category);
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Affiche un indicateur de chargement
+  }
+
   return (
     <MainContainer>
-      {/* Form UI here */}
       <FormRow>
         <label>Name:</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          disabled={isUpdating} // Disable input if updating
+          disabled={isUpdating}
         />
       </FormRow>
       <FormRow>
@@ -191,34 +275,41 @@ export function WizardFormBase({
       <FormRow>
         <label>Maison:</label>
         <select
-          value={house}
-          onChange={(e) => setHouse(e.target.value as string)}
+          value={houseName}
+          onChange={(e) => setHouseName(e.target.value as string)}
         >
-          {Object.values([
-            undefined,
-            "Poufsouffle",
-            "Gryffondor",
-            "Serdaigle",
-            "Serpentard",
-          ]).map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
+          {["Poufsouffle", "Gryffondor", "Serdaigle", "Serpentard"].map(
+            (cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ),
+          )}
         </select>
       </FormRow>
-      {/* Stats, knowledges, and spells logic here */}
-
       <FormSection>
-        <h3>Stats: {statsSum}</h3>
-        <p>Choisissez bien!</p>
+        <h3>
+          Stats: {statsSum} / {maxStats}{" "}
+          <button
+            onClick={() => {
+              setWizardStats(
+                generateRandomValues(
+                  maxStats,
+                  stats.map((s) => s.name),
+                ),
+              );
+            }}
+          >
+            🎲
+          </button>
+        </h3>
         <MultiColumnGrid>
           {stats.map((stat) => (
             <FormRow key={stat.name}>
               <label>{stat.name}:</label>
               <input
                 type="number"
-                value={wizardStats[stat.name]}
+                value={wizardStats[stat.name] || 0}
                 onChange={(e) =>
                   setWizardStats({
                     ...wizardStats,
@@ -231,15 +322,28 @@ export function WizardFormBase({
         </MultiColumnGrid>
       </FormSection>
       <FormSection>
-        <h3>Knowledges: {knowledgesSum}</h3>
-        <p>Choisissez bien!</p>
+        <h3>
+          Knowledges: {knowledgesSum} / {maxKnowledges}{" "}
+          <button
+            onClick={() => {
+              setWizardKnowledges(
+                generateRandomValues(
+                  maxKnowledges,
+                  knowledges.map((k) => k.name),
+                ),
+              );
+            }}
+          >
+            🎲
+          </button>
+        </h3>
         <MultiColumnGrid>
           {knowledges.map((knowledge) => (
             <FormRow key={knowledge.name}>
               <label>{knowledge.name}:</label>
               <input
                 type="number"
-                value={wizardKnowledges[knowledge.name]}
+                value={wizardKnowledges[knowledge.name] || 0}
                 onChange={(e) =>
                   setWizardKnowledges({
                     ...wizardKnowledges,
@@ -263,8 +367,10 @@ export function WizardFormBase({
         </select>
         <SpellsList
           wizardSpells={selectedWizardSpells}
-          removeSpell={handleSpellRemove}
-          updateDifficulty={handleDifficultyChange}
+          removeSpell={(name) => handleSpellRemove(name)}
+          updateDifficulty={(name, difficulty) =>
+            handleDifficultyChange(name, difficulty)
+          }
         />
       </FormSection>
       <FormRow>
@@ -285,23 +391,21 @@ const MainContainer = styled.div`
 const FormSection = styled.div`
   margin-bottom: 20px;
 `;
+
 const FormRow = styled.div`
   margin-bottom: 10px;
   display: flex;
   align-items: center;
-  flex-wrap: wrap; /* Pour forcer le retour à la ligne si l'espace est insuffisant */
-
+  flex-wrap: wrap;
   label {
     margin-right: 10px;
-    min-width: 100px; /* Définit une largeur minimale pour les labels */
-    white-space: nowrap; /* Empêche les labels de se diviser sur plusieurs lignes */
+    min-width: 100px;
   }
-
   input[type="text"],
   input[type="number"],
   select {
     flex: 1;
-    min-width: 150px; /* Ajoute une largeur minimale pour les inputs */
+    min-width: 150px;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -316,35 +420,48 @@ const MultiColumnGrid = styled.div`
   margin: 0 auto;
 `;
 
-const SpellsContainer = styled.div`
-  margin-top: 20px;
-`;
-
-const SpellRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f9f9f9;
-
-  select {
-    margin-left: 10px;
-    margin-right: 10px;
+function getMaxStatsForCategory(category: SchoolCategory): number {
+  switch (category) {
+    case SchoolCategory.YEAR1:
+      return 3;
+    case SchoolCategory.YEAR2:
+      return 7;
+    case SchoolCategory.YEAR3:
+      return 11;
+    case SchoolCategory.YEAR4:
+      return 15;
+    case SchoolCategory.YEAR5:
+      return 19;
+    case SchoolCategory.YEAR6:
+      return 23;
+    case SchoolCategory.YEAR7:
+      return 27;
+    case SchoolCategory.TEACHER:
+      return 30;
+    default:
+      return 15;
   }
+}
 
-  button {
-    margin-left: 10px;
-    background-color: #ff6666;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-
-    &:hover {
-      background-color: #ff4d4d;
-    }
+function getMaxKnowledgesForCategory(category: SchoolCategory): number {
+  switch (category) {
+    case SchoolCategory.YEAR1:
+      return 10;
+    case SchoolCategory.YEAR2:
+      return 15;
+    case SchoolCategory.YEAR3:
+      return 20;
+    case SchoolCategory.YEAR4:
+      return 25;
+    case SchoolCategory.YEAR5:
+      return 30;
+    case SchoolCategory.YEAR6:
+      return 35;
+    case SchoolCategory.YEAR7:
+      return 45;
+    case SchoolCategory.TEACHER:
+      return 50;
+    default:
+      return 20;
   }
-`;
+}

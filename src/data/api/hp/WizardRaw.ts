@@ -1,7 +1,6 @@
 import { WizardStatRaw } from "./WizardStatRaw";
 import { WizardKnowledgeRaw } from "./WizardKnowledgeRaw";
 import { WizardSpellRaw } from "./WizardSpellRaw";
-import { HouseRaw } from "./HouseRaw";
 
 export interface WizardRaw {
   name: string;
@@ -10,7 +9,7 @@ export interface WizardRaw {
   stats: WizardStatRaw[];
   knowledges: WizardKnowledgeRaw[];
   spells: WizardSpellRaw[];
-  house: HouseRaw;
+  houseName: string;
   xp: number;
   pv: number;
   pvMax: number;

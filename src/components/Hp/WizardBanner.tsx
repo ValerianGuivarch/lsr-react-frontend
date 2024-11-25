@@ -47,7 +47,10 @@ export function WizardBanner(props: {
   }
 
   return (
-    <WizardBannerContainer>
+    <WizardBannerContainer
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <BannerContainer>
         <WizardBackground
           src={
@@ -81,10 +84,7 @@ export function WizardBanner(props: {
             </LifePointsContainer>
           </AvatarContainer>
 
-          <WizardListInfo
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
+          <WizardListInfo>
             {isButtonsVisible && (
               <ButtonsContainer>
                 <AdvantageIcon
@@ -105,7 +105,7 @@ export function WizardBanner(props: {
                 ))}
             </XPStarsContainer>
             <WizardSubText>
-              {props.wizard.category + " - " + props.wizard.house?.name ?? ""}
+              {props.wizard.category + " - " + props.wizard.houseName ?? ""}
             </WizardSubText>
             <WizardText>{props.wizard.baguette}</WizardText>
             <WizardText>{props.wizard.coupDePouce}</WizardText>
@@ -151,19 +151,20 @@ const WizardBannerContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
 `;
 
 const BannerContainer = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
-  max-width: 620px;
-  width: 100%;
+  width: 900px;
   height: auto;
+  align-items: center;
 `;
 
 const WizardBackground = styled.img`
-  width: 800px;
+  width: 900px;
   height: 10rem;
   object-fit: cover;
 `;
@@ -180,8 +181,8 @@ const WizardListInfo = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 1rem;
-  padding: 1rem;
+  margin: 1rem 2rem;
+  padding: 1rem 2rem;
   width: 100%;
   height: 100%;
   background-color: #fffa;
@@ -289,6 +290,7 @@ const AvatarContainer = styled.div`
   margin-top: 4rem;
   position: relative;
   display: flex;
+  margin-left: 1rem;
   justify-content: center;
   align-items: center;
 `;

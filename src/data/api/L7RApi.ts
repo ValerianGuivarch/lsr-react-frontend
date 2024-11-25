@@ -236,6 +236,7 @@ export class L7RApi {
       category: string;
       knowledges: { level: number; name: string }[];
       spells: { difficulty: Difficulty; name: string }[];
+      houseName: string;
     }>,
   ) {
     await axios.post(`${config.BASE_URL}/hp/wizards`, toCreate);
