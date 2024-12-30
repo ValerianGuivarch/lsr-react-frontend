@@ -154,6 +154,7 @@ export function WizardPanel({
               <GiBrokenHeart />
             </ActionButton>
             <MainButton
+              difficulty={spellWizard.difficulty}
               onClick={() =>
                 handleClick(spellWizard.spell.name, "spell", Difficulty.NORMAL)
               }
@@ -230,8 +231,8 @@ const TripleButton = styled.div`
 `;
 
 const ActionButton = styled.button`
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -254,14 +255,20 @@ const ActionButton = styled.button`
   }
 `;
 
-const MainButton = styled.button<{ color?: string }>`
+const MainButton = styled.button<{ color?: string; difficulty?: Difficulty }>`
   flex-grow: 1; // Le bouton principal prend toute la largeur restante
-  height: 40px;
+  height: 36px;
   padding: 0 10px;
   border: none;
-  font-size: 1em;
-  background-color: ${(props) =>
-    props.color || "#eee"}; // Utilise la couleur prop si fournie
+  font-size: 0.85em;
+  background-color: ${({ color, difficulty }) =>
+    color
+      ? color
+      : difficulty === Difficulty.AVANTAGE
+      ? "#c0f3cc" // Vert clair pour Avantage
+      : difficulty === Difficulty.DESAVANTAGE
+      ? "#eeb0b6" // Rouge clair pour Désavantage
+      : "#eee"}; // Gris clair pour Normal
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -269,7 +276,19 @@ const MainButton = styled.button<{ color?: string }>`
   white-space: nowrap;
   flex-direction: column; // Force l'affichage du texte et des étoiles en colonne
 
+  color: ${({ difficulty }) =>
+    difficulty === Difficulty.AVANTAGE
+      ? "#155724" // Vert foncé pour Avantage
+      : difficulty === Difficulty.DESAVANTAGE
+      ? "#721c24" // Rouge foncé pour Désavantage
+      : "#333"}; // Gris foncé pour Normal
+
   &:hover {
-    background-color: #ddd;
+    background-color: ${({ difficulty }) =>
+      difficulty === Difficulty.AVANTAGE
+        ? "#c3e6cb" // Vert un peu plus foncé au survol
+        : difficulty === Difficulty.DESAVANTAGE
+        ? "#f5c6cb" // Rouge un peu plus foncé au survol
+        : "#ddd"}; // Gris foncé au survol pour Normal
   }
 `;

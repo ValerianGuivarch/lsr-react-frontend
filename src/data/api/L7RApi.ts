@@ -16,6 +16,7 @@ import { SchoolCategory } from "../../domain/models/SchoolCategory";
 import { SpellRaw } from "./hp/SpellRaw";
 import { Difficulty } from "../../domain/models/hp/Difficulty";
 import { HouseRaw } from "./hp/HouseRaw";
+import { Knowledge } from "../../domain/models/hp/Knowledge";
 
 export class L7RApi {
   static async sendNewTurn(): Promise<void> {
@@ -254,5 +255,17 @@ export class L7RApi {
 
   static levelUp(id: string) {
     axios.put(`${config.BASE_URL}/hp/flips/level-up/${id}`);
+  }
+
+  static async createSpell(param: {
+    level: number;
+    knowledgeName: string;
+    spellName: string;
+  }) {
+    await axios.post(`${config.BASE_URL}/hp/spells`, {
+      rank: param.level,
+      knowledgeName: param.knowledgeName,
+      name: param.spellName,
+    });
   }
 }

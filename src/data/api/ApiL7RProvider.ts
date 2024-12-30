@@ -292,4 +292,12 @@ export class ApiL7RProvider {
   static levelUp(id: string) {
     return L7RApi.levelUp(id);
   }
+
+  static async createSpell(param: {
+    level: number;
+    knowledgeName: string;
+    spellName: string;
+  }) {
+    await L7RApi.createSpell(param);
+  }
 }

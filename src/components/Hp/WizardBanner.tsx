@@ -158,19 +158,19 @@ const BannerContainer = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
-  width: 900px;
+  width: 1200px;
   height: auto;
   align-items: center;
 `;
 
 const WizardBackground = styled.img`
-  width: 900px;
+  width: 1200px;
   height: 10rem;
   object-fit: cover;
 `;
 
 const WizardInfoContainer = styled.div`
-  width: 50rem;
+  width: 70rem;
   height: 6rem;
   display: flex;
   flex-direction: row;
@@ -185,9 +185,9 @@ const WizardListInfo = styled.div`
   padding: 1rem 2rem;
   width: 100%;
   height: 100%;
-  background-color: #fffa;
+  background-color: #fffd;
   border-radius: 0.5rem;
-  box-shadow: 0 0 0.5rem 0.25rem rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 0.5rem 0.5rem rgba(0, 0, 0, 0.25);
 `;
 
 const ButtonsContainer = styled.div`
@@ -238,7 +238,7 @@ const WizardText = styled.div`
 
 const HourglassSection = styled.div`
   display: flex;
-  justify-content: start;
+  justify-content: center;
   align-items: center;
   width: 75%;
   margin-top: 4rem;

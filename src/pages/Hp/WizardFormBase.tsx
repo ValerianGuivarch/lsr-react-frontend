@@ -65,12 +65,7 @@ export function WizardFormBase({
       (spell: Spell) => spell.name === spellName,
     );
     if (selectedSpell) {
-      const newWizardSpell = new WizardSpell({
-        spell: selectedSpell,
-        difficulty: Difficulty.NORMAL, // Par défaut, difficulté normale
-        xp: 0, // Par défaut, XP initial à 0
-      });
-      setSelectedWizardSpells((prev) => [...prev, newWizardSpell]);
+      setSelectedWizardSpells((prev) => [...prev, selectedSpell]);
     }
   }
   function handleSpellRemove(spellName: string) {
@@ -125,16 +120,7 @@ export function WizardFormBase({
           {},
         ),
       );
-      setSelectedWizardSpells(
-        wizard.spells.map(
-          (spell: any) =>
-            new WizardSpell({
-              spell,
-              difficulty: spell.difficulty,
-              xp: 0,
-            }),
-        ),
-      );
+      setSelectedWizardSpells(wizard.spells.map((spell: any) => spell));
     } catch (error) {
       console.error("Error fetching wizard:", error);
     } finally {

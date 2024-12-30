@@ -8,4 +8,5 @@ export enum SchoolCategory {
   YEAR7 = "7ème année",
   TEACHER = "Professeur",
   OTHER = "Autre",
+  ANIMAL = "Animal",
 }

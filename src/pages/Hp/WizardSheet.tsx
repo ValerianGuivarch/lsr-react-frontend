@@ -8,7 +8,6 @@ import { WizardBanner } from "../../components/Hp/WizardBanner";
 import { WizardPanel } from "../../components/Character/CharacterPanel/WizardPanel";
 import FlipCard from "../../components/Hp/FlipCard";
 import { Difficulty } from "../../domain/models/hp/Difficulty";
-import { useSSEFlips } from "../../data/api/useSSEFlips";
 import { House } from "../../domain/models/hp/House";
 import { CharacterNotes } from "../../components/Character/CharacterNotes/CharacterNotes";
 
@@ -26,6 +25,26 @@ export function WizardSheet() {
     fetchWizard().then(() => {});
     fetchFlips().then(() => {});
     fetchHouses().then(() => {});
+
+    const startTime = Date.now();
+
+    // Démarrer un intervalle pour récupérer les flips toutes les secondes
+    const intervalId = setInterval(() => {
+      const elapsedTime = Date.now() - startTime;
+
+      // Si plus d'une heure s'est écoulée, arrêter l'intervalle
+      if (elapsedTime >= 3600000) {
+        clearInterval(intervalId);
+        console.log("Stopped updating flips after 1 hour.");
+        return;
+      }
+
+      // Appeler fetchFlips pour mettre à jour les données
+      fetchFlips();
+    }, 2000);
+
+    // Nettoyage : arrêter l'intervalle lors du démontage du composant
+    return () => clearInterval(intervalId);
   }, []);
 
   async function fetchWizard() {
@@ -55,25 +74,6 @@ export function WizardSheet() {
       console.error("Error fetching houses:", error);
     }
   }
-
-  /*  useSSEWizardByName({
-    name: wizardName || "",
-    callback: (wizard: Wizard) => {
-      setWizard(wizard);
-    },
-  });
-
-  useSSEWizardsPreviewSession({
-    callback: (wizardsPreview: WizardPreview[]) => {
-      setWizardsSession(wizardsPreview);
-    },
-  });*/
-
-  useSSEFlips({
-    callback: (flips: Flip[]) => {
-      setFlips(flips);
-    },
-  });
 
   function handleUpdateWizardText(text: string) {
     if (wizard) {
@@ -106,24 +106,12 @@ export function WizardSheet() {
     }
   }
 
-  /*function handleUpdateWizardNotes(text: string) {
-    if (wizard) {
-      ApiL7RProvider.updateWizard({
-        ...wizard,
-        notes: text,
-      });
-    }
-  }*/
-  /*
-<WizardNotes text={wizard.notes} setText={handleUpdateWizardNotes} />
- */
   return (
     <>
       {!wizard || !houses ? (
         <p>Loading...</p>
       ) : (
         <MainContainer>
-          {/* Bannière */}
           <BannerContainer>
             <WizardBanner
               wizard={wizard}
@@ -144,11 +132,9 @@ export function WizardSheet() {
               }
             />
           </BannerContainer>
-
-          {/* Contenu principal */}
           <ContentContainer>
-            {/* Colonne de gauche */}
             <LeftColumn>
+              <WizardPanel wizard={wizard} sendFlip={handleSendFlip} />
               <CharacterNotes
                 text={wizard.text}
                 setText={handleUpdateWizardText}
@@ -168,7 +154,6 @@ export function WizardSheet() {
                     </ul>
                   )}
                 </DropdownContainer>
-
                 <DropdownContainer>
                   <DropdownHeader onClick={toggleAdvantages}>
                     Désavantages
@@ -184,13 +169,8 @@ export function WizardSheet() {
                   )}
                 </DropdownContainer>
               </WizardTraits>
-              <WizardPanel wizard={wizard} sendFlip={handleSendFlip} />
             </LeftColumn>
-
-            {/* Séparateur vertical */}
             <VerticalSeparator />
-
-            {/* Colonne de droite */}
             <RightColumn>
               {flips.map((flip: Flip) => (
                 <FlipCardContainer key={flip.id}>
@@ -204,8 +184,9 @@ export function WizardSheet() {
     </>
   );
 }
+
 const MainContainer = styled.div`
-  max-width: 1200px;
+  max-width: 1400px;
   padding: 20px;
   margin: 0 auto;
   display: flex;
@@ -214,7 +195,7 @@ const MainContainer = styled.div`
 `;
 
 const BannerContainer = styled.div`
-  max-width: 1200px;
+  max-width: 1400px;
   margin-bottom: 20px;
   display: flex;
   justify-content: center; /* Centre parfaitement la bannière */
@@ -231,7 +212,7 @@ const ContentContainer = styled.div`
 const LeftColumn = styled.div`
   flex: 1;
   padding-right: 20px;
-  max-width: 500px;
+  max-width: 900px;
   display: flex;
   flex-direction: column;
   gap: 20px; /* Ajoute de l’espacement entre les éléments */
