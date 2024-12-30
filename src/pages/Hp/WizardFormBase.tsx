@@ -64,8 +64,13 @@ export function WizardFormBase({
     const selectedSpell = spells.find(
       (spell: Spell) => spell.name === spellName,
     );
+    const newSpell = {
+      spell: selectedSpell,
+      difficulty: Difficulty.NORMAL,
+      xp: 0,
+    };
     if (selectedSpell) {
-      setSelectedWizardSpells((prev) => [...prev, selectedSpell]);
+      setSelectedWizardSpells((prev) => [...prev, newSpell]);
     }
   }
   function handleSpellRemove(spellName: string) {
