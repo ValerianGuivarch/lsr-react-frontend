@@ -7,6 +7,7 @@ import { GiBrokenHeart, GiHearts } from "react-icons/gi"; // Icons for difficult
 import { FaRegStar } from "react-icons/fa6";
 import { faDiceD20 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { CharacterNotes } from "../CharacterNotes/CharacterNotes";
 
 export function WizardPanel({
   wizard,
@@ -104,96 +105,104 @@ export function WizardPanel({
       </Section>
 
       {/* Connaissances */}
-      <Section>
-        <h3>Connaissances</h3>
-        {wizard.knowledges.map((knowledgeWizard) => (
-          <TripleButton key={knowledgeWizard.knowledge.name}>
-            <ActionButton
-              onClick={() =>
-                handleClick(
-                  knowledgeWizard.knowledge.name,
-                  "knowledge",
-                  Difficulty.DESAVANTAGE,
-                )
-              }
-              style={{ backgroundColor: knowledgeWizard.knowledge.color }}
-            >
-              <GiBrokenHeart />
-            </ActionButton>
-            <MainButton
-              onClick={() =>
-                handleClick(
-                  knowledgeWizard.knowledge.name,
-                  "knowledge",
-                  Difficulty.NORMAL,
-                )
-              }
-              style={{ backgroundColor: knowledgeWizard.knowledge.color }}
-            >
-              <div>
-                {knowledgeWizard.knowledge.name} {knowledgeWizard.level}
-              </div>
-              <div>
-                <XpContainer>{renderXpIcons(knowledgeWizard.xp)}</XpContainer>{" "}
-              </div>
-            </MainButton>
-            <ActionButton
-              onClick={() =>
-                handleClick(
-                  knowledgeWizard.knowledge.name,
-                  "knowledge",
-                  Difficulty.AVANTAGE,
-                )
-              }
-              style={{ backgroundColor: knowledgeWizard.knowledge.color }}
-            >
-              <FaStar />
-            </ActionButton>
-          </TripleButton>
-        ))}
-      </Section>
+      {wizard.category !== "Animal" && (
+        <Section>
+          <h3>Connaissances</h3>
+          {wizard.knowledges.map((knowledgeWizard) => (
+            <TripleButton key={knowledgeWizard.knowledge.name}>
+              <ActionButton
+                onClick={() =>
+                  handleClick(
+                    knowledgeWizard.knowledge.name,
+                    "knowledge",
+                    Difficulty.DESAVANTAGE,
+                  )
+                }
+                style={{ backgroundColor: knowledgeWizard.knowledge.color }}
+              >
+                <GiBrokenHeart />
+              </ActionButton>
+              <MainButton
+                onClick={() =>
+                  handleClick(
+                    knowledgeWizard.knowledge.name,
+                    "knowledge",
+                    Difficulty.NORMAL,
+                  )
+                }
+                style={{ backgroundColor: knowledgeWizard.knowledge.color }}
+              >
+                <div>
+                  {knowledgeWizard.knowledge.name} {knowledgeWizard.level}
+                </div>
+                <div>
+                  <XpContainer>{renderXpIcons(knowledgeWizard.xp)}</XpContainer>{" "}
+                </div>
+              </MainButton>
+              <ActionButton
+                onClick={() =>
+                  handleClick(
+                    knowledgeWizard.knowledge.name,
+                    "knowledge",
+                    Difficulty.AVANTAGE,
+                  )
+                }
+                style={{ backgroundColor: knowledgeWizard.knowledge.color }}
+              >
+                <FaStar />
+              </ActionButton>
+            </TripleButton>
+          ))}
+        </Section>
+      )}
 
       {/* Sorts */}
-      <Section>
-        <h3>Sorts</h3>
-        {wizard.spells.map((spellWizard) => (
-          <TripleButton key={spellWizard.spell.name}>
-            <ActionButton
-              onClick={() =>
-                handleClick(
-                  spellWizard.spell.name,
-                  "spell",
-                  Difficulty.DESAVANTAGE,
-                )
-              }
-            >
-              <GiBrokenHeart />
-            </ActionButton>
-            <MainButton
-              difficulty={spellWizard.difficulty}
-              onClick={() =>
-                handleClick(spellWizard.spell.name, "spell", Difficulty.NORMAL)
-              }
-            >
-              <div>{spellWizard.spell.name}</div>
-              <div>
-                <XpContainer>{renderXpIcons(spellWizard.xp)}</XpContainer>{" "}
-              </div>
-            </MainButton>
-            <ActionButton
-              onClick={() =>
-                handleClick(
-                  spellWizard.spell.name,
-                  "spell",
-                  Difficulty.AVANTAGE,
-                )
-              }
-            >
-              <GiHearts />
-            </ActionButton>
-          </TripleButton>
-        ))}
-      </Section>
+      {wizard.category !== "Animal" && (
+        <Section>
+          <h3>Sorts</h3>
+          {wizard.spells.map((spellWizard) => (
+            <TripleButton key={spellWizard.spell.name}>
+              <ActionButton
+                onClick={() =>
+                  handleClick(
+                    spellWizard.spell.name,
+                    "spell",
+                    Difficulty.DESAVANTAGE,
+                  )
+                }
+              >
+                <GiBrokenHeart />
+              </ActionButton>
+              <MainButton
+                difficulty={spellWizard.difficulty}
+                onClick={() =>
+                  handleClick(
+                    spellWizard.spell.name,
+                    "spell",
+                    Difficulty.NORMAL,
+                  )
+                }
+              >
+                <div>{spellWizard.spell.name}</div>
+                <div>
+                  <XpContainer>{renderXpIcons(spellWizard.xp)}</XpContainer>{" "}
+                </div>
+              </MainButton>
+              <ActionButton
+                onClick={() =>
+                  handleClick(
+                    spellWizard.spell.name,
+                    "spell",
+                    Difficulty.AVANTAGE,
+                  )
+                }
+              >
+                <GiHearts />
+              </ActionButton>
+            </TripleButton>
+          ))}
+        </Section>
+      )}
     </PanelContainer>
   );
 }

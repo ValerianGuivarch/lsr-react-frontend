@@ -128,15 +128,11 @@ export function WizardSheet() {
           </BannerContainer>
           <ContentContainer>
             <LeftColumn>
-              {wizard.category !== "Animal" && (
-                <>
-                  <WizardPanel wizard={wizard} sendFlip={handleSendFlip} />
-                  <CharacterNotes
-                    text={wizard.text}
-                    setText={handleUpdateWizardText}
-                  />
-                </>
-              )}
+              <WizardPanel wizard={wizard} sendFlip={handleSendFlip} />
+              <CharacterNotes
+                text={wizard.text}
+                setText={handleUpdateWizardText}
+              />
               <WizardTraits>
                 <DropdownContainer>
                   <DropdownHeader onClick={toggleAdvantages}>
