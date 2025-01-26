@@ -100,6 +100,36 @@ export function WizardBanner(props: {
             </LifePointsContainer>
           </AvatarContainer>
 
+          <HourglassSection>
+            <HourglassWrapper>
+              <HourglassImage
+                src={"/l7r/HouseSerpentard.png"}
+                alt="Slytherin Hourglass"
+              />
+              <PointsText>{props.serpentard}</PointsText>
+            </HourglassWrapper>
+            <HourglassWrapper>
+              <HourglassImage
+                src={"/l7r/HouseSerdaigle.png"}
+                alt="Ravenclaw Hourglass"
+              />
+              <PointsText>{props.serdaigle}</PointsText>
+            </HourglassWrapper>
+            <HourglassWrapper>
+              <HourglassImage
+                src={"/l7r/HouseGryffondor.png"}
+                alt="Gryffindor Hourglass"
+              />
+              <PointsText>{props.gryffondor}</PointsText>
+            </HourglassWrapper>
+            <HourglassWrapper>
+              <HourglassImage
+                src={"/l7r/HousePoufsouffle.png"}
+                alt="Hufflepuff Hourglass"
+              />
+              <PointsText>{props.poufsouffle}</PointsText>
+            </HourglassWrapper>
+          </HourglassSection>
           <WizardListInfo>
             {isButtonsVisibleSpellAndPotions && (
               <ButtonsContainer top="1rem">
