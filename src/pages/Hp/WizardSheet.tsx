@@ -10,6 +10,8 @@ import FlipCard from "../../components/Hp/FlipCard";
 import { Difficulty } from "../../domain/models/hp/Difficulty";
 import { House } from "../../domain/models/hp/House";
 import { CharacterNotes } from "../../components/Character/CharacterNotes/CharacterNotes";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDiceD20 } from "@fortawesome/free-solid-svg-icons";
 
 export function WizardSheet() {
   const { wizardName } = useParams();
@@ -28,22 +30,16 @@ export function WizardSheet() {
 
     const startTime = Date.now();
 
-    // Démarrer un intervalle pour récupérer les flips toutes les secondes
     const intervalId = setInterval(() => {
       const elapsedTime = Date.now() - startTime;
-
-      // Si plus d'une heure s'est écoulée, arrêter l'intervalle
       if (elapsedTime >= 3600000) {
         clearInterval(intervalId);
         console.log("Stopped updating flips after 1 hour.");
         return;
       }
-
-      // Appeler fetchFlips pour mettre à jour les données
       fetchFlips();
     }, 2000);
 
-    // Nettoyage : arrêter l'intervalle lors du démontage du composant
     return () => clearInterval(intervalId);
   }, []);
 
@@ -68,7 +64,6 @@ export function WizardSheet() {
   async function fetchHouses() {
     try {
       const houses = await ApiL7RProvider.getHouses();
-      console.log("houses", houses);
       setHouses(houses);
     } catch (error) {
       console.error("Error fetching houses:", error);
@@ -100,7 +95,6 @@ export function WizardSheet() {
         });
       }
     } catch (error) {
-      console.error("ERROR");
       console.error("Error sending flip:", error);
       alert(error);
     }
@@ -134,11 +128,15 @@ export function WizardSheet() {
           </BannerContainer>
           <ContentContainer>
             <LeftColumn>
-              <WizardPanel wizard={wizard} sendFlip={handleSendFlip} />
-              <CharacterNotes
-                text={wizard.text}
-                setText={handleUpdateWizardText}
-              />
+              {wizard.category !== "Animal" && (
+                <>
+                  <WizardPanel wizard={wizard} sendFlip={handleSendFlip} />
+                  <CharacterNotes
+                    text={wizard.text}
+                    setText={handleUpdateWizardText}
+                  />
+                </>
+              )}
               <WizardTraits>
                 <DropdownContainer>
                   <DropdownHeader onClick={toggleAdvantages}>

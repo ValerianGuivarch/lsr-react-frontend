@@ -189,6 +189,7 @@ export class ApiL7RProvider {
     return new Wizard({
       name: wizardRaw.name,
       familyName: wizardRaw.familyName,
+      animal: wizardRaw.animal,
       category: wizardRaw.category,
       stats: wizardRaw.stats.map((stat) => new WizardStat(stat)),
       spells: wizardRaw.spells.map((spell) => {

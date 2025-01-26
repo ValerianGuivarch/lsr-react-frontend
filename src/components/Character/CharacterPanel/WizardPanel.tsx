@@ -5,6 +5,8 @@ import { Wizard } from "../../../domain/models/hp/Wizard";
 import { Difficulty } from "../../../domain/models/hp/Difficulty";
 import { GiBrokenHeart, GiHearts } from "react-icons/gi"; // Icons for difficulty
 import { FaRegStar } from "react-icons/fa6";
+import { faDiceD20 } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export function WizardPanel({
   wizard,
@@ -20,7 +22,7 @@ export function WizardPanel({
 }) {
   function handleClick(
     skillName: string,
-    type: "stat" | "knowledge" | "spell",
+    type: "stat" | "knowledge" | "spell" | undefined,
     difficulty: Difficulty,
   ) {
     if (type === "spell") {
@@ -30,7 +32,7 @@ export function WizardPanel({
     } else if (type === "knowledge") {
       sendFlip({ knowledgeName: skillName, difficulty });
     } else {
-      console.error("Unknown type");
+      sendFlip({ difficulty });
     }
   }
 
@@ -50,7 +52,21 @@ export function WizardPanel({
     <PanelContainer>
       {/* Stats */}
       <Section>
-        <h3>Stats</h3>
+        <h3>
+          Stats{" "}
+          <FontAwesomeIcon
+            icon={faDiceD20}
+            style={{
+              marginLeft: "10px",
+              cursor: "pointer",
+              fontSize: "1.2rem",
+              color: "#333",
+            }}
+            onClick={() =>
+              handleClick("undefined", undefined, Difficulty.NORMAL)
+            }
+          />
+        </h3>
         {wizard.stats.map((statWizard) => (
           <TripleButton key={statWizard.stat.name}>
             <ActionButton

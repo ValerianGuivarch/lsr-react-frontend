@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { FaStar, FaUser } from "react-icons/fa6";
+import {
+  FaStar,
+  FaUser,
+  FaCat,
+  FaPlateWheat,
+  FaBottleDroplet,
+  FaWandMagicSparkles,
+} from "react-icons/fa6";
 import { IconType } from "react-icons";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import { Wizard } from "../../domain/models/hp/Wizard";
 import { ApiL7RProvider } from "../../data/api/ApiL7RProvider";
 
@@ -13,42 +20,50 @@ export function WizardBanner(props: {
   gryffondor: number;
   serpentard: number;
 }) {
-  const [isButtonsVisible, setIsButtonsVisible] = useState(false);
-  const navigate = useNavigate(); // Hook pour naviguer
+  const [isButtonsVisibleSpellAndPotions, setIsButtonsVisibleSpellAndPotions] =
+    useState(false);
+  const [isButtonsVisibleAnimal, setIsButtonsVisibleAnimal] = useState(false);
+  const navigate = useNavigate();
 
-  const handleMouseEnter = () => {
-    setIsButtonsVisible(true);
+  const handleMouseEnter = (wizard: Wizard) => {
+    setIsButtonsVisibleSpellAndPotions(true);
+    setIsButtonsVisibleAnimal(
+      wizard.animal !== "" && wizard.animal !== undefined,
+    );
   };
 
   const handleMouseLeave = () => {
-    setIsButtonsVisible(false);
+    setIsButtonsVisibleSpellAndPotions(false);
+    setIsButtonsVisibleAnimal(false);
   };
 
-  const handleAdvantageClick = () => {
-    // Redirection vers la page /hp/update/:wizardName
-    navigate(`/hp/update/${props.wizard.name}`);
+  const handleRedirect = (url: string, newTab: boolean = false) => {
+    if (newTab) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else {
+      navigate(url);
+    }
   };
-  function handleUpdateWizardPV(change: number) {
+
+  const handleUpdateWizardPV = (change: number) => {
     if (props.wizard) {
       const newPV = Math.min(
         Math.max(props.wizard.pv + change, 0),
         props.wizard.pvMax,
       );
-      ApiL7RProvider.updateWizard(props.wizard.name, {
-        pv: newPV,
-      })
+      ApiL7RProvider.updateWizard(props.wizard.name, { pv: newPV })
         .then(() => {
-          props.wizard.pv = newPV; // Mise à jour locale après succès de l'API
+          props.wizard.pv = newPV;
         })
         .catch((error) => {
           console.error("Erreur lors de la mise à jour des PV :", error);
         });
     }
-  }
+  };
 
   return (
     <WizardBannerContainer
-      onMouseEnter={handleMouseEnter}
+      onMouseEnter={() => handleMouseEnter(props.wizard)}
       onMouseLeave={handleMouseLeave}
     >
       <BannerContainer>
@@ -63,6 +78,7 @@ export function WizardBanner(props: {
             <WizardAvatar
               src={"/l7r/" + props.wizard.name + ".png"}
               alt={props.wizard.name}
+              onClick={() => handleRedirect(`/hp/update/${props.wizard.name}`)} // Redirection
             />
 
             <LifePointsContainer>
@@ -85,12 +101,42 @@ export function WizardBanner(props: {
           </AvatarContainer>
 
           <WizardListInfo>
-            {isButtonsVisible && (
-              <ButtonsContainer>
+            {isButtonsVisibleSpellAndPotions && (
+              <ButtonsContainer top="1rem">
                 <AdvantageIcon
-                  icon={FaUser}
+                  icon={FaWandMagicSparkles}
                   title="Avantage"
-                  onClick={handleAdvantageClick}
+                  onClick={() =>
+                    handleRedirect(
+                      "https://drive.google.com/file/d/1--Si8em5qBIGDf1ukK0uE-IVNs7mCL4F/view?usp=sharing",
+                      true,
+                    )
+                  } // Google dans un nouvel onglet
+                />
+              </ButtonsContainer>
+            )}
+            {isButtonsVisibleSpellAndPotions && (
+              <ButtonsContainer top="5rem">
+                <AdvantageIcon
+                  icon={FaBottleDroplet}
+                  title="Avantage"
+                  onClick={() =>
+                    handleRedirect(
+                      "https://drive.google.com/file/d/1HhXYrE9kL0V7DsC1mUuljf2OZyBXNeBF/view?usp=sharing",
+                      true,
+                    )
+                  } // Facebook dans un nouvel onglet
+                />
+              </ButtonsContainer>
+            )}
+            {isButtonsVisibleAnimal && (
+              <ButtonsContainer top="9rem">
+                <AdvantageIcon
+                  icon={FaCat}
+                  title="Animal"
+                  onClick={() =>
+                    handleRedirect(`/hp/${props.wizard.animal}`, true)
+                  } // Animal dans un nouvel onglet
                 />
               </ButtonsContainer>
             )}
@@ -111,42 +157,11 @@ export function WizardBanner(props: {
             <WizardText>{props.wizard.coupDePouce}</WizardText>
             <WizardText>{props.wizard.crochePatte}</WizardText>
           </WizardListInfo>
-          <HourglassSection>
-            <HourglassWrapper>
-              <HourglassImage
-                src={"/l7r/HouseSerpentard.png"}
-                alt="Slytherin Hourglass"
-              />
-              <PointsText>{props.serpentard}</PointsText>
-            </HourglassWrapper>
-            <HourglassWrapper>
-              <HourglassImage
-                src={"/l7r/HouseSerdaigle.png"}
-                alt="Ravenclaw Hourglass"
-              />
-              <PointsText>{props.serdaigle}</PointsText>
-            </HourglassWrapper>
-            <HourglassWrapper>
-              <HourglassImage
-                src={"/l7r/HouseGryffondor.png"}
-                alt="Gryffindor Hourglass"
-              />
-              <PointsText>{props.gryffondor}</PointsText>
-            </HourglassWrapper>
-            <HourglassWrapper>
-              <HourglassImage
-                src={"/l7r/HousePoufsouffle.png"}
-                alt="Hufflepuff Hourglass"
-              />
-              <PointsText>{props.poufsouffle}</PointsText>
-            </HourglassWrapper>
-          </HourglassSection>
         </WizardInfoContainer>
       </BannerContainer>
     </WizardBannerContainer>
   );
 }
-
 const WizardBannerContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -190,11 +205,16 @@ const WizardListInfo = styled.div`
   box-shadow: 0 0 0.5rem 0.5rem rgba(0, 0, 0, 0.25);
 `;
 
-const ButtonsContainer = styled.div`
+interface ButtonsContainerProps {
+  top?: string; // 'top' est une propriété facultative
+}
+
+const ButtonsContainer = styled.div<ButtonsContainerProps>`
   position: absolute;
   display: flex;
   flex-direction: row;
-  top: 1rem;
+  top: ${({ top }) =>
+    top || "1rem"}; // Valeur par défaut si 'top' n'est pas fourni
   right: 1rem;
   justify-content: flex-start;
   gap: 0.5rem;
