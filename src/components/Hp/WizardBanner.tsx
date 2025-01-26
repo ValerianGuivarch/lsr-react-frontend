@@ -116,7 +116,7 @@ export function WizardBanner(props: {
               </ButtonsContainer>
             )}
             {isButtonsVisibleSpellAndPotions && (
-              <ButtonsContainer top="5rem">
+              <ButtonsContainer top="4rem">
                 <AdvantageIcon
                   icon={FaBottleDroplet}
                   title="Avantage"
@@ -130,7 +130,7 @@ export function WizardBanner(props: {
               </ButtonsContainer>
             )}
             {isButtonsVisibleAnimal && (
-              <ButtonsContainer top="9rem">
+              <ButtonsContainer top="7rem">
                 <AdvantageIcon
                   icon={FaCat}
                   title="Animal"
