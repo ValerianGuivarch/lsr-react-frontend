@@ -15,6 +15,7 @@ import { CharacterState } from "../../domain/models/CharacterState";
 import { useSSECharactersPreviewSession } from "../../data/api/useSSECharactersPreview";
 import { CharacterPreview } from "../../domain/models/CharacterPreview";
 import { Skill } from "../../domain/models/Skill";
+import CharacterSynchro from "../../components/Character/CharacterSynchro";
 
 export function CharacterSheet() {
   const { characterName } = useParams();
@@ -247,10 +248,14 @@ export function CharacterSheet() {
       ) : (
         <MainContainer>
           <CharacterBanner character={character} />
-          <CharacterNotes
-            text={character.notes}
-            setText={handleUpdateCharacterNotes}
-          />
+          {character.vr === -1 ? (
+            <CharacterNotes
+              text={character.notes}
+              setText={handleUpdateCharacterNotes}
+            />
+          ) : (
+            <CharacterSynchro character={character} />
+          )}
           <CharacterPanel
             characterState={characterState}
             cardDisplay={false}

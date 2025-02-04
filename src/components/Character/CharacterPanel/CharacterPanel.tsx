@@ -189,6 +189,30 @@ export function CharacterPanel(props: {
               );
             }}
           />
+          {character.vr !== -1 && cardDisplay && (
+            <CharacterButton
+              cardDisplay={cardDisplay}
+              skillStat={SkillStat.ESPRIT}
+              name={"vr"}
+              column={true}
+              selected={false}
+              value={character.vr}
+              icon={FaSkullCrossbones}
+              onClickIncr={() => {
+                props.updateCharacter({
+                  ...character,
+                  vr: character.vr + 1,
+                });
+              }}
+              onClickDecr={() => {
+                props.updateCharacter({
+                  ...character,
+                  vr: character.vr - 1,
+                });
+              }}
+              onClickBtn={() => {}}
+            />
+          )}
           <CharacterButton
             cardDisplay={cardDisplay}
             skillStat={SkillStat.CHAIR}

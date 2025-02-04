@@ -61,4 +61,5 @@ export interface CharacterRaw {
   proficiencies: ProficiencyRaw[];
   apotheoses: ApotheoseRaw[];
   apotheoseState: string;
+  vr: number;
 }

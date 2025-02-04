@@ -67,6 +67,7 @@ export class Character {
   rest: number;
   longRest: number;
   boulet: boolean;
+  vr: number;
 
   constructor(p: CharacterRaw) {
     this.controlledBy = p.controlledBy;
@@ -124,6 +125,7 @@ export class Character {
     this.buttonColor = p.buttonColor;
     this.textColor = p.textColor;
     this.battleState = BattleState[p.battleState as keyof typeof BattleState];
+    this.vr = p.vr;
   }
 
   static getDisplayName(character: Character): string {

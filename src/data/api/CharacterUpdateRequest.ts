@@ -31,6 +31,7 @@ export class CharacterUpdateRequest {
   relance: number;
   apotheoseState: string;
   battleState: string;
+  vr: number;
 
   constructor(character: Character) {
     this.apotheoseState = character.apotheoseState;
@@ -63,5 +64,6 @@ export class CharacterUpdateRequest {
     this.apotheoseImprovement = character.apotheoseImprovement;
     this.apotheoseImprovementList = character.apotheoseImprovementList;
     this.relance = character.relance;
+    this.vr = character.vr;
   }
 }
