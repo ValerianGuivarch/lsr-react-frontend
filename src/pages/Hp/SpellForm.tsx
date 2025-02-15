@@ -8,6 +8,7 @@ export function SpellForm() {
   const [knowledges, setKnowledges] = useState<Knowledge[]>([]);
   const [selectedKnowledge, setSelectedKnowledge] = useState<string>(""); // Stocke l'ID ou le nom de la connaissance
   const [spellName, setSpellName] = useState<string>("");
+  const [spellFormule, setSpellFormule] = useState<string>("");
   const [spellLevel, setSpellLevel] = useState<number>(1);
 
   // Récupérer la liste des connaissances
@@ -32,12 +33,19 @@ export function SpellForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!selectedKnowledge || !spellName || (!spellLevel && spellLevel !== 0)) {
+    if (
+      !selectedKnowledge ||
+      !spellName ||
+      !spellFormule ||
+      (!spellLevel && spellLevel !== 0)
+    ) {
       alert(
         "Veuillez remplir tous les champs : selectedKnowledge=" +
           selectedKnowledge +
           ", spellName=" +
           spellName +
+          ", spellFormule=" +
+          spellFormule +
           ", spellLevel=" +
           spellLevel,
       );
@@ -48,12 +56,14 @@ export function SpellForm() {
       await ApiL7RProvider.createSpell({
         knowledgeName: selectedKnowledge,
         spellName: spellName,
+        spellFormule: spellFormule,
         level: spellLevel,
       });
 
       alert("Sortilège ajouté avec succès !");
       // Réinitialiser le formulaire
       setSpellName("");
+      setSpellFormule("");
       setSpellLevel(1);
     } catch (error) {
       console.error("Erreur lors de l'ajout du sortilège :", error);
@@ -89,6 +99,17 @@ export function SpellForm() {
           value={spellName}
           onChange={(e) => setSpellName(e.target.value)}
           placeholder="Entrez le nom du sortilège"
+        />
+      </FormRow>
+      {/* Formule du sortilège */}
+      <FormRow>
+        <label htmlFor="spellFormule">Formule du sortilège :</label>
+        <input
+          id="spellFormule"
+          type="text"
+          value={spellName}
+          onChange={(e) => setSpellFormule(e.target.value)}
+          placeholder="Entrez la formule du sortilège"
         />
       </FormRow>
 

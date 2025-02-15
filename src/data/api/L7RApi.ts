@@ -261,11 +261,13 @@ export class L7RApi {
     level: number;
     knowledgeName: string;
     spellName: string;
+    spellFormule: string;
   }) {
     await axios.post(`${config.BASE_URL}/hp/spells`, {
       rank: param.level,
       knowledgeName: param.knowledgeName,
       name: param.spellName,
+      formule: param.spellFormule,
     });
   }
 }

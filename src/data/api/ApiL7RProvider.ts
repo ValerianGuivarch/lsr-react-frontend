@@ -298,6 +298,7 @@ export class ApiL7RProvider {
     level: number;
     knowledgeName: string;
     spellName: string;
+    spellFormule: string;
   }) {
     await L7RApi.createSpell(param);
   }
