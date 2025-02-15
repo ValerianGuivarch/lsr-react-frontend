@@ -138,7 +138,7 @@ export function WizardBanner(props: {
                   title="Avantage"
                   onClick={() =>
                     handleRedirect(
-                      "https://drive.google.com/file/d/1--Si8em5qBIGDf1ukK0uE-IVNs7mCL4F/view?usp=sharing",
+                      "https://drive.google.com/file/d/1YOFj9g9JUGhP4oTqSUAWi7k6MIOTJEk5/view?usp=sharing",
                       true,
                     )
                   } // Google dans un nouvel onglet
