@@ -20,6 +20,7 @@ import { WizardSheet } from "./pages/Hp/WizardSheet";
 import { WizardFormCreate } from "./pages/Hp/WizardFormCreate";
 import { WizardFormUpdate } from "./pages/Hp/WizardFormUpdate";
 import { SpellForm } from "./pages/Hp/SpellForm";
+import StoreControl from "./components/Store";
 
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -35,6 +36,7 @@ root.render(
           <Route path="/hp/spell" element={<SpellForm />} />
           <Route path="/hp/update/:wizardName" element={<WizardFormUpdate />} />
           <Route path="/diary" element={<Diary />} />
+          <Route path="/stores" element={<StoreControl />} />
           <Route
             path="/characters/:characterName"
             element={<CharacterSheet />}
