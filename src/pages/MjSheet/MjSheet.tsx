@@ -170,15 +170,12 @@ export function MjSheet() {
   };
 
   const estherDette = async () => {
-    const character = charactersSession.find(
-      (character) => character.name === "esther",
+    await ApiL7RProvider.getCharacterByName("esther").then(
+      async (character) => {
+        character.dettes += 1;
+        await ApiL7RProvider.updateCharacter(character);
+      },
     );
-    if (character) {
-      await ApiL7RProvider.updateCharacter({
-        ...character,
-        dettes: character.dettes + 1,
-      });
-    }
   };
 
   const clickOnSubir = async (p: { roll: Roll; originRoll?: Roll }) => {
