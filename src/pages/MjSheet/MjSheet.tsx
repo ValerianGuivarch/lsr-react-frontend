@@ -10,8 +10,26 @@ import { CharacterState } from "../../domain/models/CharacterState";
 import { Character } from "../../domain/models/Character";
 import { useSSECharactersSession } from "../../data/api/useSSECharacters";
 import { CharacterCard } from "../../components/Mj/CharacterCard";
+import { useRef } from "react";
 
 export function MjSheet() {
+  const [estherValue, setEstherValue] = useState<number>(1);
+  const [estherEnabled, setEstherEnabled] = useState<boolean>(false);
+  const estherTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  function handleEstherActivation(activate: boolean) {
+    if (estherTimeoutRef.current) {
+      clearInterval(estherTimeoutRef.current);
+      estherTimeoutRef.current = null;
+    }
+
+    if (activate) {
+      estherTimeoutRef.current = setInterval(() => {
+        estherDette();
+      }, estherValue * 1000);
+    }
+  }
+
   const [charactersState, setCharactersState] = useState<
     Map<string, CharacterState>
   >(new Map<string, CharacterState>());
@@ -151,6 +169,18 @@ export function MjSheet() {
     }
   };
 
+  const estherDette = async () => {
+    const character = charactersSession.find(
+      (character) => character.name === "esther",
+    );
+    if (character) {
+      await ApiL7RProvider.updateCharacter({
+        ...character,
+        dettes: character.dettes + 1,
+      });
+    }
+  };
+
   const clickOnSubir = async (p: { roll: Roll; originRoll?: Roll }) => {
     const degats = UtilsRules.getDegats(p.roll, p.originRoll);
 
@@ -240,6 +270,25 @@ export function MjSheet() {
     <div>
       <MjHeader>
         <SelectContainer>
+          <label>Esther : </label>
+          <input
+            type="number"
+            min={1}
+            value={estherValue}
+            onChange={(e) => setEstherValue(Number(e.target.value))}
+          />
+          <label style={{ marginLeft: "10px" }}>
+            <input
+              type="checkbox"
+              checked={estherEnabled}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setEstherEnabled(checked);
+                handleEstherActivation(checked);
+              }}
+            />
+            Activer
+          </label>
           <Select
             id="pj-select"
             onChange={(e) =>
