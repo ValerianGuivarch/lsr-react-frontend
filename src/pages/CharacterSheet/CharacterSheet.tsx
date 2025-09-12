@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import RollCard from "../../components/RollCard/RollCard";
 import { Roll } from "../../domain/models/Roll";
@@ -25,29 +25,42 @@ export function CharacterSheet() {
     CharacterPreview[]
   >([]);
 
-  useEffect(() => {
-    fetchCharacter().then(() => {});
-    fetchCharactersSession().then(() => {});
-    fetchRolls(characterName ?? "").then(() => {});
+  // ====== QUEUES / COALESCING ======
+  // 1) PV/PF/PP → updateCharacter sérialisé
+  const inFlightCharUpdateRef = useRef(false);
+  const pendingStatsRef = useRef<{ pv: number; pf: number; pp: number }>({
+    pv: 0,
+    pf: 0,
+    pp: 0,
+  });
+  const pollingPausedRef = useRef(false);
 
-    const interval = setInterval(() => {
-      fetchCharacter().then(() => {});
-      fetchRolls(characterName ?? "").then(() => {});
-    }, 1000);
+  // 2) Bonus/Malus (UI only)
+  const pendingUiRef = useRef<{ bonus: number; malus: number }>({
+    bonus: 0,
+    malus: 0,
+  });
+  const uiFlushTimerRef = useRef<number | null>(null);
 
-    return () => clearInterval(interval);
-  }, [characterName]);
+  // 3) Dette d’arcane (par skill)
+  type DebtKey = string; // skill.id
+  const debtInFlightRef = useRef<Record<DebtKey, boolean>>({});
+  const debtPendingRef = useRef<Record<DebtKey, number>>({});
+
+  // ====== HELPERS ======
+  function clamp(v: number, min: number, max: number) {
+    return Math.max(min, Math.min(max, v));
+  }
 
   async function fetchCharacter() {
     try {
-      const character = await ApiL7RProvider.getCharacterByName(
-        characterName ?? "",
-      );
-      setCharacter(character);
+      const c = await ApiL7RProvider.getCharacterByName(characterName ?? "");
+      setCharacter(c);
     } catch (error) {
       console.error("Error fetching character:", error);
     }
   }
+
   async function fetchCharactersSession() {
     try {
       const characters = await ApiL7RProvider.getSessionCharacters();
@@ -59,13 +72,177 @@ export function CharacterSheet() {
 
   async function fetchRolls(name: string) {
     try {
-      const rolls = await ApiL7RProvider.getRolls(name);
-      setRolls(rolls);
+      const r = await ApiL7RProvider.getRolls(name);
+      setRolls(r);
     } catch (error) {
       console.error("Error fetching rolls:", error);
     }
   }
 
+  useEffect(() => {
+    // initial fetch
+    fetchCharacter().then(() => {});
+    fetchCharactersSession().then(() => {});
+    fetchRolls(characterName ?? "").then(() => {});
+
+    // polling (1s) — on le met en pause pendant les flushs DB
+    const interval = setInterval(() => {
+      if (!pollingPausedRef.current) {
+        fetchCharacter().then(() => {});
+        fetchRolls(characterName ?? "").then(() => {});
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [characterName]);
+
+  // ====== QUEUE: PV/PF/PP ======
+  async function queueCharacterDelta(
+    d: Partial<{ pv: number; pf: number; pp: number }>,
+  ) {
+    const p = pendingStatsRef.current;
+    pendingStatsRef.current = {
+      pv: p.pv + (d.pv ?? 0),
+      pf: p.pf + (d.pf ?? 0),
+      pp: p.pp + (d.pp ?? 0),
+    };
+    if (!inFlightCharUpdateRef.current) {
+      await flushCharacterDelta();
+    }
+  }
+
+  async function flushCharacterDelta() {
+    if (inFlightCharUpdateRef.current) return;
+    const deltas = pendingStatsRef.current;
+    if (deltas.pv === 0 && deltas.pf === 0 && deltas.pp === 0) return;
+
+    // “prendre” les deltas
+    pendingStatsRef.current = { pv: 0, pf: 0, pp: 0 };
+    inFlightCharUpdateRef.current = true;
+    pollingPausedRef.current = true;
+
+    try {
+      // Variante B (sûre) : read-modify-write → repart de l’état serveur
+      const fresh = await ApiL7RProvider.getCharacterByName(
+        characterName ?? "",
+      );
+      const next = {
+        ...fresh,
+        pv: clamp(fresh.pv + deltas.pv, 0, fresh.pvMax),
+        pf:
+          fresh.pfMax !== undefined
+            ? clamp((fresh.pf ?? 0) + deltas.pf, 0, fresh.pfMax)
+            : fresh.pf ?? 0,
+        pp:
+          fresh.ppMax !== undefined
+            ? clamp((fresh.pp ?? 0) + deltas.pp, 0, fresh.ppMax)
+            : fresh.pp ?? 0,
+      };
+
+      if (
+        next.pv !== fresh.pv ||
+        next.pf !== (fresh.pf ?? 0) ||
+        next.pp !== (fresh.pp ?? 0)
+      ) {
+        await ApiL7RProvider.updateCharacter(next);
+      }
+
+      setCharacter(next); // maj optimiste locale
+    } catch (e) {
+      // remet les deltas pour ne pas perdre les clics
+      const p = pendingStatsRef.current;
+      pendingStatsRef.current = {
+        pv: p.pv + deltas.pv,
+        pf: p.pf + deltas.pf,
+        pp: p.pp + deltas.pp,
+      };
+      console.error("Character stats update failed", e);
+    } finally {
+      inFlightCharUpdateRef.current = false;
+      pollingPausedRef.current = false;
+      // s'il reste des deltas, relance
+      if (
+        pendingStatsRef.current.pv !== 0 ||
+        pendingStatsRef.current.pf !== 0 ||
+        pendingStatsRef.current.pp !== 0
+      ) {
+        flushCharacterDelta();
+      }
+    }
+  }
+
+  // ====== QUEUE: bonus/malus (UI only) ======
+  function queueUiDelta(d: Partial<{ bonus: number; malus: number }>) {
+    pendingUiRef.current = {
+      bonus: pendingUiRef.current.bonus + (d.bonus ?? 0),
+      malus: pendingUiRef.current.malus + (d.malus ?? 0),
+    };
+    if (uiFlushTimerRef.current !== null) return;
+
+    uiFlushTimerRef.current = window.setTimeout(() => {
+      const { bonus, malus } = pendingUiRef.current;
+      pendingUiRef.current = { bonus: 0, malus: 0 };
+      uiFlushTimerRef.current = null;
+
+      setCharacterState((prev) => ({
+        ...prev,
+        bonus: (prev.bonus ?? 0) + bonus,
+        malus: (prev.malus ?? 0) + malus,
+      }));
+    }, 120);
+  }
+
+  // ====== QUEUE: dette d’arcane (par skill) ======
+  async function queueArcaneDebt(
+    skillId: string,
+    delta: number,
+    characterNameArg: string,
+    skill: Skill,
+  ) {
+    debtPendingRef.current[skillId] =
+      (debtPendingRef.current[skillId] ?? 0) + delta;
+    if (debtInFlightRef.current[skillId]) return;
+    await flushArcaneDebt(skillId, characterNameArg, skill);
+  }
+
+  async function flushArcaneDebt(
+    skillId: string,
+    characterNameArg: string,
+    skill: Skill,
+  ) {
+    if (debtInFlightRef.current[skillId]) return;
+    const delta = debtPendingRef.current[skillId] ?? 0;
+    if (delta === 0) return;
+
+    debtPendingRef.current[skillId] = 0;
+    debtInFlightRef.current[skillId] = true;
+
+    try {
+      const newDette = Math.max(0, (skill.arcaneDette ?? 0) + delta);
+      await ApiL7RProvider.updateCharacterSkillsAttribution(
+        characterNameArg,
+        skillId,
+        skill.dailyUse,
+        skill.dailyUseMax,
+        true,
+        newDette,
+      );
+      // (Optionnel) refetch character si ces infos sont lues dessus
+      // await fetchCharacter();
+    } catch (e) {
+      // remet le delta pour retenter
+      debtPendingRef.current[skillId] =
+        (debtPendingRef.current[skillId] ?? 0) + delta;
+      console.error("Arcane debt update failed", e);
+    } finally {
+      debtInFlightRef.current[skillId] = false;
+      if ((debtPendingRef.current[skillId] ?? 0) !== 0) {
+        flushArcaneDebt(skillId, characterNameArg, skill);
+      }
+    }
+  }
+
+  // ====== HANDLERS ======
   async function handleSendRoll(p: {
     skillId: string;
     empiriqueRoll?: string;
@@ -79,7 +256,7 @@ export function CharacterSheet() {
         const malus = characterState.malus + (characterState.umbra ? 1 : 0);
         const hasProficiency = Array.from(
           characterState.proficiencies.values(),
-        ).some((value) => value);
+        ).some(Boolean);
 
         await ApiL7RProvider.sendRoll({
           skillId: p.skillId,
@@ -88,8 +265,8 @@ export function CharacterSheet() {
           power: characterState.powerActivated,
           proficiency: hasProficiency,
           secret: characterState.secret,
-          bonus: bonus,
-          malus: malus,
+          bonus,
+          malus,
           empiriqueRoll: p.empiriqueRoll,
           avantage:
             characterState.avantage === "avantage"
@@ -110,21 +287,16 @@ export function CharacterSheet() {
     setCharacterState(newState);
   }
 
-  async function handleArcaneDette(characterName: string, skill: Skill) {
-    await ApiL7RProvider.updateCharacterSkillsAttribution(
-      characterName,
-      skill.id,
-      skill.dailyUse,
-      skill.dailyUseMax,
-      true,
-      skill.arcaneDette ? skill.arcaneDette - 1 : 0,
-    );
+  async function handleArcaneDette(charName: string, skill: Skill) {
+    // coalescer la dette d’arcane (−1 ici)
+    await queueArcaneDebt(skill.id, -1, charName, skill);
   }
 
   async function handleRest() {
     try {
       if (character) {
         await ApiL7RProvider.rest(character.name);
+        await fetchCharacter(); // resync
       }
     } catch (error) {
       console.error("Error resting character:", error);
@@ -135,6 +307,7 @@ export function CharacterSheet() {
     try {
       if (character) {
         await ApiL7RProvider.updateCharacter(newCharacter);
+        setCharacter(newCharacter);
       }
     } catch (error) {
       console.error("Error updating character:", error);
@@ -148,10 +321,7 @@ export function CharacterSheet() {
         if (character.name === "Aeryl" && degats > 0) {
           degats = degats - 1;
         }
-        await ApiL7RProvider.updateCharacter({
-          ...character,
-          pv: Math.max(character.pv - degats, 0),
-        });
+        await queueCharacterDelta({ pv: -degats });
       }
     } catch (error) {
       console.error("Error updating character:", error);
@@ -159,13 +329,7 @@ export function CharacterSheet() {
   }
 
   async function handleHelp(p: { bonus: number; malus: number }) {
-    characterState.bonus += p.bonus;
-    characterState.malus += p.malus;
-    await handleUpdateState({
-      ...characterState,
-      bonus: characterState.bonus,
-      malus: characterState.malus,
-    });
+    queueUiDelta({ bonus: p.bonus, malus: p.malus });
   }
 
   async function handleHealOnClick(p: { roll: Roll; characterName: string }) {
@@ -179,10 +343,11 @@ export function CharacterSheet() {
           id: p.roll.id,
           healPoint: healPoint - 1,
         });
-        await ApiL7RProvider.updateCharacter({
-          ...characterToHeal,
-          pv: Math.min(characterToHeal.pv + 1, characterToHeal.pvMax),
-        });
+        // +1 PV coalescé
+        await queueCharacterDelta({ pv: +1 });
+
+        // Optionnel : si tu veux afficher le heal sur la carte ciblée précisément,
+        // tu peux aussi forcer un refetch ici pour ce perso.
       }
     } catch (error) {
       console.error("Error updating character:", error);
@@ -202,7 +367,7 @@ export function CharacterSheet() {
           focus: characterState.focusActivated,
           power: characterState.powerActivated,
           proficiency: Array.from(characterState.proficiencies.values()).some(
-            (value) => value,
+            Boolean,
           ),
           secret: characterState.secret,
           bonus: characterState.bonus,
@@ -221,7 +386,7 @@ export function CharacterSheet() {
       ApiL7RProvider.updateCharacter({
         ...character,
         notes: text,
-      });
+      }).then(() => setCharacter({ ...character, notes: text }));
     }
   }
 
