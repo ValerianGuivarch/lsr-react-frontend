@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ApiL7RProvider } from "../../data/api/ApiL7RProvider";
-import { useSSECharacterByName } from "../../data/api/useSSECharacterByName";
 import { CharacterBanner } from "../../components/Character/CharacterBanner/CharacterBanner";
 import styled from "styled-components";
 import { Character } from "../../domain/models/Character";
@@ -39,13 +38,6 @@ export function CharacterMunitionsSheet() {
       console.error("Error fetching character:", error);
     }
   }
-
-  useSSECharacterByName({
-    name: characterName || "",
-    callback: (character: Character) => {
-      setCharacter(character);
-    },
-  });
 
   async function handleMunitionsEvolution(skillId: string, evolution: number) {
     console.log("handleMunitionsEvolution ", skillId, evolution);

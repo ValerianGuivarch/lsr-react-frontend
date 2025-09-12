@@ -2,17 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import RollCard from "../../components/RollCard/RollCard";
 import { Roll } from "../../domain/models/Roll";
-import { useSSERolls } from "../../data/api/useSSERolls";
 import { ApiL7RProvider } from "../../data/api/ApiL7RProvider";
 import { CharacterPanel } from "../../components/Character/CharacterPanel/CharacterPanel";
-import { useSSECharacterByName } from "../../data/api/useSSECharacterByName";
 import { CharacterBanner } from "../../components/Character/CharacterBanner/CharacterBanner";
 import { CharacterNotes } from "../../components/Character/CharacterNotes/CharacterNotes";
 import styled from "styled-components";
 import { UtilsRules } from "../../utils/UtilsRules";
 import { Character } from "../../domain/models/Character";
 import { CharacterState } from "../../domain/models/CharacterState";
-import { useSSECharactersPreviewSession } from "../../data/api/useSSECharactersPreview";
 import { CharacterPreview } from "../../domain/models/CharacterPreview";
 import { Skill } from "../../domain/models/Skill";
 import CharacterSynchro from "../../components/Character/CharacterSynchro";
@@ -32,7 +29,14 @@ export function CharacterSheet() {
     fetchCharacter().then(() => {});
     fetchCharactersSession().then(() => {});
     fetchRolls(characterName ?? "").then(() => {});
-  }, []);
+
+    const interval = setInterval(() => {
+      fetchCharacter().then(() => {});
+      fetchRolls(characterName ?? "").then(() => {});
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [characterName]);
 
   async function fetchCharacter() {
     try {
@@ -61,26 +65,6 @@ export function CharacterSheet() {
       console.error("Error fetching rolls:", error);
     }
   }
-
-  useSSECharacterByName({
-    name: characterName || "",
-    callback: (character: Character) => {
-      setCharacter(character);
-    },
-  });
-
-  useSSECharactersPreviewSession({
-    callback: (charactersPreview: CharacterPreview[]) => {
-      setCharactersSession(charactersPreview);
-    },
-  });
-
-  useSSERolls({
-    name: characterName || "",
-    callback: (rolls: Roll[]) => {
-      setRolls(rolls);
-    },
-  });
 
   async function handleSendRoll(p: {
     skillId: string;

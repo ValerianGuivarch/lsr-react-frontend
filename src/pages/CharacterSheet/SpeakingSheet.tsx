@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ApiL7RProvider } from "../../data/api/ApiL7RProvider";
 import { SpeakingState } from "../../domain/models/SpeakingState";
-import { useSSESpeaking } from "../../data/api/useSSESpeaking";
 import styled from "styled-components";
-import { useSSECharacterByName } from "../../data/api/useSSECharacterByName";
 import { Character } from "../../domain/models/Character";
 
 export function SpeakingSheet() {
@@ -14,12 +12,6 @@ export function SpeakingSheet() {
   useEffect(() => {
     fetchSpeaking().then(() => {});
   }, []);
-
-  useSSESpeaking({
-    callback: (speaking: string) => {
-      setSpeakingState(new SpeakingState(speaking));
-    },
-  });
 
   async function fetchSpeaking() {
     try {

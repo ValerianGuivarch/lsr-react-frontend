@@ -1,35 +1,16 @@
 import React, { useEffect, useState } from "react";
 import RollCard from "../../components/RollCard/RollCard";
 import { Roll } from "../../domain/models/Roll";
-import { useSSERolls } from "../../data/api/useSSERolls";
 import { ApiL7RProvider } from "../../data/api/ApiL7RProvider";
 import styled from "styled-components";
 import { BattleState } from "../../domain/models/BattleState";
 import { UtilsRules } from "../../utils/UtilsRules";
 import { CharacterState } from "../../domain/models/CharacterState";
 import { Character } from "../../domain/models/Character";
-import { useSSECharactersSession } from "../../data/api/useSSECharacters";
 import { CharacterCard } from "../../components/Mj/CharacterCard";
 import { useRef } from "react";
 
 export function MjSheet() {
-  const [estherValue, setEstherValue] = useState<number>(1);
-  const [estherEnabled, setEstherEnabled] = useState<boolean>(false);
-  const estherTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  function handleEstherActivation(activate: boolean) {
-    if (estherTimeoutRef.current) {
-      clearInterval(estherTimeoutRef.current);
-      estherTimeoutRef.current = null;
-    }
-
-    if (activate) {
-      estherTimeoutRef.current = setInterval(() => {
-        estherDette();
-      }, estherValue * 1000);
-    }
-  }
-
   const [charactersState, setCharactersState] = useState<
     Map<string, CharacterState>
   >(new Map<string, CharacterState>());
@@ -48,6 +29,11 @@ export function MjSheet() {
     fetchSessionCharacters().then(() => {});
     fetchRolls().then(() => {});
     fetchCharactersList().then(() => {});
+    const interval = setInterval(() => {
+      fetchRolls().then(() => {});
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, []);
 
   async function fetchCharactersList() {
@@ -83,19 +69,6 @@ export function MjSheet() {
       console.error("Error fetching rolls:", error);
     }
   }
-
-  useSSECharactersSession({
-    callback: (characters: Character[]) => {
-      setCharactersSession(characters);
-    },
-  });
-
-  useSSERolls({
-    name: "MJ",
-    callback: (rolls: Roll[]) => {
-      setRolls(rolls);
-    },
-  });
 
   async function handleSendRoll(p: {
     characterName: string;
@@ -167,15 +140,6 @@ export function MjSheet() {
         setCharactersState(charactersState);
       }
     }
-  };
-
-  const estherDette = async () => {
-    await ApiL7RProvider.getCharacterByName("esther").then(
-      async (character) => {
-        character.dettes += 1;
-        await ApiL7RProvider.updateCharacter(character);
-      },
-    );
   };
 
   const clickOnSubir = async (p: { roll: Roll; originRoll?: Roll }) => {
@@ -267,25 +231,6 @@ export function MjSheet() {
     <div>
       <MjHeader>
         <SelectContainer>
-          <label>Esther : </label>
-          <input
-            type="number"
-            min={1}
-            value={estherValue}
-            onChange={(e) => setEstherValue(Number(e.target.value))}
-          />
-          <label style={{ marginLeft: "10px" }}>
-            <input
-              type="checkbox"
-              checked={estherEnabled}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                setEstherEnabled(checked);
-                handleEstherActivation(checked);
-              }}
-            />
-            Activer
-          </label>
           <Select
             id="pj-select"
             onChange={(e) =>
@@ -330,6 +275,16 @@ export function MjSheet() {
               Soin PNJ
             </option>
           </Select>
+        </SelectContainer>
+        <SelectContainer>
+          <button
+            onClick={() => {
+              fetchSessionCharacters();
+              fetchRolls();
+            }}
+          >
+            Update
+          </button>
         </SelectContainer>
       </MjHeader>
       <MjPageContainer>
