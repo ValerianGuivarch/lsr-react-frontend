@@ -88,7 +88,7 @@ export function CharacterEdition() {
 
         {/* pv */}
         <label>
-          PV Max:
+          PV :
           <input
             type="number"
             value={character.pv}
@@ -114,7 +114,7 @@ export function CharacterEdition() {
 
         {/* pf */}
         <label>
-          PF Max:
+          PF :
           <input
             type="number"
             value={character.pf}
@@ -140,7 +140,7 @@ export function CharacterEdition() {
 
         {/* pp */}
         <label>
-          PP Max:
+          PP :
           <input
             type="number"
             value={character.pp}
