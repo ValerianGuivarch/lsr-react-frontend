@@ -292,6 +292,7 @@ const SaveButton = styled.button`
   margin-top: 20px;
   padding: 10px 15px;
   background-color: #007bff;
+
   color: white;
   border: none;
   border-radius: 5px;
