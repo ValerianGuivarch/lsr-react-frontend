@@ -86,6 +86,19 @@ export function CharacterEdition() {
           <br />
         </label>
 
+        {/* pv */}
+        <label>
+          PV Max:
+          <input
+            type="number"
+            value={character.pv}
+            onChange={(e) =>
+              setCharacter({ ...character, pv: e.target.valueAsNumber })
+            }
+          />
+          <br />
+        </label>
+
         {/* pvMax */}
         <label>
           PV Max:
@@ -94,6 +107,19 @@ export function CharacterEdition() {
             value={character.pvMax}
             onChange={(e) =>
               setCharacter({ ...character, pvMax: e.target.valueAsNumber })
+            }
+          />
+          <br />
+        </label>
+
+        {/* pf */}
+        <label>
+          PF Max:
+          <input
+            type="number"
+            value={character.pf}
+            onChange={(e) =>
+              setCharacter({ ...character, pf: e.target.valueAsNumber })
             }
           />
           <br />
@@ -112,6 +138,18 @@ export function CharacterEdition() {
           <br />
         </label>
 
+        {/* pp */}
+        <label>
+          PP Max:
+          <input
+            type="number"
+            value={character.pp}
+            onChange={(e) =>
+              setCharacter({ ...character, pp: e.target.valueAsNumber })
+            }
+          />
+          <br />
+        </label>
         {/* ppMax */}
         <label>
           PP Max:
