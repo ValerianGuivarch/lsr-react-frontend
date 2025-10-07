@@ -94,9 +94,15 @@ export function CharacterBanner(props: { character: Character }) {
           <CharacterName>
             {Character.getDisplayNameAndDescription(props.character)}
           </CharacterName>
-          <CharacterInfo>Lux: {props.character.lux}</CharacterInfo>
-          <CharacterInfo>Umbra: {props.character.umbra}</CharacterInfo>
-          <CharacterInfo>Secunda: {props.character.secunda}</CharacterInfo>
+          {props.character.umbra === "fée" ? (
+            <CharacterInfo>Lux: {props.character.lux}</CharacterInfo>
+          ) : (
+            <>
+              <CharacterInfo>Lux: {props.character.lux}</CharacterInfo>
+              <CharacterInfo>Umbra: {props.character.umbra}</CharacterInfo>
+              <CharacterInfo>Secunda: {props.character.secunda}</CharacterInfo>
+            </>
+          )}
         </CharacterListInfo>
       </CharacterBannerContainer>
     </CharacterBannerBox>
