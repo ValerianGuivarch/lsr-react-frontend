@@ -91,6 +91,7 @@ export function WizardSheet() {
           statName: p.statName,
           spellName: p.spellName,
           wizardName: wizard.name,
+          wizardDisplayName: wizard.displayName,
           difficulty: p.difficulty,
         });
       }

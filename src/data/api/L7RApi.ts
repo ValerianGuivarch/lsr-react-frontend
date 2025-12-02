@@ -195,10 +195,12 @@ export class L7RApi {
     statName: string | undefined;
     spellName: string | undefined;
     wizardName: string;
+    wizardDisplayName?: string;
     difficulty: Difficulty;
   }) {
     await axios.post(`${config.BASE_URL}/hp/flips`, {
       wizardName: param.wizardName,
+      wizardDisplayName: param.wizardDisplayName,
       knowledgeName: param.knowledgeName,
       statName: param.statName,
       spellName: param.spellName,

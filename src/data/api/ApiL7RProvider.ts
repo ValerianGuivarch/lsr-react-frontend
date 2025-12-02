@@ -232,6 +232,7 @@ export class ApiL7RProvider {
     statName: string | undefined;
     spellName: string | undefined;
     wizardName: string;
+    wizardDisplayName?: string;
     difficulty: Difficulty;
   }) {
     await L7RApi.sendFlip(param);
