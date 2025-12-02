@@ -3,6 +3,7 @@ import { Difficulty } from "./Difficulty";
 export class Flip {
   id: string;
   wizardName: string;
+  wizardDisplayName?: string;
   text: string;
   result: number;
   baseBis?: number;
@@ -15,6 +16,7 @@ export class Flip {
   constructor(p: Flip) {
     this.id = p.id;
     this.wizardName = p.wizardName;
+    this.wizardDisplayName = p.wizardDisplayName;
     this.text = p.text;
     this.result = p.result;
     this.base = p.base;

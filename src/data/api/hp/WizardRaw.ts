@@ -5,6 +5,7 @@ import { WizardSpellRaw } from "./WizardSpellRaw";
 export interface WizardRaw {
   name: string;
   familyName: string;
+  displayName?: string;
   animal: string;
   category: string;
   stats: WizardStatRaw[];
