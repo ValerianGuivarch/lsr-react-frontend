@@ -12,7 +12,7 @@ export interface WizardToUpdate {
 
 export class Wizard {
   name: string;
-  displayName?: string;
+  displayName: string;
   animal: string;
   familyName: string;
   category: string;
@@ -31,7 +31,7 @@ export class Wizard {
 
   constructor(wizard: {
     name: string;
-    displayName?: string;
+    displayName: string;
     familyName: string;
     animal: string;
     category: string;

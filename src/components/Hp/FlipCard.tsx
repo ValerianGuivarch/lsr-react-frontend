@@ -21,10 +21,17 @@ export default function FlipCard(props: FlipCardProps) {
     <Container>
       <Avatar
         src={
-          "/l7r/" + props.flip.wizardDisplayName ??
-          props.flip.wizardName + ".png"
+          "/l7r/" +
+          (props.flip.wizardDisplayName !== ""
+            ? props.flip.wizardDisplayName
+            : props.flip.wizardName) +
+          ".png"
         }
-        alt={props.flip.wizardDisplayName ?? props.flip.wizardName}
+        alt={
+          props.flip.wizardDisplayName !== ""
+            ? props.flip.wizardDisplayName
+            : props.flip.wizardName
+        }
       />
       <FlipDisplay>
         <span>{props.flip.text}</span>

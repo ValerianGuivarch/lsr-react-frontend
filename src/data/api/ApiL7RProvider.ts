@@ -188,6 +188,7 @@ export class ApiL7RProvider {
     const wizardRaw: WizardRaw = await L7RApi.getWizardByName(name);
     return new Wizard({
       name: wizardRaw.name,
+      displayName: wizardRaw.displayName,
       familyName: wizardRaw.familyName,
       animal: wizardRaw.animal,
       category: wizardRaw.category,
@@ -214,6 +215,7 @@ export class ApiL7RProvider {
     return (await L7RApi.getFlips()).map((flip) => {
       return new Flip({
         id: flip.id,
+        wizardDisplayName: flip.wizardDisplayName,
         wizardName: flip.wizardName,
         text: flip.text,
         result: flip.result,
@@ -232,7 +234,7 @@ export class ApiL7RProvider {
     statName: string | undefined;
     spellName: string | undefined;
     wizardName: string;
-    wizardDisplayName?: string;
+    wizardDisplayName: string;
     difficulty: Difficulty;
   }) {
     await L7RApi.sendFlip(param);

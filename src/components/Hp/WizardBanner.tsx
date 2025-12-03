@@ -77,9 +77,15 @@ export function WizardBanner(props: {
           <AvatarContainer>
             <WizardAvatar
               src={
-                "/l7r/" + props.wizard.displayName ?? props.wizard.name + ".png"
+                "/l7r/" + props.wizard.displayName
+                  ? props.wizard.displayName
+                  : props.wizard.name + ".png"
               }
-              alt={props.wizard.displayName ?? props.wizard.name}
+              alt={
+                props.wizard.displayName
+                  ? props.wizard.displayName
+                  : props.wizard.name
+              }
               onClick={() => handleRedirect(`/hp/update/${props.wizard.name}`)} // Redirection
             />
 
@@ -173,8 +179,9 @@ export function WizardBanner(props: {
               </ButtonsContainer>
             )}
             <WizardName>
-              {props.wizard.displayName ??
-                props.wizard.name + " " + (props.wizard.familyName ?? "")}
+              {props.wizard.displayName
+                ? props.wizard.displayName
+                : props.wizard.name + " " + (props.wizard.familyName ?? "")}
             </WizardName>
             <XPStarsContainer>
               {Array(props.wizard.xp)

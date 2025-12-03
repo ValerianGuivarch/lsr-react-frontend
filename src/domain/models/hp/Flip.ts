@@ -3,7 +3,7 @@ import { Difficulty } from "./Difficulty";
 export class Flip {
   id: string;
   wizardName: string;
-  wizardDisplayName?: string;
+  wizardDisplayName: string;
   text: string;
   result: number;
   baseBis?: number;
