@@ -200,7 +200,10 @@ export class L7RApi {
   }) {
     await axios.post(`${config.BASE_URL}/hp/flips`, {
       wizardName: param.wizardName,
-      wizardDisplayName: param.wizardDisplayName,
+      wizardDisplayName:
+        param.wizardDisplayName !== "" && param.wizardDisplayName !== null
+          ? param.wizardDisplayName
+          : "",
       knowledgeName: param.knowledgeName,
       statName: param.statName,
       spellName: param.spellName,
