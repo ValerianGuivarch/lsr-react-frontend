@@ -77,12 +77,12 @@ export function WizardBanner(props: {
           <AvatarContainer>
             <WizardAvatar
               src={
-                "/l7r/" + props.wizard.displayName
+                "/l7r/" + props.wizard.displayName !== ""
                   ? props.wizard.displayName
                   : props.wizard.name + ".png"
               }
               alt={
-                props.wizard.displayName
+                props.wizard.displayName !== ""
                   ? props.wizard.displayName
                   : props.wizard.name
               }
@@ -179,7 +179,7 @@ export function WizardBanner(props: {
               </ButtonsContainer>
             )}
             <WizardName>
-              {props.wizard.displayName
+              {props.wizard.displayName !== ""
                 ? props.wizard.displayName
                 : props.wizard.name + " " + (props.wizard.familyName ?? "")}
             </WizardName>
