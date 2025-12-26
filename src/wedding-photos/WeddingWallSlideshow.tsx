@@ -22,16 +22,32 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     width: 100%;
     max-width: 100%;
-    overflow: hidden; /* ✅ stop scroll horizontal */
+    overflow: hidden;
+    background: #000;
   }
   *, *::before, *::after { box-sizing: border-box; }
 `;
 
 function normalizeUrl(u: string): string {
-  // si ton API renvoie "/api/..." => on préfixe avec BASE_URL
   if (u.startsWith("http://") || u.startsWith("https://")) return u;
   if (u.startsWith("/")) return `${config.BASE_URL}${u}`;
   return u;
+}
+
+function preloadImage(src: string): Promise<void> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = () => resolve(); // on ne bloque pas si ça fail
+    img.src = src;
+  });
+}
+
+function pickRandomDifferent(items: PhotoItem[], lastId?: string): PhotoItem {
+  if (items.length === 1) return items[0];
+  const candidates = lastId ? items.filter((it) => it.id !== lastId) : items;
+  const pool = candidates.length > 0 ? candidates : items;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 export default function WeddingWallSlideshow() {
@@ -44,15 +60,17 @@ export default function WeddingWallSlideshow() {
   const runningRef = useRef(false);
   const timerRef = useRef<number | null>(null);
 
-  const pickRandom = (items: PhotoItem[]) =>
-    items[Math.floor(Math.random() * items.length)];
-
   const fetchItems = async (): Promise<PhotoItem[]> => {
     const res = await axios.get<LatestResponse>(`${API_URL}/latest`, {
       params: { limit: 200 },
       timeout: 20_000,
     });
-    return res.data?.items ?? [];
+    const items = res.data?.items ?? [];
+    return items.map((it) => ({
+      ...it,
+      url: normalizeUrl(it.url),
+      thumbUrl: normalizeUrl(it.thumbUrl),
+    }));
   };
 
   const showFirst = async () => {
@@ -62,15 +80,11 @@ export default function WeddingWallSlideshow() {
         setStatus("En attente de photos…");
         return;
       }
-      const first = items[0];
-      const fixed = {
-        ...first,
-        url: normalizeUrl(first.url),
-        thumbUrl: normalizeUrl(first.thumbUrl),
-      };
+      const first = items[0]; // priorité au plus récent
+      await preloadImage(first.url);
 
-      currentRef.current = fixed;
-      setCurrent(fixed);
+      currentRef.current = first;
+      setCurrent(first);
       setStatus("");
     } catch (e: any) {
       setStatus(`Erreur latest: ${e?.message ?? e}`);
@@ -89,28 +103,37 @@ export default function WeddingWallSlideshow() {
         return;
       }
 
-      const chosen = pickRandom(items);
-      const item = {
-        ...chosen,
-        url: normalizeUrl(chosen.url),
-        thumbUrl: normalizeUrl(chosen.thumbUrl),
-      };
+      const lastId = currentRef.current?.id;
+      const chosen = pickRandomDifferent(items, lastId);
 
-      // Si on n’a pas encore de current -> on affiche direct
+      // première image si aucune
       if (!currentRef.current) {
-        currentRef.current = item;
-        setCurrent(item);
+        await preloadImage(chosen.url);
+        currentRef.current = chosen;
+        setCurrent(chosen);
         setStatus("");
         runningRef.current = false;
         return;
       }
 
-      setNext(item);
-      setFading(true);
+      // précharge pour éviter le flash/noir
+      await preloadImage(chosen.url);
 
+      // 1) on monte next à opacity 0 (fading=false)
+      setNext(chosen);
+      setFading(false);
+
+      // 2) on déclenche le fade au frame suivant pour que le CSS transition s’applique proprement
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setFading(true);
+        });
+      });
+
+      // 3) après la transition: on "commit" chosen comme current
       window.setTimeout(() => {
-        currentRef.current = item;
-        setCurrent(item);
+        currentRef.current = chosen;
+        setCurrent(chosen);
         setNext(null);
         setFading(false);
         runningRef.current = false;
@@ -122,7 +145,6 @@ export default function WeddingWallSlideshow() {
   };
 
   useEffect(() => {
-    // ✅ on lance UNE SEULE FOIS (plus de dépendance à current)
     void showFirst();
 
     timerRef.current = window.setInterval(() => {
@@ -137,19 +159,16 @@ export default function WeddingWallSlideshow() {
   return (
     <>
       <GlobalStyle />
-
       <Page>
         <Stage onClick={() => void advance()}>
-          {current && <Layer $src={current.url} $visible={!fading} />}
-          {next && <Layer $src={next.url} $visible={fading} />}
+          {current && <Layer $src={current.url} $opacity={fading ? 0 : 1} />}
+          {next && <Layer $src={next.url} $opacity={fading ? 1 : 0} />}
 
           {!current && (
             <Empty>
               <EmptyText>{status}</EmptyText>
             </Empty>
           )}
-
-          {status && current && <Toast>{status}</Toast>}
         </Stage>
       </Page>
     </>
@@ -160,9 +179,9 @@ export default function WeddingWallSlideshow() {
 
 const Page = styled.div`
   position: fixed;
-  inset: 0; /* ✅ pas de dépassement */
+  inset: 0;
   background: #000;
-  overflow: hidden; /* ✅ */
+  overflow: hidden;
 `;
 
 const Stage = styled.div`
@@ -171,7 +190,7 @@ const Stage = styled.div`
   overflow: hidden;
 `;
 
-const Layer = styled.div<{ $src: string; $visible: boolean }>`
+const Layer = styled.div<{ $src: string; $opacity: number }>`
   position: absolute;
   inset: 0;
   background-image: url(${(p) => p.$src});
@@ -179,7 +198,7 @@ const Layer = styled.div<{ $src: string; $visible: boolean }>`
   background-position: center;
   background-repeat: no-repeat;
 
-  opacity: ${(p) => (p.$visible ? 1 : 0)};
+  opacity: ${(p) => p.$opacity};
   transition: opacity ${FADE_MS}ms ease;
   will-change: opacity;
 `;
@@ -197,20 +216,5 @@ const Empty = styled.div`
 const EmptyText = styled.div`
   opacity: 0.85;
   font-size: 14px;
-  overflow-wrap: anywhere;
-`;
-
-const Toast = styled.div`
-  position: absolute;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #fff;
-  font-size: 13px;
-  max-width: calc(100% - 24px);
   overflow-wrap: anywhere;
 `;
