@@ -24,7 +24,8 @@ const GlobalStyle = createGlobalStyle`
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
-    background: #0f1115;
+    background: #121522;
+    color: rgba(255,255,255,0.92);
   }
   *, *::before, *::after { box-sizing: border-box; }
 `;
@@ -266,21 +267,21 @@ function loadImage(src: string) {
 const Page = styled.div`
   position: fixed;
   inset: 0;
-  overflow-x: hidden; /* ✅ jamais de scroll horizontal */
-  overflow-y: auto; /* ✅ scroll vertical ok */
+  overflow-x: hidden;
+  overflow-y: auto;
+
   background: radial-gradient(
-      1000px 500px at 20% -10%,
-      rgba(255, 255, 255, 0.12),
+      1100px 520px at 18% -10%,
+      rgba(255, 255, 255, 0.18),
       transparent 60%
     ),
     radial-gradient(
-      900px 500px at 100% 0%,
-      rgba(255, 255, 255, 0.08),
+      1000px 520px at 100% 0%,
+      rgba(255, 255, 255, 0.12),
       transparent 55%
     ),
-    #0f1115;
+    linear-gradient(180deg, #171a27 0%, #121522 100%);
 
-  /* ✅ padding safe pour iPhone + évite débordements */
   padding-top: max(12px, env(safe-area-inset-top));
   padding-bottom: max(12px, env(safe-area-inset-bottom));
   padding-left: max(12px, env(safe-area-inset-left));
@@ -291,14 +292,17 @@ const Card = styled.div`
   width: 100%;
   max-width: 680px;
   margin: 0 auto;
-  overflow-x: hidden;
-  border-radius: 18px;
-  padding: 14px;
-  background: rgba(20, 22, 28, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(10px);
   min-width: 0;
+
+  padding: 14px;
+  border-radius: 18px;
+
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(26, 30, 44, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
 `;
 
 const Header = styled.div`
@@ -307,7 +311,6 @@ const Header = styled.div`
   gap: 12px;
   align-items: center;
   min-width: 0;
-  max-width: 100%;
 `;
 
 const Logo = styled.img`
@@ -315,24 +318,24 @@ const Logo = styled.img`
   height: 52px;
   border-radius: 14px;
   object-fit: cover;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 `;
 
 const HeaderText = styled.div`
   min-width: 0;
-  max-width: 100%;
 `;
 
 const Title = styled.h1`
   margin: 0;
   font-size: 20px;
   line-height: 1.1;
+  color: rgba(255, 255, 255, 0.96);
 `;
 
 const Subtitle = styled.div`
   margin-top: 4px;
-  opacity: 0.82;
+  opacity: 0.86;
   font-size: 13px;
   line-height: 1.2;
   overflow-wrap: anywhere;
@@ -346,11 +349,11 @@ const PhotoPanel = styled.div`
   position: relative;
   margin-top: 14px;
   width: 100%;
-  max-width: 100%;
   border-radius: 18px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.26);
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
   cursor: pointer;
   outline: none;
 
@@ -363,7 +366,7 @@ const PhotoPanel = styled.div`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
   }
 `;
 
@@ -381,8 +384,8 @@ const PhotoShade = styled.div`
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.05) 40%,
-    rgba(0, 0, 0, 0.55) 100%
+    rgba(0, 0, 0, 0) 35%,
+    rgba(0, 0, 0, 0.3) 100%
   );
 `;
 
@@ -399,11 +402,12 @@ const HintPill = styled.div`
   max-width: 100%;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.16);
   backdrop-filter: blur(8px);
   font-size: 12.5px;
   font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
   overflow-wrap: anywhere;
 `;
 
@@ -414,6 +418,7 @@ const Empty = styled.div`
   place-items: center;
   text-align: center;
   padding: 14px;
+  color: rgba(255, 255, 255, 0.92);
 `;
 
 const EmptyIcon = styled.div`
@@ -424,12 +429,13 @@ const EmptyTitle = styled.div`
   margin-top: 8px;
   font-weight: 900;
   font-size: 16px;
+  color: rgba(255, 255, 255, 0.96);
 `;
 
 const EmptyText = styled.div`
   margin-top: 4px;
-  opacity: 0.8;
   font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
 `;
 
 const StickyBottom = styled.div`
@@ -437,25 +443,24 @@ const StickyBottom = styled.div`
   bottom: 0;
   margin-top: 14px;
   padding-top: 10px;
-  max-width: 100%;
-  overflow: hidden;
   background: linear-gradient(
     to bottom,
-    rgba(20, 22, 28, 0) 0%,
-    rgba(20, 22, 28, 0.92) 30%,
-    rgba(20, 22, 28, 0.98) 100%
+    rgba(26, 30, 44, 0) 0%,
+    rgba(26, 30, 44, 0.86) 30%,
+    rgba(26, 30, 44, 0.96) 100%
   );
 `;
 
 const SendButton = styled.button<{ $ready: boolean }>`
   width: 100%;
-  max-width: 100%;
   padding: 12px 14px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
   background: ${(p) =>
-    p.$ready ? "rgba(255, 255, 255, 0.18)" : "rgba(255, 255, 255, 0.07)"};
-  color: #fff;
+    p.$ready ? "rgba(255, 255, 255, 0.18)" : "rgba(255, 255, 255, 0.08)"};
+
+  color: rgba(255, 255, 255, 0.92);
   display: inline-flex;
   gap: 10px;
   align-items: center;
@@ -471,7 +476,7 @@ const SendButton = styled.button<{ $ready: boolean }>`
 
 const FinePrint = styled.div`
   margin-top: 8px;
-  opacity: 0.7;
+  opacity: 0.75;
   font-size: 12.5px;
   line-height: 1.2rem;
   text-align: center;
@@ -484,16 +489,15 @@ const StatusLine = styled.div<{ $kind: StatusKind }>`
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.06);
-  max-width: 100%;
-  overflow: hidden;
 
   ${(p) =>
     p.$kind === "ok"
-      ? `border-color: rgba(0, 255, 120, 0.22);`
+      ? `border-color: rgba(0, 255, 120, 0.24);`
       : p.$kind === "err"
-      ? `border-color: rgba(255, 80, 80, 0.22);`
+      ? `border-color: rgba(255, 80, 80, 0.26);`
       : ""}
 
   span {
@@ -511,7 +515,7 @@ const spin = keyframes`
 const Overlay = styled.div`
   position: absolute;
   inset: 0;
-  background: rgba(10, 12, 16, 0.72);
+  background: rgba(10, 12, 16, 0.62);
   display: grid;
   place-items: center;
   align-content: center;
@@ -524,7 +528,7 @@ const Spinner = styled.div`
   height: 42px;
   border-radius: 50%;
   border: 3px solid rgba(255, 255, 255, 0.22);
-  border-top-color: rgba(255, 255, 255, 0.95);
+  border-top-color: rgba(255, 255, 255, 0.92);
   animation: ${spin} 0.9s linear infinite;
 `;
 
@@ -533,7 +537,7 @@ const OverlayTitle = styled.div`
 `;
 
 const OverlaySub = styled.div`
-  opacity: 0.75;
+  opacity: 0.78;
   font-size: 13px;
 `;
 
@@ -543,13 +547,13 @@ const ProgressWrap = styled.div`
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.12);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
 `;
 
 const ProgressFill = styled.div`
   height: 100%;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.72);
   width: 0%;
   transition: width 140ms ease;
 `;
