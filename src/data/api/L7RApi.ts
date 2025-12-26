@@ -16,7 +16,6 @@ import { SchoolCategory } from "../../domain/models/SchoolCategory";
 import { SpellRaw } from "./hp/SpellRaw";
 import { Difficulty } from "../../domain/models/hp/Difficulty";
 import { HouseRaw } from "./hp/HouseRaw";
-import { Knowledge } from "../../domain/models/hp/Knowledge";
 
 export class L7RApi {
   static async sendNewTurn(): Promise<void> {
