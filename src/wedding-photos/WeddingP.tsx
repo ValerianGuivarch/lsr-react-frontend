@@ -1,58 +1,53 @@
 import React, { useRef, useState } from "react";
-import styled from "styled-components";
-import axios from "axios";
-import { FaCamera, FaRedo, FaCloudUploadAlt } from "react-icons/fa";
+import styled, { keyframes } from "styled-components";
+import axios, { AxiosProgressEvent } from "axios";
+import {
+  FaCloudUploadAlt,
+  FaCheckCircle,
+  FaExclamationTriangle,
+} from "react-icons/fa";
 import config from "../../src/config/config";
 
 const API_URL = `${config.BASE_URL}/wedding-photos`;
+const GOLF_URL = `https://l7r.fr/l7r/golf.png`;
 
-// Taille max côté client pour éviter d'exploser le réseau (en px)
 const MAX_DIMENSION = 2000;
-// Qualité JPEG (0..1)
 const JPEG_QUALITY = 0.82;
+const PREVIEW_DIMENSION = 520;
+
+type StatusKind = "idle" | "ok" | "err";
+type Status = { kind: StatusKind; text: string };
 
 const WeddingP: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [jpegBlob, setJpegBlob] = useState<Blob | null>(null);
-  const [status, setStatus] = useState<{
-    kind: "idle" | "ok" | "err";
-    text: string;
-  }>({
-    kind: "idle",
-    text: "",
-  });
-  const [isUploading, setIsUploading] = useState(false);
 
-  const reset = () => {
-    setPreviewUrl(null);
-    setJpegBlob(null);
-    setStatus({ kind: "idle", text: "" });
-    setIsUploading(false);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
+  const [status, setStatus] = useState<Status>({ kind: "idle", text: "" });
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadPct, setUploadPct] = useState<number>(0);
 
   const openCamera = () => {
-    fileInputRef.current?.click();
+    if (!isUploading) fileInputRef.current?.click();
   };
 
-  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setStatus({ kind: "idle", text: "" });
-    setPreviewUrl(null);
-    setJpegBlob(null);
+    setUploadPct(0);
 
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
-      const { blob, dataUrl } = await fileToJpeg(
+      const { blob, previewDataUrl } = await fileToJpegAndPreview(
         file,
         MAX_DIMENSION,
         JPEG_QUALITY,
+        PREVIEW_DIMENSION,
       );
       setJpegBlob(blob);
-      setPreviewUrl(dataUrl);
+      setPreviewUrl(previewDataUrl);
     } catch (err: any) {
       setStatus({
         kind: "err",
@@ -62,28 +57,31 @@ const WeddingP: React.FC = () => {
   };
 
   const upload = async () => {
-    if (!jpegBlob) return;
+    if (!jpegBlob || isUploading) return;
 
     setIsUploading(true);
-    setStatus({ kind: "idle", text: "Envoi…" });
+    setUploadPct(0);
+    setStatus({ kind: "idle", text: "Envoi en cours…" });
 
     try {
       const fd = new FormData();
       fd.append("file", jpegBlob, "photo.jpg");
 
-      const url = `${API_URL}/upload`;
-      const response = await axios.post(url, fd, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const response = await axios.post(`${API_URL}/upload`, fd, {
         timeout: 60_000,
+        onUploadProgress: (evt: AxiosProgressEvent) => {
+          if (!evt.total) return;
+          const pct = Math.round((evt.loaded * 100) / evt.total);
+          setUploadPct(Math.max(0, Math.min(100, pct)));
+        },
       });
 
       if (!response.data?.ok) throw new Error("Réponse API inattendue");
-
-      setStatus({ kind: "ok", text: "✅ Merci ! Photo envoyée." });
+      setStatus({ kind: "ok", text: "Merci ! Photo envoyée ✅" });
     } catch (err: any) {
       setStatus({
         kind: "err",
-        text: `❌ Échec de l’envoi : ${
+        text: `Échec de l’envoi : ${
           err?.response?.data?.message ?? err?.message ?? err
         }`,
       });
@@ -94,87 +92,135 @@ const WeddingP: React.FC = () => {
     setIsUploading(false);
   };
 
+  const canSend = Boolean(jpegBlob) && !isUploading;
+
   return (
     <Page>
       <Card>
-        <Title>📸 Photo</Title>
-        <Subtitle>Prends une photo puis envoie-la.</Subtitle>
+        <Header>
+          <Logo
+            src={GOLF_URL}
+            alt=""
+            onError={(e) =>
+              ((e.currentTarget as HTMLImageElement).style.display = "none")
+            }
+          />
+          <HeaderText>
+            <Title>Photo</Title>
+            <Subtitle>
+              Appuie sur l’image pour prendre (ou refaire) une photo.
+            </Subtitle>
+          </HeaderText>
+        </Header>
 
         <HiddenInput
           ref={fileInputRef}
           type="file"
           accept="image/*"
           capture="environment"
-          onChange={onFileChange}
+          onChange={onPick}
         />
 
-        <ButtonRow>
-          <ActionButton onClick={openCamera} disabled={isUploading}>
-            <FaCamera /> Prendre une photo
-          </ActionButton>
+        <PhotoPanel
+          role="button"
+          tabIndex={0}
+          aria-label="Prendre une photo"
+          onClick={openCamera}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") openCamera();
+          }}
+        >
+          {previewUrl ? (
+            <>
+              <PhotoBg $src={previewUrl} />
+              <PhotoShade />
+              <PhotoHint>
+                <HintPill>↺ Appuie pour refaire</HintPill>
+              </PhotoHint>
+            </>
+          ) : (
+            <Empty>
+              <EmptyIcon>📷</EmptyIcon>
+              <EmptyTitle>Appuie ici</EmptyTitle>
+              <EmptyText>pour prendre une photo</EmptyText>
+            </Empty>
+          )}
 
-          <ActionButton onClick={reset} disabled={isUploading && !previewUrl}>
-            <FaRedo /> Reprendre
-          </ActionButton>
-        </ButtonRow>
+          {isUploading && (
+            <Overlay onClick={(e) => e.stopPropagation()}>
+              <Spinner />
+              <OverlayTitle>Envoi…</OverlayTitle>
+              <ProgressWrap aria-label={`Progression ${uploadPct}%`}>
+                <ProgressFill style={{ width: `${uploadPct}%` }} />
+              </ProgressWrap>
+              <OverlaySub>{uploadPct}%</OverlaySub>
+            </Overlay>
+          )}
+        </PhotoPanel>
 
-        {previewUrl && (
-          <>
-            <Preview>
-              <img src={previewUrl} alt="Aperçu" />
-            </Preview>
-
-            <ButtonRow>
-              <PrimaryButton
-                onClick={upload}
-                disabled={!jpegBlob || isUploading}
-              >
-                <FaCloudUploadAlt /> {isUploading ? "Envoi…" : "Envoyer"}
-              </PrimaryButton>
-            </ButtonRow>
-          </>
+        {status.text && (
+          <StatusLine $kind={status.kind}>
+            {status.kind === "ok" ? (
+              <FaCheckCircle />
+            ) : status.kind === "err" ? (
+              <FaExclamationTriangle />
+            ) : null}
+            <span>{status.text}</span>
+          </StatusLine>
         )}
 
-        {status.text && <Status $kind={status.kind}>{status.text}</Status>}
+        <StickyBottom>
+          <SendButton onClick={upload} disabled={!canSend} $ready={canSend}>
+            <FaCloudUploadAlt /> {isUploading ? "Envoi…" : "Envoyer"}
+          </SendButton>
+          <FinePrint>Astuce : en Wi-Fi, c’est plus rapide.</FinePrint>
+        </StickyBottom>
       </Card>
     </Page>
   );
 };
 
-async function fileToJpeg(
+export default WeddingP;
+
+/* ---------- image utils ---------- */
+
+async function fileToJpegAndPreview(
   file: File,
-  maxDim: number,
-  quality: number,
-): Promise<{ blob: Blob; dataUrl: string }> {
-  // On passe par un <img> + canvas : souvent plus robuste sur mobile (y compris iOS)
+  uploadMaxDim: number,
+  uploadQuality: number,
+  previewMaxDim: number,
+): Promise<{ blob: Blob; previewDataUrl: string }> {
   const dataUrl = await readAsDataURL(file);
   const img = await loadImage(dataUrl);
 
-  const { width, height } = fitWithin(
-    img.naturalWidth,
-    img.naturalHeight,
-    maxDim,
-  );
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  const up = fitWithin(img.naturalWidth, img.naturalHeight, uploadMaxDim);
+  const upCanvas = document.createElement("canvas");
+  upCanvas.width = up.width;
+  upCanvas.height = up.height;
 
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas non disponible");
-
-  ctx.drawImage(img, 0, 0, width, height);
+  const upCtx = upCanvas.getContext("2d");
+  if (!upCtx) throw new Error("Canvas non disponible");
+  upCtx.drawImage(img, 0, 0, up.width, up.height);
 
   const blob: Blob = await new Promise((resolve, reject) => {
-    canvas.toBlob(
+    upCanvas.toBlob(
       (b) => (b ? resolve(b) : reject(new Error("canvas.toBlob a échoué"))),
       "image/jpeg",
-      quality,
+      uploadQuality,
     );
   });
 
-  // preview légère (pas forcément full quality)
-  const preview = canvas.toDataURL("image/jpeg", 0.7);
-  return { blob, dataUrl: preview };
+  const pv = fitWithin(img.naturalWidth, img.naturalHeight, previewMaxDim);
+  const pvCanvas = document.createElement("canvas");
+  pvCanvas.width = pv.width;
+  pvCanvas.height = pv.height;
+
+  const pvCtx = pvCanvas.getContext("2d");
+  if (!pvCtx) throw new Error("Canvas non disponible");
+  pvCtx.drawImage(img, 0, 0, pv.width, pv.height);
+
+  const previewDataUrl = pvCanvas.toDataURL("image/jpeg", 0.78);
+  return { blob, previewDataUrl };
 }
 
 function fitWithin(w: number, h: number, maxDim: number) {
@@ -200,92 +246,285 @@ function loadImage(src: string) {
   });
 }
 
-// Styles (proche de ton Diary)
-const Page = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  max-width: 100vw;
-  overflow-x: hidden;
+/* ---------- styles (responsive “bulletproof”) ---------- */
 
-  @media (max-width: 768px) {
-    padding: 10px;
-  }
+const Page = styled.div`
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: clamp(10px, 3vw, 18px);
+  background: radial-gradient(
+      1000px 500px at 20% -10%,
+      rgba(255, 255, 255, 0.12),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 500px at 100% 0%,
+      rgba(255, 255, 255, 0.08),
+      transparent 55%
+    ),
+    #0f1115;
+  color: #fff;
 `;
 
 const Card = styled.div`
-  width: 100%;
-  max-width: 600px;
+  width: min(680px, 100%);
+  border-radius: 18px;
+  padding: clamp(12px, 3vw, 16px);
+  background: rgba(20, 22, 28, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+
+  /* Empêche les débordements de flex/grid sur petit écran */
+  min-width: 0;
+`;
+
+const Header = styled.div`
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+`;
+
+const Logo = styled.img`
+  width: clamp(44px, 10vw, 56px);
+  height: clamp(44px, 10vw, 56px);
+  border-radius: 14px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+`;
+
+const HeaderText = styled.div`
+  min-width: 0;
 `;
 
 const Title = styled.h1`
-  margin: 0 0 6px 0;
+  margin: 0;
+  font-size: clamp(18px, 4.2vw, 22px);
+  line-height: 1.1;
 `;
 
-const Subtitle = styled.p`
-  margin: 0 0 14px 0;
-  opacity: 0.85;
+const Subtitle = styled.div`
+  margin-top: 4px;
+  opacity: 0.82;
+  font-size: clamp(12px, 3.4vw, 14px);
+  line-height: 1.2;
 `;
 
 const HiddenInput = styled.input`
   display: none;
 `;
 
-const ButtonRow = styled.div`
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 10px 0;
+/* Zone photo: full width + ratio constant => responsive nickel */
+const PhotoPanel = styled.div`
+  position: relative;
+  margin-top: 14px;
+  width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.26);
+  cursor: pointer;
+  outline: none;
 
-  button {
-    flex: 1;
-    min-width: 180px;
+  /* Portrait agréable sur mobile */
+  aspect-ratio: 4 / 5;
+  min-height: 240px;
 
-    @media (max-width: 768px) {
-      width: 100%;
-      min-width: unset;
-    }
+  @media (min-width: 520px) {
+    aspect-ratio: 16 / 10;
+    min-height: 300px;
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
   }
 `;
 
-const ActionButton = styled.button`
-  padding: 12px 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+const PhotoBg = styled.div<{ $src: string }>`
+  position: absolute;
+  inset: 0;
+  background-image: url(${(p) => p.$src});
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.001); /* évite les liserés */
 `;
 
-const PrimaryButton = styled(ActionButton)`
+const PhotoShade = styled.div`
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.05) 40%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+`;
+
+const PhotoHint = styled.div`
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const HintPill = styled.div`
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  font-size: 12.5px;
   font-weight: 700;
 `;
 
-const Preview = styled.div`
-  margin-top: 10px;
-
-  img {
-    width: 100%;
-    border-radius: 12px;
-  }
+const Empty = styled.div`
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 14px;
 `;
 
-const Status = styled.p<{ $kind: "idle" | "ok" | "err" }>`
-  margin-top: 12px;
-  white-space: pre-wrap;
-  color: ${(p) =>
-    p.$kind === "ok" ? "green" : p.$kind === "err" ? "#b00020" : "inherit"};
+const EmptyIcon = styled.div`
+  font-size: 34px;
 `;
 
-const Hint = styled.p`
-  margin-top: 16px;
+const EmptyTitle = styled.div`
+  margin-top: 8px;
+  font-weight: 900;
+  font-size: 16px;
+`;
+
+const EmptyText = styled.div`
+  margin-top: 4px;
   opacity: 0.8;
+  font-size: 13px;
+`;
 
-  code {
-    background: rgba(0, 0, 0, 0.06);
-    padding: 2px 6px;
-    border-radius: 6px;
+const StickyBottom = styled.div`
+  position: sticky;
+  bottom: 0;
+  margin-top: 14px;
+  padding-top: 10px;
+
+  /* petit voile pour que le bouton reste lisible quand ça scroll */
+  background: linear-gradient(
+    to bottom,
+    rgba(20, 22, 28, 0) 0%,
+    rgba(20, 22, 28, 0.92) 30%,
+    rgba(20, 22, 28, 0.98) 100%
+  );
+`;
+
+const SendButton = styled.button<{ $ready: boolean }>`
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: ${(p) =>
+    p.$ready ? "rgba(255, 255, 255, 0.18)" : "rgba(255, 255, 255, 0.07)"};
+  color: #fff;
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 `;
 
-export default WeddingP;
+const FinePrint = styled.div`
+  margin-top: 8px;
+  opacity: 0.7;
+  font-size: 12.5px;
+  line-height: 1.2rem;
+  text-align: center;
+`;
+
+const StatusLine = styled.div<{ $kind: StatusKind }>`
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+
+  ${(p) =>
+    p.$kind === "ok"
+      ? `border-color: rgba(0, 255, 120, 0.22);`
+      : p.$kind === "err"
+      ? `border-color: rgba(255, 80, 80, 0.22);`
+      : ""}
+
+  span {
+    white-space: pre-wrap;
+    line-height: 1.25rem;
+  }
+`;
+
+/* overlay + loader */
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+const Overlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 12, 16, 0.72);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  padding: 16px;
+`;
+
+const Spinner = styled.div`
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.22);
+  border-top-color: rgba(255, 255, 255, 0.95);
+  animation: ${spin} 0.9s linear infinite;
+`;
+
+const OverlayTitle = styled.div`
+  font-weight: 900;
+`;
+
+const OverlaySub = styled.div`
+  opacity: 0.75;
+  font-size: 13px;
+`;
+
+const ProgressWrap = styled.div`
+  width: min(320px, 88%);
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const ProgressFill = styled.div`
+  height: 100%;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  width: 0%;
+  transition: width 140ms ease;
+`;
