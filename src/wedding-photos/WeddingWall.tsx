@@ -17,6 +17,27 @@ type PhotoItem = {
 const POLL_MS = 3000;
 const LIMIT = 120;
 
+const MEDIA_BASE =
+  // Vite
+  (import.meta as any).env?.VITE_WEDDING_MEDIA_BASE ??
+  // CRA / webpack
+  process.env.REACT_APP_WEDDING_MEDIA_BASE ??
+  "" ??
+  // Next
+  process.env.NEXT_PUBLIC_WEDDING_MEDIA_BASE ??
+  "";
+
+function withBase(pathOrUrl: string) {
+  if (!pathOrUrl) return pathOrUrl;
+
+  // si c'est déjà une URL absolue, on ne touche pas
+  if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;
+
+  const base = (MEDIA_BASE || "").replace(/\/$/, "");
+  const path = pathOrUrl.startsWith("/") ? pathOrUrl : `/${pathOrUrl}`;
+  return base ? `${base}${path}` : pathOrUrl;
+}
+
 const WeddingWall: React.FC = () => {
   const [items, setItems] = useState<PhotoItem[]>([]);
   const [status, setStatus] = useState<string>("");
@@ -126,7 +147,7 @@ const WeddingWall: React.FC = () => {
 
       <Grid>
         {items.map((it) => {
-          const src = it.thumbUrl || it.url;
+          const src = withBase(it.thumbUrl || it.url);
           return <Thumb key={it.id} src={src} alt="" loading="lazy" />;
         })}
       </Grid>
