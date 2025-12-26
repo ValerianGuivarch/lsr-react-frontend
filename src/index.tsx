@@ -22,7 +22,7 @@ import { WizardFormUpdate } from "./pages/Hp/WizardFormUpdate";
 import { SpellForm } from "./pages/Hp/SpellForm";
 import StoreControl from "./components/Store";
 import WeddingP from "./wedding-photos/WeddingP";
-import WeddingWall from "./wedding-photos/WeddingWall";
+import WeddingWallSlideshow from "./wedding-photos/WeddingWallSlideshow";
 
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -34,7 +34,7 @@ root.render(
         <Route path="/" element={<App />}>
           <Route path="/" element={<CharacterSelection />} />
           <Route path="/p" element={<WeddingP />} />
-          <Route path="/wall" element={<WeddingWall />} />
+          <Route path="/wall" element={<WeddingWallSlideshow />} />
           <Route path="/hp/:wizardName" element={<WizardSheet />} />
           <Route path="/hp/create" element={<WizardFormCreate />} />
           <Route path="/hp/spell" element={<SpellForm />} />

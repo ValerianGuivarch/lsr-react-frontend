@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes, createGlobalStyle } from "styled-components";
 import axios, { AxiosProgressEvent } from "axios";
 import {
   FaCloudUploadAlt,
@@ -17,6 +17,25 @@ const PREVIEW_DIMENSION = 520;
 
 type StatusKind = "idle" | "ok" | "err";
 type Status = { kind: StatusKind; text: string };
+
+const GlobalStyle = createGlobalStyle`
+  /* ✅ Empêche les pages de dépasser horizontalement */
+  html, body, #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* ✅ Supprime la marge par défaut du body (cause fréquente de “ça dépasse”) */
+  body {
+    margin: 0;
+  }
+
+  /* ✅ Le vrai fix: évite width 100% + padding => overflow */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+`;
 
 const WeddingP: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -95,88 +114,92 @@ const WeddingP: React.FC = () => {
   const canSend = Boolean(jpegBlob) && !isUploading;
 
   return (
-    <Page>
-      <Card>
-        <Header>
-          <Logo
-            src={GOLF_URL}
-            alt=""
-            onError={(e) =>
-              ((e.currentTarget as HTMLImageElement).style.display = "none")
-            }
+    <>
+      <GlobalStyle />
+
+      <Page>
+        <Card>
+          <Header>
+            <Logo
+              src={GOLF_URL}
+              alt=""
+              onError={(e) =>
+                ((e.currentTarget as HTMLImageElement).style.display = "none")
+              }
+            />
+            <HeaderText>
+              <Title>Photo</Title>
+              <Subtitle>
+                Appuie sur l’image pour prendre (ou refaire) une photo.
+              </Subtitle>
+            </HeaderText>
+          </Header>
+
+          <HiddenInput
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={onPick}
           />
-          <HeaderText>
-            <Title>Photo</Title>
-            <Subtitle>
-              Appuie sur l’image pour prendre (ou refaire) une photo.
-            </Subtitle>
-          </HeaderText>
-        </Header>
 
-        <HiddenInput
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={onPick}
-        />
+          <PhotoPanel
+            role="button"
+            tabIndex={0}
+            aria-label="Prendre une photo"
+            onClick={openCamera}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") openCamera();
+            }}
+          >
+            {previewUrl ? (
+              <>
+                <PhotoBg $src={previewUrl} />
+                <PhotoShade />
+                <PhotoHint>
+                  <HintPill>↺ Appuie pour refaire</HintPill>
+                </PhotoHint>
+              </>
+            ) : (
+              <Empty>
+                <EmptyIcon>📷</EmptyIcon>
+                <EmptyTitle>Appuie ici</EmptyTitle>
+                <EmptyText>pour prendre une photo</EmptyText>
+              </Empty>
+            )}
 
-        <PhotoPanel
-          role="button"
-          tabIndex={0}
-          aria-label="Prendre une photo"
-          onClick={openCamera}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") openCamera();
-          }}
-        >
-          {previewUrl ? (
-            <>
-              <PhotoBg $src={previewUrl} />
-              <PhotoShade />
-              <PhotoHint>
-                <HintPill>↺ Appuie pour refaire</HintPill>
-              </PhotoHint>
-            </>
-          ) : (
-            <Empty>
-              <EmptyIcon>📷</EmptyIcon>
-              <EmptyTitle>Appuie ici</EmptyTitle>
-              <EmptyText>pour prendre une photo</EmptyText>
-            </Empty>
+            {isUploading && (
+              <Overlay onClick={(e) => e.stopPropagation()}>
+                <Spinner />
+                <OverlayTitle>Envoi…</OverlayTitle>
+                <ProgressWrap aria-label={`Progression ${uploadPct}%`}>
+                  <ProgressFill style={{ width: `${uploadPct}%` }} />
+                </ProgressWrap>
+                <OverlaySub>{uploadPct}%</OverlaySub>
+              </Overlay>
+            )}
+          </PhotoPanel>
+
+          {status.text && (
+            <StatusLine $kind={status.kind}>
+              {status.kind === "ok" ? (
+                <FaCheckCircle />
+              ) : status.kind === "err" ? (
+                <FaExclamationTriangle />
+              ) : null}
+              <span>{status.text}</span>
+            </StatusLine>
           )}
 
-          {isUploading && (
-            <Overlay onClick={(e) => e.stopPropagation()}>
-              <Spinner />
-              <OverlayTitle>Envoi…</OverlayTitle>
-              <ProgressWrap aria-label={`Progression ${uploadPct}%`}>
-                <ProgressFill style={{ width: `${uploadPct}%` }} />
-              </ProgressWrap>
-              <OverlaySub>{uploadPct}%</OverlaySub>
-            </Overlay>
-          )}
-        </PhotoPanel>
-
-        {status.text && (
-          <StatusLine $kind={status.kind}>
-            {status.kind === "ok" ? (
-              <FaCheckCircle />
-            ) : status.kind === "err" ? (
-              <FaExclamationTriangle />
-            ) : null}
-            <span>{status.text}</span>
-          </StatusLine>
-        )}
-
-        <StickyBottom>
-          <SendButton onClick={upload} disabled={!canSend} $ready={canSend}>
-            <FaCloudUploadAlt /> {isUploading ? "Envoi…" : "Envoyer"}
-          </SendButton>
-          <FinePrint>Astuce : en Wi-Fi, c’est plus rapide.</FinePrint>
-        </StickyBottom>
-      </Card>
-    </Page>
+          <StickyBottom>
+            <SendButton onClick={upload} disabled={!canSend} $ready={canSend}>
+              <FaCloudUploadAlt /> {isUploading ? "Envoi…" : "Envoyer"}
+            </SendButton>
+            <FinePrint>Astuce : en Wi-Fi, c’est plus rapide.</FinePrint>
+          </StickyBottom>
+        </Card>
+      </Page>
+    </>
   );
 };
 
@@ -246,10 +269,13 @@ function loadImage(src: string) {
   });
 }
 
-/* ---------- styles (responsive “bulletproof”) ---------- */
+/* ---------- styles ---------- */
 
 const Page = styled.div`
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* ✅ anti scroll horizontal */
   display: flex;
   justify-content: center;
   padding: clamp(10px, 3vw, 18px);
@@ -268,15 +294,15 @@ const Page = styled.div`
 `;
 
 const Card = styled.div`
-  width: min(680px, 100%);
+  width: 100%;
+  max-width: 680px;
+  overflow-x: hidden; /* ✅ */
   border-radius: 18px;
   padding: clamp(12px, 3vw, 16px);
   background: rgba(20, 22, 28, 0.78);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(10px);
-
-  /* Empêche les débordements de flex/grid sur petit écran */
   min-width: 0;
 `;
 
@@ -286,6 +312,7 @@ const Header = styled.div`
   gap: 12px;
   align-items: center;
   min-width: 0;
+  max-width: 100%;
 `;
 
 const Logo = styled.img`
@@ -299,6 +326,7 @@ const Logo = styled.img`
 
 const HeaderText = styled.div`
   min-width: 0;
+  max-width: 100%;
 `;
 
 const Title = styled.h1`
@@ -312,17 +340,18 @@ const Subtitle = styled.div`
   opacity: 0.82;
   font-size: clamp(12px, 3.4vw, 14px);
   line-height: 1.2;
+  overflow-wrap: anywhere; /* ✅ évite qu’un texte “pousse” la page */
 `;
 
 const HiddenInput = styled.input`
   display: none;
 `;
 
-/* Zone photo: full width + ratio constant => responsive nickel */
 const PhotoPanel = styled.div`
   position: relative;
   margin-top: 14px;
   width: 100%;
+  max-width: 100%;
   border-radius: 18px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -330,7 +359,6 @@ const PhotoPanel = styled.div`
   cursor: pointer;
   outline: none;
 
-  /* Portrait agréable sur mobile */
   aspect-ratio: 4 / 5;
   min-height: 240px;
 
@@ -353,7 +381,7 @@ const PhotoBg = styled.div<{ $src: string }>`
   background-image: url(${(p) => p.$src});
   background-size: cover;
   background-position: center;
-  transform: scale(1.001); /* évite les liserés */
+  transform: scale(1.001);
 `;
 
 const PhotoShade = styled.div`
@@ -376,6 +404,7 @@ const PhotoHint = styled.div`
 `;
 
 const HintPill = styled.div`
+  max-width: 100%;
   padding: 8px 12px;
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.45);
@@ -383,6 +412,7 @@ const HintPill = styled.div`
   backdrop-filter: blur(8px);
   font-size: 12.5px;
   font-weight: 700;
+  overflow-wrap: anywhere;
 `;
 
 const Empty = styled.div`
@@ -415,8 +445,9 @@ const StickyBottom = styled.div`
   bottom: 0;
   margin-top: 14px;
   padding-top: 10px;
+  max-width: 100%;
+  overflow: hidden;
 
-  /* petit voile pour que le bouton reste lisible quand ça scroll */
   background: linear-gradient(
     to bottom,
     rgba(20, 22, 28, 0) 0%,
@@ -427,6 +458,7 @@ const StickyBottom = styled.div`
 
 const SendButton = styled.button<{ $ready: boolean }>`
   width: 100%;
+  max-width: 100%;
   padding: 12px 14px;
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -463,6 +495,8 @@ const StatusLine = styled.div<{ $kind: StatusKind }>`
   align-items: flex-start;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.06);
+  max-width: 100%;
+  overflow: hidden;
 
   ${(p) =>
     p.$kind === "ok"
@@ -474,10 +508,10 @@ const StatusLine = styled.div<{ $kind: StatusKind }>`
   span {
     white-space: pre-wrap;
     line-height: 1.25rem;
+    overflow-wrap: anywhere; /* ✅ */
   }
 `;
 
-/* overlay + loader */
 const spin = keyframes`
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
