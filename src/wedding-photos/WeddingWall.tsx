@@ -9,33 +9,29 @@ const API_URL = `${config.BASE_URL}/wedding-photos`;
 
 type PhotoItem = {
   id: string;
-  url: string;
-  thumbUrl: string;
+  url: string; // ex: "/api/wedding-photos/original/xxx.jpg" (ou autre)
+  thumbUrl: string; // ex: "/api/wedding-photos/thumb/xxx_thumb.jpg" (ou autre)
   createdAt?: string;
 };
 
 const POLL_MS = 3000;
 const LIMIT = 120;
 
-const MEDIA_BASE =
-  // Vite
-  (import.meta as any).env?.VITE_WEDDING_MEDIA_BASE ??
-  // CRA / webpack
-  process.env.REACT_APP_WEDDING_MEDIA_BASE ??
-  "" ??
-  // Next
-  process.env.NEXT_PUBLIC_WEDDING_MEDIA_BASE ??
-  "";
+function filenameFromPath(pathOrUrl: string): string {
+  // prend le dernier segment après le dernier '/'
+  const clean = (pathOrUrl || "").split("?")[0];
+  const parts = clean.split("/");
+  return parts[parts.length - 1] || "";
+}
 
-function withBase(pathOrUrl: string) {
-  if (!pathOrUrl) return pathOrUrl;
+function toThumbQueryUrl(it: PhotoItem): string {
+  const name = filenameFromPath(it.thumbUrl || it.url);
+  return `${API_URL}/thumb?name=${encodeURIComponent(name)}`;
+}
 
-  // si c'est déjà une URL absolue, on ne touche pas
-  if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;
-
-  const base = (MEDIA_BASE || "").replace(/\/$/, "");
-  const path = pathOrUrl.startsWith("/") ? pathOrUrl : `/${pathOrUrl}`;
-  return base ? `${base}${path}` : pathOrUrl;
+function toOriginalQueryUrl(it: PhotoItem): string {
+  const name = filenameFromPath(it.url || it.thumbUrl);
+  return `${API_URL}/original?name=${encodeURIComponent(name)}`;
 }
 
 const WeddingWall: React.FC = () => {
@@ -76,7 +72,6 @@ const WeddingWall: React.FC = () => {
   };
 
   const startSSE = () => {
-    // SSE optionnel : si ton API implémente /stream
     try {
       stopSSE();
       const es = new EventSource(`${API_URL}/stream`);
@@ -86,7 +81,6 @@ const WeddingWall: React.FC = () => {
         void fetchLatest();
       });
       es.addEventListener("error", () => {
-        // si SSE instable -> polling
         startPolling();
       });
     } catch {
@@ -103,8 +97,8 @@ const WeddingWall: React.FC = () => {
 
   useEffect(() => {
     void fetchLatest();
-    startSSE(); // tente SSE, sinon polling
-    startPolling(); // fallback polling au cas où
+    startSSE();
+    startPolling();
 
     return () => {
       stopSSE();
@@ -147,8 +141,16 @@ const WeddingWall: React.FC = () => {
 
       <Grid>
         {items.map((it) => {
-          const src = withBase(it.thumbUrl || it.url);
-          return <Thumb key={it.id} src={src} alt="" loading="lazy" />;
+          const src = toThumbQueryUrl(it);
+
+          // Optionnel: clic pour ouvrir l'original
+          const original = toOriginalQueryUrl(it);
+
+          return (
+            <a key={it.id} href={original} target="_blank" rel="noreferrer">
+              <Thumb src={src} alt="" loading="lazy" />
+            </a>
+          );
         })}
       </Grid>
     </Page>
@@ -212,6 +214,7 @@ const Thumb = styled.img`
   height: 16vw;
   object-fit: cover;
   border-radius: 10px;
+  display: block;
 
   @media (max-width: 1100px) {
     height: 22vw;
