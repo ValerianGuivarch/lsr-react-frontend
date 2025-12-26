@@ -19,22 +19,14 @@ type StatusKind = "idle" | "ok" | "err";
 type Status = { kind: StatusKind; text: string };
 
 const GlobalStyle = createGlobalStyle`
-  /* ✅ Empêche les pages de dépasser horizontalement */
   html, body, #root {
+    margin: 0;
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
+    background: #0f1115;
   }
-
-  /* ✅ Supprime la marge par défaut du body (cause fréquente de “ça dépasse”) */
-  body {
-    margin: 0;
-  }
-
-  /* ✅ Le vrai fix: évite width 100% + padding => overflow */
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
+  *, *::before, *::after { box-sizing: border-box; }
 `;
 
 const WeddingP: React.FC = () => {
@@ -272,13 +264,10 @@ function loadImage(src: string) {
 /* ---------- styles ---------- */
 
 const Page = styled.div`
-  min-height: 100vh;
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden; /* ✅ anti scroll horizontal */
-  display: flex;
-  justify-content: center;
-  padding: clamp(10px, 3vw, 18px);
+  position: fixed;
+  inset: 0;
+  overflow-x: hidden; /* ✅ jamais de scroll horizontal */
+  overflow-y: auto; /* ✅ scroll vertical ok */
   background: radial-gradient(
       1000px 500px at 20% -10%,
       rgba(255, 255, 255, 0.12),
@@ -290,15 +279,21 @@ const Page = styled.div`
       transparent 55%
     ),
     #0f1115;
-  color: #fff;
+
+  /* ✅ padding safe pour iPhone + évite débordements */
+  padding-top: max(12px, env(safe-area-inset-top));
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
 `;
 
 const Card = styled.div`
   width: 100%;
   max-width: 680px;
-  overflow-x: hidden; /* ✅ */
+  margin: 0 auto;
+  overflow-x: hidden;
   border-radius: 18px;
-  padding: clamp(12px, 3vw, 16px);
+  padding: 14px;
   background: rgba(20, 22, 28, 0.78);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
@@ -316,8 +311,8 @@ const Header = styled.div`
 `;
 
 const Logo = styled.img`
-  width: clamp(44px, 10vw, 56px);
-  height: clamp(44px, 10vw, 56px);
+  width: 52px;
+  height: 52px;
   border-radius: 14px;
   object-fit: cover;
   background: rgba(255, 255, 255, 0.06);
@@ -331,16 +326,16 @@ const HeaderText = styled.div`
 
 const Title = styled.h1`
   margin: 0;
-  font-size: clamp(18px, 4.2vw, 22px);
+  font-size: 20px;
   line-height: 1.1;
 `;
 
 const Subtitle = styled.div`
   margin-top: 4px;
   opacity: 0.82;
-  font-size: clamp(12px, 3.4vw, 14px);
+  font-size: 13px;
   line-height: 1.2;
-  overflow-wrap: anywhere; /* ✅ évite qu’un texte “pousse” la page */
+  overflow-wrap: anywhere;
 `;
 
 const HiddenInput = styled.input`
@@ -367,9 +362,6 @@ const PhotoPanel = styled.div`
     min-height: 300px;
   }
 
-  &:hover {
-    border-color: rgba(255, 255, 255, 0.18);
-  }
   &:focus-visible {
     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
   }
@@ -447,7 +439,6 @@ const StickyBottom = styled.div`
   padding-top: 10px;
   max-width: 100%;
   overflow: hidden;
-
   background: linear-gradient(
     to bottom,
     rgba(20, 22, 28, 0) 0%,
@@ -508,7 +499,7 @@ const StatusLine = styled.div<{ $kind: StatusKind }>`
   span {
     white-space: pre-wrap;
     line-height: 1.25rem;
-    overflow-wrap: anywhere; /* ✅ */
+    overflow-wrap: anywhere;
   }
 `;
 
