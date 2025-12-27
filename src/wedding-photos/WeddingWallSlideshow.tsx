@@ -38,7 +38,7 @@ function preloadImage(src: string): Promise<void> {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve();
-    img.onerror = () => resolve();
+    img.onerror = () => resolve(); // on ne bloque pas si ça fail
     img.src = src;
   });
 }
@@ -53,7 +53,7 @@ function pickRandomDifferent(items: PhotoItem[], lastId?: string): PhotoItem {
 export default function WeddingWallSlideshow() {
   const [current, setCurrent] = useState<PhotoItem | null>(null);
   const [next, setNext] = useState<PhotoItem | null>(null);
-  const [nextOpacity, setNextOpacity] = useState(0); // ✅ contrôle fin, sans toucher current
+  const [fading, setFading] = useState(false);
   const [status, setStatus] = useState<string>("Chargement…");
 
   const currentRef = useRef<PhotoItem | null>(null);
@@ -106,7 +106,7 @@ export default function WeddingWallSlideshow() {
       const lastId = currentRef.current?.id;
       const chosen = pickRandomDifferent(items, lastId);
 
-      // 1ère image si aucune
+      // première image si aucune
       if (!currentRef.current) {
         await preloadImage(chosen.url);
         currentRef.current = chosen;
@@ -116,26 +116,28 @@ export default function WeddingWallSlideshow() {
         return;
       }
 
-      // Précharge
+      // précharge pour éviter le flash/noir
       await preloadImage(chosen.url);
 
-      // Monte "next" au-dessus, opacity 0 => 1
+      // 1) on monte next à opacity 0 (fading=false)
       setNext(chosen);
-      setNextOpacity(0);
+      setFading(false);
 
+      // 2) on déclenche le fade au frame suivant pour que le CSS transition s’applique proprement
       requestAnimationFrame(() => {
-        // un frame après, on lance le fade-in
-        setNextOpacity(1);
+        requestAnimationFrame(() => {
+          setFading(true);
+        });
       });
 
-      // Après fade: commit sans re-fader
+      // 3) après la transition: on "commit" chosen comme current
       window.setTimeout(() => {
         currentRef.current = chosen;
         setCurrent(chosen);
         setNext(null);
-        setNextOpacity(0);
+        setFading(false);
         runningRef.current = false;
-      }, FADE_MS);
+      }, 0);
     } catch (e: any) {
       setStatus(`Erreur latest: ${e?.message ?? e}`);
       runningRef.current = false;
@@ -159,11 +161,8 @@ export default function WeddingWallSlideshow() {
       <GlobalStyle />
       <Page>
         <Stage onClick={() => void advance()}>
-          {/* current reste stable, jamais d’opacité animée => plus de "2e flash" */}
-          {current && <Layer $src={current.url} $opacity={1} />}
-
-          {/* next fade-in par dessus */}
-          {next && <Layer $src={next.url} $opacity={nextOpacity} $isNext />}
+          {current && <Layer $src={current.url} $opacity={fading ? 0 : 1} />}
+          {next && <Layer $src={next.url} $opacity={fading ? 1 : 0} />}
 
           {!current && (
             <Empty>
@@ -175,6 +174,8 @@ export default function WeddingWallSlideshow() {
     </>
   );
 }
+
+/* ===== styles ===== */
 
 const Page = styled.div`
   position: fixed;
@@ -189,7 +190,7 @@ const Stage = styled.div`
   overflow: hidden;
 `;
 
-const Layer = styled.div<{ $src: string; $opacity: number; $isNext?: boolean }>`
+const Layer = styled.div<{ $src: string; $opacity: number }>`
   position: absolute;
   inset: 0;
   background-image: url(${(p) => p.$src});
@@ -198,7 +199,7 @@ const Layer = styled.div<{ $src: string; $opacity: number; $isNext?: boolean }>`
   background-repeat: no-repeat;
 
   opacity: ${(p) => p.$opacity};
-  transition: ${(p) => (p.$isNext ? `opacity ${FADE_MS}ms ease` : "none")};
+  transition: opacity ${FADE_MS}ms ease;
   will-change: opacity;
 `;
 
