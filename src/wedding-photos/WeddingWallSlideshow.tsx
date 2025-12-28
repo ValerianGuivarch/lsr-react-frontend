@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import axios from "axios";
 import config from "../../src/config/config";
@@ -6,7 +6,7 @@ import config from "../../src/config/config";
 const API_URL = `${config.BASE_URL}/wedding-photos`;
 
 type PhotoItem = {
-  id: string;
+  id: string; // chez toi = nom du thumb (souvent)
   createdAt: string;
   url: string;
   thumbUrl: string;
@@ -14,8 +14,9 @@ type PhotoItem = {
 
 type LatestResponse = { ok: true; items: PhotoItem[] };
 
-const DISPLAY_MS = 6000;
+const DISPLAY_MS = 6500;
 const FADE_MS = 900;
+const CONTROLS_AUTOHIDE_MS = 2500;
 
 const GlobalStyle = createGlobalStyle`
   html, body, #root {
@@ -29,6 +30,7 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 function normalizeUrl(u: string): string {
+  if (!u) return u;
   if (u.startsWith("http://") || u.startsWith("https://")) return u;
   if (u.startsWith("/")) return `${config.BASE_URL}${u}`;
   return u;
@@ -38,27 +40,40 @@ function preloadImage(src: string): Promise<void> {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve();
-    img.onerror = () => resolve(); // on ne bloque pas si ça fail
+    img.onerror = () => resolve();
     img.src = src;
   });
 }
 
 function pickRandomDifferent(items: PhotoItem[], lastId?: string): PhotoItem {
-  if (items.length === 1) return items[0];
+  if (items.length <= 1) return items[0];
   const candidates = lastId ? items.filter((it) => it.id !== lastId) : items;
-  const pool = candidates.length > 0 ? candidates : items;
+  const pool = candidates.length ? candidates : items;
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
 export default function WeddingWallSlideshow() {
+  const stageRef = useRef<HTMLDivElement | null>(null);
+
   const [current, setCurrent] = useState<PhotoItem | null>(null);
+
+  // couche “next” par-dessus current, qui fade-in
   const [next, setNext] = useState<PhotoItem | null>(null);
-  const [fading, setFading] = useState(false);
+  const [nextOpacity, setNextOpacity] = useState(0);
+
   const [status, setStatus] = useState<string>("Chargement…");
 
-  const currentRef = useRef<PhotoItem | null>(null);
+  const [playing, setPlaying] = useState(true);
+
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+
   const runningRef = useRef(false);
+  const currentRef = useRef<PhotoItem | null>(null);
   const timerRef = useRef<number | null>(null);
+  const hideCtlTimerRef = useRef<number | null>(null);
+
+  const isPaused = useMemo(() => !playing, [playing]);
 
   const fetchItems = async (): Promise<PhotoItem[]> => {
     const res = await axios.get<LatestResponse>(`${API_URL}/latest`, {
@@ -73,6 +88,19 @@ export default function WeddingWallSlideshow() {
     }));
   };
 
+  const scheduleHideControls = () => {
+    if (!isFullscreen) return;
+    if (hideCtlTimerRef.current) window.clearTimeout(hideCtlTimerRef.current);
+    hideCtlTimerRef.current = window.setTimeout(() => {
+      setShowControls(false);
+    }, CONTROLS_AUTOHIDE_MS);
+  };
+
+  const ensureControlsVisible = () => {
+    setShowControls(true);
+    scheduleHideControls();
+  };
+
   const showFirst = async () => {
     try {
       const items = await fetchItems();
@@ -80,7 +108,7 @@ export default function WeddingWallSlideshow() {
         setStatus("En attente de photos…");
         return;
       }
-      const first = items[0]; // priorité au plus récent
+      const first = items[0]; // dernière prise (plus récente)
       await preloadImage(first.url);
 
       currentRef.current = first;
@@ -91,7 +119,33 @@ export default function WeddingWallSlideshow() {
     }
   };
 
-  const advance = async () => {
+  const crossfadeTo = async (chosen: PhotoItem) => {
+    // précharge pour éviter le “noir”
+    await preloadImage(chosen.url);
+
+    // next est au-dessus, opacity 0 -> 1
+    setNext(chosen);
+    setNextOpacity(0);
+
+    // lancer transition au frame suivant
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setNextOpacity(1));
+    });
+
+    // commit après la durée de fondu (✅ pas 0)
+    window.setTimeout(() => {
+      currentRef.current = chosen;
+      setCurrent(chosen);
+
+      // retirer la couche next sans transition parasite
+      setNext(null);
+      setNextOpacity(0);
+
+      runningRef.current = false;
+    }, FADE_MS);
+  };
+
+  const advance = async (opts?: { preferLatest?: boolean }) => {
     if (runningRef.current) return;
     runningRef.current = true;
 
@@ -103,71 +157,172 @@ export default function WeddingWallSlideshow() {
         return;
       }
 
-      const lastId = currentRef.current?.id;
-      const chosen = pickRandomDifferent(items, lastId);
+      const last = currentRef.current;
 
-      // première image si aucune
-      if (!currentRef.current) {
-        await preloadImage(chosen.url);
-        currentRef.current = chosen;
-        setCurrent(chosen);
+      // si aucune photo affichée : on force “dernière prise”
+      if (!last) {
+        const first = items[0];
+        await preloadImage(first.url);
+        currentRef.current = first;
+        setCurrent(first);
         setStatus("");
         runningRef.current = false;
         return;
       }
 
-      // précharge pour éviter le flash/noir
-      await preloadImage(chosen.url);
+      const chosen = opts?.preferLatest
+        ? items[0].id === last.id
+          ? pickRandomDifferent(items, last.id)
+          : items[0]
+        : pickRandomDifferent(items, last.id);
 
-      // 1) on monte next à opacity 0 (fading=false)
-      setNext(chosen);
-      setFading(false);
-
-      // 2) on déclenche le fade au frame suivant pour que le CSS transition s’applique proprement
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setFading(true);
-        });
-      });
-
-      // 3) après la transition: on "commit" chosen comme current
-      window.setTimeout(() => {
-        currentRef.current = chosen;
-        setCurrent(chosen);
-        setNext(null);
-        setFading(false);
-        runningRef.current = false;
-      }, 0);
+      await crossfadeTo(chosen);
     } catch (e: any) {
-      setStatus(`Erreur latest: ${e?.message ?? e}`);
+      setStatus(`Erreur: ${e?.message ?? e}`);
       runningRef.current = false;
     }
   };
 
+  // Loop play/pause
   useEffect(() => {
-    void showFirst();
+    if (!playing) {
+      if (timerRef.current) window.clearInterval(timerRef.current);
+      timerRef.current = null;
+      return;
+    }
 
+    if (timerRef.current) window.clearInterval(timerRef.current);
     timerRef.current = window.setInterval(() => {
       void advance();
     }, DISPLAY_MS);
 
     return () => {
       if (timerRef.current) window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing]);
+
+  // Init
+  useEffect(() => {
+    void showFirst();
+    return () => {
+      if (hideCtlTimerRef.current) window.clearTimeout(hideCtlTimerRef.current);
     };
   }, []);
+
+  // Fullscreen tracking
+  useEffect(() => {
+    const onFs = () => {
+      const fs = Boolean(document.fullscreenElement);
+      setIsFullscreen(fs);
+      setShowControls(true);
+      if (fs) scheduleHideControls();
+    };
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFullscreen]);
+
+  const enterFullscreen = async () => {
+    ensureControlsVisible();
+    const el = stageRef.current;
+    if (!el) return;
+    try {
+      await el.requestFullscreen();
+    } catch {
+      // ignore
+    }
+  };
+
+  const exitFullscreen = async () => {
+    ensureControlsVisible();
+    try {
+      await document.exitFullscreen();
+    } catch {
+      // ignore
+    }
+  };
+
+  const onStageClick = () => {
+    // plein écran : clic => affiche/masque contrôles (comme tu veux)
+    if (isFullscreen) {
+      if (showControls) {
+        setShowControls(false);
+      } else {
+        ensureControlsVisible();
+      }
+      return;
+    }
+
+    // mode normal : clic => prochaine photo (utile en pause)
+    void advance();
+  };
+
+  const onDelete = async () => {
+    if (!currentRef.current) return;
+    try {
+      // ⬇️ nécessite l’endpoint backend DELETE (voir plus bas)
+      await axios.delete(`${API_URL}/item`, {
+        params: { id: currentRef.current.id },
+        timeout: 20_000,
+      });
+
+      // après suppression, on force la plus récente en priorité
+      setStatus("Supprimée ✅");
+      await advance({ preferLatest: true });
+    } catch (e: any) {
+      setStatus(
+        `Suppression KO: ${e?.response?.data?.message ?? e?.message ?? e}`,
+      );
+    }
+  };
 
   return (
     <>
       <GlobalStyle />
       <Page>
-        <Stage onClick={() => void advance()}>
-          {current && <Layer $src={current.url} $opacity={fading ? 0 : 1} />}
-          {next && <Layer $src={next.url} $opacity={fading ? 1 : 0} />}
+        <Stage ref={stageRef} onClick={onStageClick}>
+          {/* current stable */}
+          {current && (
+            <Layer $src={current.url} $opacity={1} $transition={false} />
+          )}
+
+          {/* next fade-in */}
+          {next && <Layer $src={next.url} $opacity={nextOpacity} $transition />}
 
           {!current && (
             <Empty>
               <EmptyText>{status}</EmptyText>
             </Empty>
+          )}
+
+          {/* Controls */}
+          {showControls && (
+            <Controls onClick={(e) => e.stopPropagation()}>
+              {!isFullscreen && (
+                <Left>
+                  <Btn onClick={() => setPlaying((p) => !p)}>
+                    {playing ? "Pause" : "Play"}
+                  </Btn>
+                  {isPaused && (
+                    <Btn $danger onClick={() => void onDelete()}>
+                      Supprimer
+                    </Btn>
+                  )}
+                </Left>
+              )}
+
+              <Right>
+                {!isFullscreen ? (
+                  <Btn onClick={() => void enterFullscreen()}>Plein écran</Btn>
+                ) : (
+                  <Btn onClick={() => void exitFullscreen()}>
+                    Quitter plein écran
+                  </Btn>
+                )}
+              </Right>
+            </Controls>
           )}
         </Stage>
       </Page>
@@ -188,9 +343,14 @@ const Stage = styled.div`
   position: absolute;
   inset: 0;
   overflow: hidden;
+  cursor: pointer;
 `;
 
-const Layer = styled.div<{ $src: string; $opacity: number }>`
+const Layer = styled.div<{
+  $src: string;
+  $opacity: number;
+  $transition: boolean;
+}>`
   position: absolute;
   inset: 0;
   background-image: url(${(p) => p.$src});
@@ -199,8 +359,42 @@ const Layer = styled.div<{ $src: string; $opacity: number }>`
   background-repeat: no-repeat;
 
   opacity: ${(p) => p.$opacity};
-  transition: opacity ${FADE_MS}ms ease;
+  transition: ${(p) => (p.$transition ? `opacity ${FADE_MS}ms ease` : "none")};
   will-change: opacity;
+`;
+
+const Controls = styled.div`
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  pointer-events: auto;
+`;
+
+const Left = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const Right = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const Btn = styled.button<{ $danger?: boolean }>`
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: ${(p) =>
+    p.$danger ? "rgba(255, 70, 70, 0.22)" : "rgba(0, 0, 0, 0.45)"};
+  color: rgba(255, 255, 255, 0.92);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 800;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
 `;
 
 const Empty = styled.div`
