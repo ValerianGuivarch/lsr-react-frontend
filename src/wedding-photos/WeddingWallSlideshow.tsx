@@ -67,6 +67,7 @@ export default function WeddingWallSlideshow() {
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [currentOpacity, setCurrentOpacity] = useState(1);
 
   const runningRef = useRef(false);
   const currentRef = useRef<PhotoItem | null>(null);
@@ -120,26 +121,36 @@ export default function WeddingWallSlideshow() {
   };
 
   const crossfadeTo = async (chosen: PhotoItem) => {
-    // précharge pour éviter le “noir”
     await preloadImage(chosen.url);
 
-    // next est au-dessus, opacity 0 -> 1
+    // Prépare la couche next
     setNext(chosen);
     setNextOpacity(0);
 
-    // lancer transition au frame suivant
+    // Prépare le fade-out du current
+    setCurrentOpacity(1);
+
+    // Lance les transitions au frame suivant
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => setNextOpacity(1));
+      requestAnimationFrame(() => {
+        setNextOpacity(1); // fade-in next
+        setCurrentOpacity(0); // fade-out current
+      });
     });
 
-    // commit après la durée de fondu (✅ pas 0)
     window.setTimeout(() => {
+      // IMPORTANT: commit SANS transition visible
+      // 1) on met le nouveau current
       currentRef.current = chosen;
       setCurrent(chosen);
 
-      // retirer la couche next sans transition parasite
+      // 2) on retire next
       setNext(null);
       setNextOpacity(0);
+
+      // 3) on remet l’opacité du current à 1 SANS transition
+      // Pour ça, on passe Layer current en transition=false (voir plus bas)
+      setCurrentOpacity(1);
 
       runningRef.current = false;
     }, FADE_MS);
@@ -285,7 +296,11 @@ export default function WeddingWallSlideshow() {
         <Stage ref={stageRef} onClick={onStageClick}>
           {/* current stable */}
           {current && (
-            <Layer $src={current.url} $opacity={1} $transition={false} />
+            <Layer
+              $src={current.url}
+              $opacity={currentOpacity}
+              $transition={Boolean(next)} // ✅ transition uniquement pendant un crossfade
+            />
           )}
 
           {/* next fade-in */}
