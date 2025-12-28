@@ -9,7 +9,9 @@ import {
 import config from "../../src/config/config";
 
 const API_URL = `${config.BASE_URL}/wedding-photos`;
-const GOLF_URL = `https://l7r.fr/l7r/golf.png`;
+const GOLF_URL_1 = `https://l7r.fr/l7r/golf1.png`;
+const GOLF_URL_2 = `https://l7r.fr/l7r/golf2.png`;
+const GOLF_URL = Math.random() < 0.5 ? GOLF_URL_1 : GOLF_URL_2;
 
 const MAX_DIMENSION = 2000;
 const JPEG_QUALITY = 0.82;
