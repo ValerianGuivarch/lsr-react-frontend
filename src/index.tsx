@@ -33,7 +33,7 @@ root.render(
       <Routes>
         <Route path="/" element={<App />}>
           <Route path="/" element={<CharacterSelection />} />
-          <Route path="/p" element={<WeddingP />} />
+          <Route path="/golf" element={<WeddingP />} />
           <Route path="/wall" element={<WeddingWallSlideshow />} />
           <Route path="/hp/:wizardName" element={<WizardSheet />} />
           <Route path="/hp/create" element={<WizardFormCreate />} />
