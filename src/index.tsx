@@ -22,6 +22,7 @@ import { WizardFormUpdate } from "./pages/Hp/WizardFormUpdate";
 import { SpellForm } from "./pages/Hp/SpellForm";
 import StoreControl from "./components/Store";
 import WeddingP from "./wedding-photos/WeddingP";
+import WeddingS from "./wedding-photos/WeddingS";
 import WeddingWallSlideshow from "./wedding-photos/WeddingWallSlideshow";
 
 // @ts-ignore
@@ -34,6 +35,7 @@ root.render(
         <Route path="/" element={<App />}>
           <Route path="/" element={<CharacterSelection />} />
           <Route path="/golf" element={<WeddingP />} />
+          <Route path="/selfie" element={<WeddingS />} />
           <Route path="/wall" element={<WeddingWallSlideshow />} />
           <Route path="/hp/:wizardName" element={<WizardSheet />} />
           <Route path="/hp/create" element={<WizardFormCreate />} />

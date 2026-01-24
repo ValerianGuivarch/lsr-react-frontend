@@ -31,7 +31,7 @@ const GlobalStyle = createGlobalStyle`
   *, *::before, *::after { box-sizing: border-box; }
 `;
 
-const WeddingP: React.FC = () => {
+const WeddingS: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -90,7 +90,7 @@ const WeddingP: React.FC = () => {
       });
 
       if (!response.data?.ok) throw new Error("Réponse API inattendue");
-      setStatus({ kind: "ok", text: "Merci ! Photo envoyée ✅" });
+      setStatus({ kind: "ok", text: "Merci ! Photo envoyée !" });
     } catch (err: any) {
       setStatus({
         kind: "err",
@@ -122,7 +122,7 @@ const WeddingP: React.FC = () => {
               }
             />
             <HeaderText>
-              <Title>Photo - Mini Golf</Title>
+              <Title>Photo Selfie</Title>
               <Subtitle>
                 Appuie sur l’image pour prendre (ou refaire) une photo.
               </Subtitle>
@@ -196,7 +196,7 @@ const WeddingP: React.FC = () => {
   );
 };
 
-export default WeddingP;
+export default WeddingS;
 
 /* ---------- image utils ---------- */
 
