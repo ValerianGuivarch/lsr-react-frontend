@@ -3,10 +3,10 @@ import styled, { createGlobalStyle } from "styled-components";
 import axios from "axios";
 import config from "../../src/config/config";
 
-const API_URL = `${config.BASE_URL}/wedding-photos`;
+const API_URL = `/apil7r/v1/wedding-photos`;
 
 type PhotoItem = {
-  id: string; // chez toi = nom du thumb (souvent)
+  id: string;
   createdAt: string;
   url: string;
   thumbUrl: string;
