@@ -81,7 +81,7 @@ const WeddingL: React.FC = () => {
       const fd = new FormData();
       fd.append("file", jpegBlob, "photo.jpg");
 
-      const response = await axios.post(`${API_URL}/check-chair`, fd, {
+      const response = await axios.post(`${API_URL}/check`, fd, {
         timeout: 90_000,
         onUploadProgress: (evt: AxiosProgressEvent) => {
           if (!evt.total) return;
