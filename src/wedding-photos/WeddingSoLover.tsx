@@ -24,7 +24,7 @@ type Status = { kind: StatusKind; text: string };
 type Side = "haut" | "droite" | "bas" | "gauche";
 type BackendResult = {
   ok: true;
-  result: Record<Side, { ok: boolean; details?: any }>;
+  result: Record<Side, boolean>;
 };
 
 const GlobalStyle = createGlobalStyle`
@@ -111,10 +111,10 @@ const WeddingL: React.FC = () => {
       setValidation(data.result);
 
       const allOk =
-        data.result.haut.ok &&
-        data.result.droite.ok &&
-        data.result.bas.ok &&
-        data.result.gauche.ok;
+        data.result.haut &&
+        data.result.droite &&
+        data.result.bas &&
+        data.result.gauche;
 
       setStatus({
         kind: allOk ? "ok" : "err",
@@ -200,24 +200,24 @@ const WeddingL: React.FC = () => {
           {validation && (
             <Checks>
               <CheckRow>
-                {validation.haut.ok ? <OkDot /> : <KoDot />}
+                {validation.haut ? <OkDot /> : <KoDot />}
                 <span>Haut</span>
-                <RightText>{validation.haut.ok ? "ok" : "non"}</RightText>
+                <RightText>{validation.haut ? "ok" : "non"}</RightText>
               </CheckRow>
               <CheckRow>
-                {validation.bas.ok ? <OkDot /> : <KoDot />}
+                {validation.bas ? <OkDot /> : <KoDot />}
                 <span>Bas</span>
-                <RightText>{validation.bas.ok ? "ok" : "non"}</RightText>
+                <RightText>{validation.bas ? "ok" : "non"}</RightText>
               </CheckRow>
               <CheckRow>
-                {validation.gauche.ok ? <OkDot /> : <KoDot />}
+                {validation.gauche ? <OkDot /> : <KoDot />}
                 <span>Gauche</span>
-                <RightText>{validation.gauche.ok ? "ok" : "non"}</RightText>
+                <RightText>{validation.gauche ? "ok" : "non"}</RightText>
               </CheckRow>
               <CheckRow>
-                {validation.droite.ok ? <OkDot /> : <KoDot />}
+                {validation.droite ? <OkDot /> : <KoDot />}
                 <span>Droite</span>
-                <RightText>{validation.droite.ok ? "ok" : "non"}</RightText>
+                <RightText>{validation.droite ? "ok" : "non"}</RightText>
               </CheckRow>
             </Checks>
           )}
