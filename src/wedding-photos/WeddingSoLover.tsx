@@ -20,6 +20,13 @@ const PREVIEW_DIMENSION = 520;
 type StatusKind = "idle" | "ok" | "err";
 type Status = { kind: StatusKind; text: string };
 
+// Réponse backend attendue
+type Side = "haut" | "droite" | "bas" | "gauche";
+type BackendResult = {
+  ok: true;
+  result: Record<Side, { ok: boolean; details?: any }>;
+};
+
 const GlobalStyle = createGlobalStyle`
   html, body, #root {
     margin: 0;
@@ -42,6 +49,10 @@ const WeddingL: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadPct, setUploadPct] = useState<number>(0);
 
+  const [validation, setValidation] = useState<BackendResult["result"] | null>(
+    null,
+  );
+
   const openCamera = () => {
     if (!isUploading) fileInputRef.current?.click();
   };
@@ -49,6 +60,7 @@ const WeddingL: React.FC = () => {
   const onPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setStatus({ kind: "idle", text: "" });
     setUploadPct(0);
+    setValidation(null);
 
     const file = e.target.files?.[0];
     if (!file) return;
@@ -76,6 +88,7 @@ const WeddingL: React.FC = () => {
     setIsUploading(true);
     setUploadPct(0);
     setStatus({ kind: "idle", text: "Analyse en cours…" });
+    setValidation(null);
 
     try {
       const fd = new FormData();
@@ -90,14 +103,22 @@ const WeddingL: React.FC = () => {
         },
       });
 
-      if (!response.data?.ok) throw new Error("Réponse API inattendue");
+      if (!response.data?.ok || !response.data?.result) {
+        throw new Error("Réponse API inattendue");
+      }
 
-      const hasChair = Boolean(response.data.hasChair);
+      const data = response.data as BackendResult;
+      setValidation(data.result);
+
+      const allOk =
+        data.result.haut.ok &&
+        data.result.droite.ok &&
+        data.result.bas.ok &&
+        data.result.gauche.ok;
+
       setStatus({
-        kind: "ok",
-        text: hasChair
-          ? "Oui : il y a une chaise ✅"
-          : "Non : pas de chaise ✅",
+        kind: allOk ? "ok" : "err",
+        text: allOk ? "✅ Plateau correct" : "❌ Plateau incorrect",
       });
     } catch (err: any) {
       setStatus({
@@ -126,10 +147,8 @@ const WeddingL: React.FC = () => {
               }
             />
             <HeaderText>
-              <Title>So-lover — Chaise ?</Title>
-              <Subtitle>
-                Appuie sur l’image pour prendre (ou refaire) une photo.
-              </Subtitle>
+              <Title>So-lover — Validation</Title>
+              <Subtitle>Prends une photo du trèfle, puis “Vérifier”.</Subtitle>
             </HeaderText>
           </Header>
 
@@ -177,6 +196,31 @@ const WeddingL: React.FC = () => {
               </Overlay>
             )}
           </PhotoPanel>
+
+          {validation && (
+            <Checks>
+              <CheckRow>
+                {validation.haut.ok ? <OkDot /> : <KoDot />}
+                <span>Haut</span>
+                <RightText>{validation.haut.ok ? "ok" : "non"}</RightText>
+              </CheckRow>
+              <CheckRow>
+                {validation.bas.ok ? <OkDot /> : <KoDot />}
+                <span>Bas</span>
+                <RightText>{validation.bas.ok ? "ok" : "non"}</RightText>
+              </CheckRow>
+              <CheckRow>
+                {validation.gauche.ok ? <OkDot /> : <KoDot />}
+                <span>Gauche</span>
+                <RightText>{validation.gauche.ok ? "ok" : "non"}</RightText>
+              </CheckRow>
+              <CheckRow>
+                {validation.droite.ok ? <OkDot /> : <KoDot />}
+                <span>Droite</span>
+                <RightText>{validation.droite.ok ? "ok" : "non"}</RightText>
+              </CheckRow>
+            </Checks>
+          )}
 
           {status.text && (
             <StatusLine $kind={status.kind}>
@@ -501,6 +545,43 @@ const StatusLine = styled.div<{ $kind: StatusKind }>`
     line-height: 1.25rem;
     overflow-wrap: anywhere;
   }
+`;
+
+const Checks = styled.div`
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  display: grid;
+  gap: 8px;
+`;
+
+const CheckRow = styled.div`
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  font-weight: 800;
+`;
+
+const RightText = styled.div`
+  opacity: 0.9;
+  font-weight: 900;
+`;
+
+const OkDot = styled.div`
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0, 255, 120, 0.8);
+`;
+
+const KoDot = styled.div`
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 80, 80, 0.85);
 `;
 
 const spin = keyframes`
