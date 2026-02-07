@@ -24,6 +24,7 @@ import StoreControl from "./components/Store";
 import WeddingP from "./wedding-photos/WeddingP";
 import WeddingS from "./wedding-photos/WeddingS";
 import WeddingWallSlideshow from "./wedding-photos/WeddingWallSlideshow";
+import WeddingSoLover from "./wedding-photos/WeddingSoLover";
 
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -35,6 +36,7 @@ root.render(
         <Route path="/" element={<App />}>
           <Route path="/" element={<CharacterSelection />} />
           <Route path="/golf" element={<WeddingP />} />
+          <Route path="/so-lover" element={<WeddingSoLover />} />
           <Route path="/selfie" element={<WeddingS />} />
           <Route path="/wall" element={<WeddingWallSlideshow />} />
           <Route path="/hp/:wizardName" element={<WizardSheet />} />
