@@ -20,9 +20,6 @@ const PREVIEW_DIMENSION = 520;
 type StatusKind = "idle" | "ok" | "err";
 type Status = { kind: StatusKind; text: string };
 
-// ✅ Nouvelle réponse backend attendue
-type AnchorId = "anch1" | "anch2" | "anch3" | "anch4";
-
 type QuadrantId = "haut_gauche" | "haut_droite" | "bas_gauche" | "bas_droite";
 
 type BackendResult = {
@@ -53,9 +50,7 @@ const WeddingL: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadPct, setUploadPct] = useState<number>(0);
 
-  // ✅ On stocke anchors + global au lieu de result(haut/bas/...)
-  const [anchors, setAnchors] = useState<BackendResult["anchors"] | null>(null);
-
+  // ✅ Plus d'anchors : on ne garde que quadrants + global
   const [quadrants, setQuadrants] = useState<BackendResult["quadrants"] | null>(
     null,
   );
@@ -68,7 +63,7 @@ const WeddingL: React.FC = () => {
   const onPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setStatus({ kind: "idle", text: "" });
     setUploadPct(0);
-    setAnchors(null);
+    setQuadrants(null);
     setGlobalOk(null);
 
     const file = e.target.files?.[0];
@@ -97,7 +92,7 @@ const WeddingL: React.FC = () => {
     setIsUploading(true);
     setUploadPct(0);
     setStatus({ kind: "idle", text: "Analyse en cours…" });
-    setAnchors(null);
+    setQuadrants(null);
     setGlobalOk(null);
 
     try {
@@ -113,10 +108,13 @@ const WeddingL: React.FC = () => {
         },
       });
 
-      if (!response.data?.ok || !response.data?.quadrants)
+      // ✅ Validation format backend: ok/global/quadrants
+      if (!response.data?.ok || !response.data?.quadrants) {
         throw new Error("Réponse API inattendue");
+      }
 
       const data = response.data as BackendResult;
+
       setQuadrants(data.quadrants);
       setGlobalOk(Boolean(data.global));
 
@@ -124,9 +122,6 @@ const WeddingL: React.FC = () => {
         kind: data.global ? "ok" : "err",
         text: data.global ? "✅ Plateau correct" : "❌ Plateau incorrect",
       });
-
-      // (optionnel) debug console si tu renvoies details.why
-      // console.log("WHY:", data.details?.why);
     } catch (err: any) {
       setStatus({
         kind: "err",
@@ -214,6 +209,10 @@ const WeddingL: React.FC = () => {
                   {quadrants.haut_gauche.same ? "ok" : "non"}
                 </RightText>
               </CheckRow>
+              {/* optionnel debug */}
+              {quadrants.haut_gauche.why ? (
+                <WhyText>{quadrants.haut_gauche.why}</WhyText>
+              ) : null}
 
               <CheckRow>
                 {quadrants.haut_droite.same ? <OkDot /> : <KoDot />}
@@ -222,6 +221,9 @@ const WeddingL: React.FC = () => {
                   {quadrants.haut_droite.same ? "ok" : "non"}
                 </RightText>
               </CheckRow>
+              {quadrants.haut_droite.why ? (
+                <WhyText>{quadrants.haut_droite.why}</WhyText>
+              ) : null}
 
               <CheckRow>
                 {quadrants.bas_gauche.same ? <OkDot /> : <KoDot />}
@@ -230,6 +232,9 @@ const WeddingL: React.FC = () => {
                   {quadrants.bas_gauche.same ? "ok" : "non"}
                 </RightText>
               </CheckRow>
+              {quadrants.bas_gauche.why ? (
+                <WhyText>{quadrants.bas_gauche.why}</WhyText>
+              ) : null}
 
               <CheckRow>
                 {quadrants.bas_droite.same ? <OkDot /> : <KoDot />}
@@ -238,6 +243,9 @@ const WeddingL: React.FC = () => {
                   {quadrants.bas_droite.same ? "ok" : "non"}
                 </RightText>
               </CheckRow>
+              {quadrants.bas_droite.why ? (
+                <WhyText>{quadrants.bas_droite.why}</WhyText>
+              ) : null}
             </Checks>
           )}
 
@@ -386,6 +394,7 @@ const Logo = styled.img`
   border-radius: 14px;
   object-fit: cover;
   background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.18);
 `;
 
@@ -587,6 +596,15 @@ const CheckRow = styled.div`
 const RightText = styled.div`
   opacity: 0.9;
   font-weight: 900;
+`;
+
+const WhyText = styled.div`
+  margin-top: -2px;
+  margin-left: 24px;
+  opacity: 0.78;
+  font-size: 12px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 `;
 
 const OkDot = styled.div`
