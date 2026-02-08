@@ -20,11 +20,17 @@ const PREVIEW_DIMENSION = 520;
 type StatusKind = "idle" | "ok" | "err";
 type Status = { kind: StatusKind; text: string };
 
-// Réponse backend attendue
-type Side = "haut" | "droite" | "bas" | "gauche";
+// ✅ Nouvelle réponse backend attendue
+type AnchorId = "anch1" | "anch2" | "anch3" | "anch4";
+
 type BackendResult = {
   ok: true;
-  result: Record<Side, boolean>;
+  anchors: Record<AnchorId, boolean>;
+  global: boolean;
+  // optionnel (si tu le renvoies)
+  details?: {
+    why?: Record<AnchorId, string>;
+  };
 };
 
 const GlobalStyle = createGlobalStyle`
@@ -49,9 +55,9 @@ const WeddingL: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadPct, setUploadPct] = useState<number>(0);
 
-  const [validation, setValidation] = useState<BackendResult["result"] | null>(
-    null,
-  );
+  // ✅ On stocke anchors + global au lieu de result(haut/bas/...)
+  const [anchors, setAnchors] = useState<BackendResult["anchors"] | null>(null);
+  const [globalOk, setGlobalOk] = useState<boolean | null>(null);
 
   const openCamera = () => {
     if (!isUploading) fileInputRef.current?.click();
@@ -60,7 +66,8 @@ const WeddingL: React.FC = () => {
   const onPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setStatus({ kind: "idle", text: "" });
     setUploadPct(0);
-    setValidation(null);
+    setAnchors(null);
+    setGlobalOk(null);
 
     const file = e.target.files?.[0];
     if (!file) return;
@@ -88,7 +95,8 @@ const WeddingL: React.FC = () => {
     setIsUploading(true);
     setUploadPct(0);
     setStatus({ kind: "idle", text: "Analyse en cours…" });
-    setValidation(null);
+    setAnchors(null);
+    setGlobalOk(null);
 
     try {
       const fd = new FormData();
@@ -103,23 +111,23 @@ const WeddingL: React.FC = () => {
         },
       });
 
-      if (!response.data?.ok || !response.data?.result) {
+      // ✅ Valide le nouveau format
+      if (!response.data?.ok || !response.data?.anchors) {
         throw new Error("Réponse API inattendue");
       }
 
       const data = response.data as BackendResult;
-      setValidation(data.result);
 
-      const allOk =
-        data.result.haut &&
-        data.result.droite &&
-        data.result.bas &&
-        data.result.gauche;
+      setAnchors(data.anchors);
+      setGlobalOk(Boolean(data.global));
 
       setStatus({
-        kind: allOk ? "ok" : "err",
-        text: allOk ? "✅ Plateau correct" : "❌ Plateau incorrect",
+        kind: data.global ? "ok" : "err",
+        text: data.global ? "✅ Plateau correct" : "❌ Plateau incorrect",
       });
+
+      // (optionnel) debug console si tu renvoies details.why
+      // console.log("WHY:", data.details?.why);
     } catch (err: any) {
       setStatus({
         kind: "err",
@@ -197,27 +205,28 @@ const WeddingL: React.FC = () => {
             )}
           </PhotoPanel>
 
-          {validation && (
+          {/* ✅ Affichage quadrants */}
+          {anchors && (
             <Checks>
               <CheckRow>
-                {validation.haut ? <OkDot /> : <KoDot />}
-                <span>Haut</span>
-                <RightText>{validation.haut ? "ok" : "non"}</RightText>
+                {anchors.anch1 ? <OkDot /> : <KoDot />}
+                <span>Haut gauche</span>
+                <RightText>{anchors.anch1 ? "ok" : "non"}</RightText>
               </CheckRow>
               <CheckRow>
-                {validation.bas ? <OkDot /> : <KoDot />}
-                <span>Bas</span>
-                <RightText>{validation.bas ? "ok" : "non"}</RightText>
+                {anchors.anch2 ? <OkDot /> : <KoDot />}
+                <span>Haut droite</span>
+                <RightText>{anchors.anch2 ? "ok" : "non"}</RightText>
               </CheckRow>
               <CheckRow>
-                {validation.gauche ? <OkDot /> : <KoDot />}
-                <span>Gauche</span>
-                <RightText>{validation.gauche ? "ok" : "non"}</RightText>
+                {anchors.anch3 ? <OkDot /> : <KoDot />}
+                <span>Bas gauche</span>
+                <RightText>{anchors.anch3 ? "ok" : "non"}</RightText>
               </CheckRow>
               <CheckRow>
-                {validation.droite ? <OkDot /> : <KoDot />}
-                <span>Droite</span>
-                <RightText>{validation.droite ? "ok" : "non"}</RightText>
+                {anchors.anch4 ? <OkDot /> : <KoDot />}
+                <span>Bas droite</span>
+                <RightText>{anchors.anch4 ? "ok" : "non"}</RightText>
               </CheckRow>
             </Checks>
           )}
