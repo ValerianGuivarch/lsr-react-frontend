@@ -23,14 +23,12 @@ type Status = { kind: StatusKind; text: string };
 // ✅ Nouvelle réponse backend attendue
 type AnchorId = "anch1" | "anch2" | "anch3" | "anch4";
 
+type QuadrantId = "haut_gauche" | "haut_droite" | "bas_gauche" | "bas_droite";
+
 type BackendResult = {
   ok: true;
-  anchors: Record<AnchorId, boolean>;
   global: boolean;
-  // optionnel (si tu le renvoies)
-  details?: {
-    why?: Record<AnchorId, string>;
-  };
+  quadrants: Record<QuadrantId, { same: boolean; why: string }>;
 };
 
 const GlobalStyle = createGlobalStyle`
@@ -57,6 +55,10 @@ const WeddingL: React.FC = () => {
 
   // ✅ On stocke anchors + global au lieu de result(haut/bas/...)
   const [anchors, setAnchors] = useState<BackendResult["anchors"] | null>(null);
+
+  const [quadrants, setQuadrants] = useState<BackendResult["quadrants"] | null>(
+    null,
+  );
   const [globalOk, setGlobalOk] = useState<boolean | null>(null);
 
   const openCamera = () => {
@@ -111,14 +113,11 @@ const WeddingL: React.FC = () => {
         },
       });
 
-      // ✅ Valide le nouveau format
-      if (!response.data?.ok || !response.data?.anchors) {
+      if (!response.data?.ok || !response.data?.quadrants)
         throw new Error("Réponse API inattendue");
-      }
 
       const data = response.data as BackendResult;
-
-      setAnchors(data.anchors);
+      setQuadrants(data.quadrants);
       setGlobalOk(Boolean(data.global));
 
       setStatus({
@@ -206,27 +205,38 @@ const WeddingL: React.FC = () => {
           </PhotoPanel>
 
           {/* ✅ Affichage quadrants */}
-          {anchors && (
+          {quadrants && (
             <Checks>
               <CheckRow>
-                {anchors.anch1 ? <OkDot /> : <KoDot />}
+                {quadrants.haut_gauche.same ? <OkDot /> : <KoDot />}
                 <span>Haut gauche</span>
-                <RightText>{anchors.anch1 ? "ok" : "non"}</RightText>
+                <RightText>
+                  {quadrants.haut_gauche.same ? "ok" : "non"}
+                </RightText>
               </CheckRow>
+
               <CheckRow>
-                {anchors.anch2 ? <OkDot /> : <KoDot />}
+                {quadrants.haut_droite.same ? <OkDot /> : <KoDot />}
                 <span>Haut droite</span>
-                <RightText>{anchors.anch2 ? "ok" : "non"}</RightText>
+                <RightText>
+                  {quadrants.haut_droite.same ? "ok" : "non"}
+                </RightText>
               </CheckRow>
+
               <CheckRow>
-                {anchors.anch3 ? <OkDot /> : <KoDot />}
+                {quadrants.bas_gauche.same ? <OkDot /> : <KoDot />}
                 <span>Bas gauche</span>
-                <RightText>{anchors.anch3 ? "ok" : "non"}</RightText>
+                <RightText>
+                  {quadrants.bas_gauche.same ? "ok" : "non"}
+                </RightText>
               </CheckRow>
+
               <CheckRow>
-                {anchors.anch4 ? <OkDot /> : <KoDot />}
+                {quadrants.bas_droite.same ? <OkDot /> : <KoDot />}
                 <span>Bas droite</span>
-                <RightText>{anchors.anch4 ? "ok" : "non"}</RightText>
+                <RightText>
+                  {quadrants.bas_droite.same ? "ok" : "non"}
+                </RightText>
               </CheckRow>
             </Checks>
           )}
