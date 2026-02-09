@@ -6,6 +6,7 @@ import {
   FaCheckCircle,
   FaExclamationTriangle,
 } from "react-icons/fa";
+import exifr from "exifr";
 
 const API_URL = `/apil7r/v1/so-lover`;
 
@@ -284,13 +285,29 @@ async function fileToJpegAndPreview(
   const dataUrl = await readAsDataURL(file);
   const img = await loadImage(dataUrl);
 
+  // ✅ Lire orientation EXIF (1..8). Si absent => 1
+  let orientation = 1;
+  try {
+    const o = await exifr.orientation(file);
+    if (typeof o === "number") orientation = o;
+  } catch {
+    // ignore (pas d'EXIF)
+  }
+
+  // --- Upload canvas (corrigé EXIF) ---
   const up = fitWithin(img.naturalWidth, img.naturalHeight, uploadMaxDim);
   const upCanvas = document.createElement("canvas");
-  upCanvas.width = up.width;
-  upCanvas.height = up.height;
-
   const upCtx = upCanvas.getContext("2d");
   if (!upCtx) throw new Error("Canvas non disponible");
+
+  // ✅ appliquer orientation => peut swap width/height
+  setupCanvasForOrientation(upCanvas, up.width, up.height, orientation);
+  applyOrientationTransform(
+    upCtx,
+    upCanvas.width,
+    upCanvas.height,
+    orientation,
+  );
   upCtx.drawImage(img, 0, 0, up.width, up.height);
 
   const blob: Blob = await new Promise((resolve, reject) => {
@@ -301,17 +318,79 @@ async function fileToJpegAndPreview(
     );
   });
 
+  // --- Preview canvas (corrigé EXIF) ---
   const pv = fitWithin(img.naturalWidth, img.naturalHeight, previewMaxDim);
   const pvCanvas = document.createElement("canvas");
-  pvCanvas.width = pv.width;
-  pvCanvas.height = pv.height;
-
   const pvCtx = pvCanvas.getContext("2d");
   if (!pvCtx) throw new Error("Canvas non disponible");
+
+  setupCanvasForOrientation(pvCanvas, pv.width, pv.height, orientation);
+  applyOrientationTransform(
+    pvCtx,
+    pvCanvas.width,
+    pvCanvas.height,
+    orientation,
+  );
   pvCtx.drawImage(img, 0, 0, pv.width, pv.height);
 
   const previewDataUrl = pvCanvas.toDataURL("image/jpeg", 0.78);
   return { blob, previewDataUrl };
+}
+
+// Si orientation 5..8 => image “pivotée”, donc canvas width/height inversés
+function setupCanvasForOrientation(
+  canvas: HTMLCanvasElement,
+  w: number,
+  h: number,
+  orientation: number,
+) {
+  const swap = orientation >= 5 && orientation <= 8;
+  canvas.width = swap ? h : w;
+  canvas.height = swap ? w : h;
+}
+
+// Transforme le contexte pour que drawImage(0,0,w,h) arrive “droit”
+function applyOrientationTransform(
+  ctx: CanvasRenderingContext2D,
+  cw: number,
+  ch: number,
+  orientation: number,
+) {
+  switch (orientation) {
+    case 2: // mirror horizontal
+      ctx.translate(cw, 0);
+      ctx.scale(-1, 1);
+      break;
+    case 3: // rotate 180
+      ctx.translate(cw, ch);
+      ctx.rotate(Math.PI);
+      break;
+    case 4: // mirror vertical
+      ctx.translate(0, ch);
+      ctx.scale(1, -1);
+      break;
+    case 5: // mirror horizontal + rotate 90 CW
+      ctx.rotate(0.5 * Math.PI);
+      ctx.scale(1, -1);
+      break;
+    case 6: // rotate 90 CW
+      ctx.translate(cw, 0);
+      ctx.rotate(0.5 * Math.PI);
+      break;
+    case 7: // mirror horizontal + rotate 90 CCW
+      ctx.translate(cw, ch);
+      ctx.rotate(0.5 * Math.PI);
+      ctx.scale(-1, 1);
+      break;
+    case 8: // rotate 90 CCW
+      ctx.translate(0, ch);
+      ctx.rotate(-0.5 * Math.PI);
+      break;
+    case 1:
+    default:
+      // no-op
+      break;
+  }
 }
 
 function fitWithin(w: number, h: number, maxDim: number) {
@@ -394,7 +473,6 @@ const Logo = styled.img`
   border-radius: 14px;
   object-fit: cover;
   background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.18);
 `;
 
@@ -668,6 +746,6 @@ const ProgressFill = styled.div`
   height: 100%;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.72);
-  width: 0%;
+  width: 0;
   transition: width 140ms ease;
 `;
