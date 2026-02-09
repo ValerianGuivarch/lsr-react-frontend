@@ -8,13 +8,11 @@ import {
 } from "react-icons/fa";
 import exifr from "exifr";
 
-// ✅ Mets l’image générée ici (ex: src/assets/so-lover/clover.png)
-import CloverImg from "../assets/so-lover/clover.png";
-
 const API_URL = `/apil7r/v1/so-lover`;
 
 const SO_URL_1 = `https://l7r.fr/l7r/golf1.png`;
 const SO_URL_2 = `https://l7r.fr/l7r/golf2.png`;
+const TREFLE_URL = `https://l7r.fr/l7r/clover.png`;
 const SO_URL = Math.random() < 0.5 ? SO_URL_1 : SO_URL_2;
 
 const MAX_DIMENSION = 2000;
@@ -205,7 +203,11 @@ const WeddingL: React.FC = () => {
           {/* ✅ Résultat = image + overlay quadrants (plus de texte) */}
           {showResult && quadrants && (
             <ResultWrap aria-label="Résultat">
-              <ResultImg src={CloverImg} alt="" $globalOk={Boolean(globalOk)} />
+              <ResultImg
+                src={TREFLE_URL}
+                alt=""
+                $globalOk={Boolean(globalOk)}
+              />
 
               <QuadBadge $pos="tl" $ok={quadrants.haut_gauche.same}>
                 {quadrants.haut_gauche.same ? (
