@@ -201,59 +201,44 @@ const WeddingL: React.FC = () => {
           </PhotoPanel>
 
           {/* ✅ Résultat = image + overlay quadrants (plus de texte) */}
-          {showResult && quadrants && (
-            <CloverOverlay>
+          {/* ✅ Résultat = trèfle + 4 badges quadrants au centre */}
+          {quadrants && (
+            <ResultWrap>
               <CloverImg src={CLOVER_URL} alt="" />
 
-              <CenterBadges>
-                <Badge
-                  $pos="top"
-                  $ok={quadrants.haut_gauche.same && quadrants.haut_droite.same}
-                >
-                  {quadrants.haut_gauche.same && quadrants.haut_droite.same ? (
+              <QuadrantBadges>
+                <QBadge $pos="hg" $ok={quadrants.haut_gauche.same}>
+                  {quadrants.haut_gauche.same ? (
                     <FaCheckCircle />
                   ) : (
                     <FaExclamationTriangle />
                   )}
-                </Badge>
-
-                <Badge
-                  $pos="right"
-                  $ok={quadrants.haut_droite.same && quadrants.bas_droite.same}
-                >
-                  {quadrants.haut_droite.same && quadrants.bas_droite.same ? (
+                </QBadge>
+                <QBadge $pos="hd" $ok={quadrants.haut_droite.same}>
+                  {quadrants.haut_droite.same ? (
                     <FaCheckCircle />
                   ) : (
                     <FaExclamationTriangle />
                   )}
-                </Badge>
-
-                <Badge
-                  $pos="bottom"
-                  $ok={quadrants.bas_gauche.same && quadrants.bas_droite.same}
-                >
-                  {quadrants.bas_gauche.same && quadrants.bas_droite.same ? (
+                </QBadge>
+                <QBadge $pos="bg" $ok={quadrants.bas_gauche.same}>
+                  {quadrants.bas_gauche.same ? (
                     <FaCheckCircle />
                   ) : (
                     <FaExclamationTriangle />
                   )}
-                </Badge>
-
-                <Badge
-                  $pos="left"
-                  $ok={quadrants.haut_gauche.same && quadrants.bas_gauche.same}
-                >
-                  {quadrants.haut_gauche.same && quadrants.bas_gauche.same ? (
+                </QBadge>
+                <QBadge $pos="bd" $ok={quadrants.bas_droite.same}>
+                  {quadrants.bas_droite.same ? (
                     <FaCheckCircle />
                   ) : (
                     <FaExclamationTriangle />
                   )}
-                </Badge>
-              </CenterBadges>
-            </CloverOverlay>
+                </QBadge>
+              </QuadrantBadges>
+            </ResultWrap>
           )}
 
-          {/* ⛔️ Plus de StatusLine — mais on garde l’erreur si besoin */}
           {status.kind === "err" && status.text ? (
             <ErrorLine>
               <FaExclamationTriangle />
@@ -751,6 +736,43 @@ const ProgressFill = styled.div`
   transition: width 140ms ease;
 `;
 
+const QBadge = styled.div<{ $pos: "hg" | "hd" | "bg" | "bd"; $ok: boolean }>`
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(8px);
+
+  ${(p) =>
+    p.$ok
+      ? `outline: 2px solid rgba(0,255,120,0.40);`
+      : `outline: 2px solid rgba(255,80,80,0.40);`}
+
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  /* carré 2×2 autour du centre */
+  ${(p) =>
+    p.$pos === "hg"
+      ? `margin-left: -62px; margin-top: -54px;`
+      : p.$pos === "hd"
+      ? `margin-left: 62px; margin-top: -54px;`
+      : p.$pos === "bg"
+      ? `margin-left: -62px; margin-top: 54px;`
+      : `margin-left: 62px; margin-top: 54px;`}
+
+  svg {
+    font-size: 24px;
+    opacity: 0.95;
+  }
+`;
+
 const CloverOverlay = styled.div`
   position: relative;
   margin-top: 12px;
@@ -821,4 +843,11 @@ const Badge = styled.div<{
     font-size: 22px;
     opacity: 0.95;
   }
+`;
+
+const QuadrantBadges = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
 `;
