@@ -8,6 +8,9 @@ import {
 } from "react-icons/fa";
 import exifr from "exifr";
 
+// ✅ Mets l’image générée ici (ex: src/assets/so-lover/clover.png)
+import CloverImg from "../assets/so-lover/clover.png";
+
 const API_URL = `/apil7r/v1/so-lover`;
 
 const SO_URL_1 = `https://l7r.fr/l7r/golf1.png`;
@@ -47,11 +50,12 @@ const WeddingL: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [jpegBlob, setJpegBlob] = useState<Blob | null>(null);
 
+  // ⛔️ On ne va plus afficher de texte, mais on garde status pour le flow/erreurs.
   const [status, setStatus] = useState<Status>({ kind: "idle", text: "" });
+
   const [isUploading, setIsUploading] = useState(false);
   const [uploadPct, setUploadPct] = useState<number>(0);
 
-  // ✅ Plus d'anchors : on ne garde que quadrants + global
   const [quadrants, setQuadrants] = useState<BackendResult["quadrants"] | null>(
     null,
   );
@@ -109,7 +113,6 @@ const WeddingL: React.FC = () => {
         },
       });
 
-      // ✅ Validation format backend: ok/global/quadrants
       if (!response.data?.ok || !response.data?.quadrants) {
         throw new Error("Réponse API inattendue");
       }
@@ -119,10 +122,7 @@ const WeddingL: React.FC = () => {
       setQuadrants(data.quadrants);
       setGlobalOk(Boolean(data.global));
 
-      setStatus({
-        kind: data.global ? "ok" : "err",
-        text: data.global ? "✅ Plateau correct" : "❌ Plateau incorrect",
-      });
+      setStatus({ kind: data.global ? "ok" : "err", text: "" }); // ⛔️ pas de texte
     } catch (err: any) {
       setStatus({
         kind: "err",
@@ -134,6 +134,8 @@ const WeddingL: React.FC = () => {
   };
 
   const canSend = Boolean(jpegBlob) && !isUploading;
+
+  const showResult = Boolean(quadrants);
 
   return (
     <>
@@ -200,66 +202,52 @@ const WeddingL: React.FC = () => {
             )}
           </PhotoPanel>
 
-          {/* ✅ Affichage quadrants */}
-          {quadrants && (
-            <Checks>
-              <CheckRow>
-                {quadrants.haut_gauche.same ? <OkDot /> : <KoDot />}
-                <span>Haut gauche</span>
-                <RightText>
-                  {quadrants.haut_gauche.same ? "ok" : "non"}
-                </RightText>
-              </CheckRow>
-              {/* optionnel debug */}
-              {quadrants.haut_gauche.why ? (
-                <WhyText>{quadrants.haut_gauche.why}</WhyText>
-              ) : null}
+          {/* ✅ Résultat = image + overlay quadrants (plus de texte) */}
+          {showResult && quadrants && (
+            <ResultWrap aria-label="Résultat">
+              <ResultImg src={CloverImg} alt="" $globalOk={Boolean(globalOk)} />
 
-              <CheckRow>
-                {quadrants.haut_droite.same ? <OkDot /> : <KoDot />}
-                <span>Haut droite</span>
-                <RightText>
-                  {quadrants.haut_droite.same ? "ok" : "non"}
-                </RightText>
-              </CheckRow>
-              {quadrants.haut_droite.why ? (
-                <WhyText>{quadrants.haut_droite.why}</WhyText>
-              ) : null}
+              <QuadBadge $pos="tl" $ok={quadrants.haut_gauche.same}>
+                {quadrants.haut_gauche.same ? (
+                  <FaCheckCircle />
+                ) : (
+                  <FaExclamationTriangle />
+                )}
+              </QuadBadge>
 
-              <CheckRow>
-                {quadrants.bas_gauche.same ? <OkDot /> : <KoDot />}
-                <span>Bas gauche</span>
-                <RightText>
-                  {quadrants.bas_gauche.same ? "ok" : "non"}
-                </RightText>
-              </CheckRow>
-              {quadrants.bas_gauche.why ? (
-                <WhyText>{quadrants.bas_gauche.why}</WhyText>
-              ) : null}
+              <QuadBadge $pos="tr" $ok={quadrants.haut_droite.same}>
+                {quadrants.haut_droite.same ? (
+                  <FaCheckCircle />
+                ) : (
+                  <FaExclamationTriangle />
+                )}
+              </QuadBadge>
 
-              <CheckRow>
-                {quadrants.bas_droite.same ? <OkDot /> : <KoDot />}
-                <span>Bas droite</span>
-                <RightText>
-                  {quadrants.bas_droite.same ? "ok" : "non"}
-                </RightText>
-              </CheckRow>
-              {quadrants.bas_droite.why ? (
-                <WhyText>{quadrants.bas_droite.why}</WhyText>
-              ) : null}
-            </Checks>
+              <QuadBadge $pos="bl" $ok={quadrants.bas_gauche.same}>
+                {quadrants.bas_gauche.same ? (
+                  <FaCheckCircle />
+                ) : (
+                  <FaExclamationTriangle />
+                )}
+              </QuadBadge>
+
+              <QuadBadge $pos="br" $ok={quadrants.bas_droite.same}>
+                {quadrants.bas_droite.same ? (
+                  <FaCheckCircle />
+                ) : (
+                  <FaExclamationTriangle />
+                )}
+              </QuadBadge>
+            </ResultWrap>
           )}
 
-          {status.text && (
-            <StatusLine $kind={status.kind}>
-              {status.kind === "ok" ? (
-                <FaCheckCircle />
-              ) : status.kind === "err" ? (
-                <FaExclamationTriangle />
-              ) : null}
+          {/* ⛔️ Plus de StatusLine — mais on garde l’erreur si besoin */}
+          {status.kind === "err" && status.text ? (
+            <ErrorLine>
+              <FaExclamationTriangle />
               <span>{status.text}</span>
-            </StatusLine>
-          )}
+            </ErrorLine>
+          ) : null}
 
           <StickyBottom>
             <SendButton onClick={upload} disabled={!canSend} $ready={canSend}>
@@ -285,22 +273,20 @@ async function fileToJpegAndPreview(
   const dataUrl = await readAsDataURL(file);
   const img = await loadImage(dataUrl);
 
-  // ✅ Lire orientation EXIF (1..8). Si absent => 1
   let orientation = 1;
   try {
     const o = await exifr.orientation(file);
     if (typeof o === "number") orientation = o;
   } catch {
-    // ignore (pas d'EXIF)
+    // ignore
   }
 
-  // --- Upload canvas (corrigé EXIF) ---
+  // Upload canvas
   const up = fitWithin(img.naturalWidth, img.naturalHeight, uploadMaxDim);
   const upCanvas = document.createElement("canvas");
   const upCtx = upCanvas.getContext("2d");
   if (!upCtx) throw new Error("Canvas non disponible");
 
-  // ✅ appliquer orientation => peut swap width/height
   setupCanvasForOrientation(upCanvas, up.width, up.height, orientation);
   applyOrientationTransform(
     upCtx,
@@ -318,7 +304,7 @@ async function fileToJpegAndPreview(
     );
   });
 
-  // --- Preview canvas (corrigé EXIF) ---
+  // Preview canvas
   const pv = fitWithin(img.naturalWidth, img.naturalHeight, previewMaxDim);
   const pvCanvas = document.createElement("canvas");
   const pvCtx = pvCanvas.getContext("2d");
@@ -337,7 +323,6 @@ async function fileToJpegAndPreview(
   return { blob, previewDataUrl };
 }
 
-// Si orientation 5..8 => image “pivotée”, donc canvas width/height inversés
 function setupCanvasForOrientation(
   canvas: HTMLCanvasElement,
   w: number,
@@ -349,7 +334,6 @@ function setupCanvasForOrientation(
   canvas.height = swap ? w : h;
 }
 
-// Transforme le contexte pour que drawImage(0,0,w,h) arrive “droit”
 function applyOrientationTransform(
   ctx: CanvasRenderingContext2D,
   cw: number,
@@ -357,38 +341,37 @@ function applyOrientationTransform(
   orientation: number,
 ) {
   switch (orientation) {
-    case 2: // mirror horizontal
+    case 2:
       ctx.translate(cw, 0);
       ctx.scale(-1, 1);
       break;
-    case 3: // rotate 180
+    case 3:
       ctx.translate(cw, ch);
       ctx.rotate(Math.PI);
       break;
-    case 4: // mirror vertical
+    case 4:
       ctx.translate(0, ch);
       ctx.scale(1, -1);
       break;
-    case 5: // mirror horizontal + rotate 90 CW
+    case 5:
       ctx.rotate(0.5 * Math.PI);
       ctx.scale(1, -1);
       break;
-    case 6: // rotate 90 CW
+    case 6:
       ctx.translate(cw, 0);
       ctx.rotate(0.5 * Math.PI);
       break;
-    case 7: // mirror horizontal + rotate 90 CCW
+    case 7:
       ctx.translate(cw, ch);
       ctx.rotate(0.5 * Math.PI);
       ctx.scale(-1, 1);
       break;
-    case 8: // rotate 90 CCW
+    case 8:
       ctx.translate(0, ch);
       ctx.rotate(-0.5 * Math.PI);
       break;
     case 1:
     default:
-      // no-op
       break;
   }
 }
@@ -628,23 +611,15 @@ const SendButton = styled.button<{ $ready: boolean }>`
   }
 `;
 
-const StatusLine = styled.div<{ $kind: StatusKind }>`
+const ErrorLine = styled.div`
   margin-top: 12px;
   padding: 10px 12px;
   border-radius: 14px;
   display: flex;
   gap: 10px;
   align-items: flex-start;
-
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 80, 80, 0.26);
   background: rgba(255, 255, 255, 0.06);
-
-  ${(p) =>
-    p.$kind === "ok"
-      ? `border-color: rgba(0, 255, 120, 0.24);`
-      : p.$kind === "err"
-      ? `border-color: rgba(255, 80, 80, 0.26);`
-      : ""}
 
   span {
     white-space: pre-wrap;
@@ -653,51 +628,65 @@ const StatusLine = styled.div<{ $kind: StatusKind }>`
   }
 `;
 
-const Checks = styled.div`
+/* ✅ Result image + overlay */
+
+const ResultWrap = styled.div`
+  position: relative;
   margin-top: 12px;
-  padding: 10px 12px;
-  border-radius: 14px;
+  width: 100%;
+  border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+  padding: 14px;
+
   display: grid;
-  gap: 8px;
+  place-items: center;
 `;
 
-const CheckRow = styled.div`
+const ResultImg = styled.img<{ $globalOk: boolean }>`
+  width: min(340px, 76vw);
+  height: auto;
+  display: block;
+
+  /* petite variation visuelle si global KO */
+  opacity: ${(p) => (p.$globalOk ? 1 : 0.55)};
+  filter: ${(p) => (p.$globalOk ? "none" : "grayscale(0.35)")};
+`;
+
+const QuadBadge = styled.div<{ $pos: "tl" | "tr" | "bl" | "br"; $ok: boolean }>`
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   display: grid;
-  grid-template-columns: 14px 1fr auto;
-  gap: 10px;
-  align-items: center;
-  font-weight: 800;
+  place-items: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+
+  svg {
+    font-size: 20px;
+    opacity: 0.95;
+  }
+
+  ${(p) =>
+    p.$ok
+      ? `outline: 2px solid rgba(0,255,120,0.35);`
+      : `outline: 2px solid rgba(255,80,80,0.35);`}
+
+  ${(p) =>
+    p.$pos === "tl"
+      ? `left: 14px; top: 14px;`
+      : p.$pos === "tr"
+      ? `right: 14px; top: 14px;`
+      : p.$pos === "bl"
+      ? `left: 14px; bottom: 14px;`
+      : `right: 14px; bottom: 14px;`}
 `;
 
-const RightText = styled.div`
-  opacity: 0.9;
-  font-weight: 900;
-`;
-
-const WhyText = styled.div`
-  margin-top: -2px;
-  margin-left: 24px;
-  opacity: 0.78;
-  font-size: 12px;
-  line-height: 1.2;
-  overflow-wrap: anywhere;
-`;
-
-const OkDot = styled.div`
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(0, 255, 120, 0.8);
-`;
-
-const KoDot = styled.div`
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(255, 80, 80, 0.85);
-`;
+/* ---------- overlay styles ---------- */
 
 const spin = keyframes`
   0% { transform: rotate(0deg); }
