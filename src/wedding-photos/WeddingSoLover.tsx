@@ -12,7 +12,7 @@ const API_URL = `/apil7r/v1/so-lover`;
 
 const SO_URL_1 = `https://l7r.fr/l7r/golf1.png`;
 const SO_URL_2 = `https://l7r.fr/l7r/golf2.png`;
-const TREFLE_URL = `https://l7r.fr/l7r/clover.png`;
+const CLOVER_URL = `https://l7r.fr/l7r/clover.png`;
 const SO_URL = Math.random() < 0.5 ? SO_URL_1 : SO_URL_2;
 
 const MAX_DIMENSION = 2000;
@@ -202,45 +202,55 @@ const WeddingL: React.FC = () => {
 
           {/* ✅ Résultat = image + overlay quadrants (plus de texte) */}
           {showResult && quadrants && (
-            <ResultWrap aria-label="Résultat">
-              <ResultImg
-                src={TREFLE_URL}
-                alt=""
-                $globalOk={Boolean(globalOk)}
-              />
+            <CloverOverlay>
+              <CloverImg src={CLOVER_URL} alt="" />
 
-              <QuadBadge $pos="tl" $ok={quadrants.haut_gauche.same}>
-                {quadrants.haut_gauche.same ? (
-                  <FaCheckCircle />
-                ) : (
-                  <FaExclamationTriangle />
-                )}
-              </QuadBadge>
+              <CenterBadges>
+                <Badge
+                  $pos="top"
+                  $ok={quadrants.haut_gauche.same && quadrants.haut_droite.same}
+                >
+                  {quadrants.haut_gauche.same && quadrants.haut_droite.same ? (
+                    <FaCheckCircle />
+                  ) : (
+                    <FaExclamationTriangle />
+                  )}
+                </Badge>
 
-              <QuadBadge $pos="tr" $ok={quadrants.haut_droite.same}>
-                {quadrants.haut_droite.same ? (
-                  <FaCheckCircle />
-                ) : (
-                  <FaExclamationTriangle />
-                )}
-              </QuadBadge>
+                <Badge
+                  $pos="right"
+                  $ok={quadrants.haut_droite.same && quadrants.bas_droite.same}
+                >
+                  {quadrants.haut_droite.same && quadrants.bas_droite.same ? (
+                    <FaCheckCircle />
+                  ) : (
+                    <FaExclamationTriangle />
+                  )}
+                </Badge>
 
-              <QuadBadge $pos="bl" $ok={quadrants.bas_gauche.same}>
-                {quadrants.bas_gauche.same ? (
-                  <FaCheckCircle />
-                ) : (
-                  <FaExclamationTriangle />
-                )}
-              </QuadBadge>
+                <Badge
+                  $pos="bottom"
+                  $ok={quadrants.bas_gauche.same && quadrants.bas_droite.same}
+                >
+                  {quadrants.bas_gauche.same && quadrants.bas_droite.same ? (
+                    <FaCheckCircle />
+                  ) : (
+                    <FaExclamationTriangle />
+                  )}
+                </Badge>
 
-              <QuadBadge $pos="br" $ok={quadrants.bas_droite.same}>
-                {quadrants.bas_droite.same ? (
-                  <FaCheckCircle />
-                ) : (
-                  <FaExclamationTriangle />
-                )}
-              </QuadBadge>
-            </ResultWrap>
+                <Badge
+                  $pos="left"
+                  $ok={quadrants.haut_gauche.same && quadrants.bas_gauche.same}
+                >
+                  {quadrants.haut_gauche.same && quadrants.bas_gauche.same ? (
+                    <FaCheckCircle />
+                  ) : (
+                    <FaExclamationTriangle />
+                  )}
+                </Badge>
+              </CenterBadges>
+            </CloverOverlay>
           )}
 
           {/* ⛔️ Plus de StatusLine — mais on garde l’erreur si besoin */}
@@ -739,4 +749,76 @@ const ProgressFill = styled.div`
   background: rgba(255, 255, 255, 0.72);
   width: 0;
   transition: width 140ms ease;
+`;
+
+const CloverOverlay = styled.div`
+  position: relative;
+  margin-top: 12px;
+  width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+
+  aspect-ratio: 16 / 10;
+  min-height: 210px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+`;
+
+const CloverImg = styled.img`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.95;
+`;
+
+const CenterBadges = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+`;
+
+// badges autour du centre (pas aux coins)
+const Badge = styled.div<{
+  $pos: "top" | "right" | "bottom" | "left";
+  $ok: boolean;
+}>`
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(8px);
+
+  ${(p) =>
+    p.$ok
+      ? `outline: 2px solid rgba(0,255,120,0.35);`
+      : `outline: 2px solid rgba(255,80,80,0.35);`}
+
+  /* centre */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  /* décalage autour du centre */
+  ${(p) =>
+    p.$pos === "top"
+      ? `margin-top: -78px;`
+      : p.$pos === "bottom"
+      ? `margin-top: 78px;`
+      : p.$pos === "left"
+      ? `margin-left: -118px;`
+      : `margin-left: 118px;`}
+
+  svg {
+    font-size: 22px;
+    opacity: 0.95;
+  }
 `;
