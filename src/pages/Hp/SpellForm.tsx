@@ -107,7 +107,7 @@ export function SpellForm() {
         <input
           id="spellFormule"
           type="text"
-          value={spellName}
+          value={spellFormule}
           onChange={(e) => setSpellFormule(e.target.value)}
           placeholder="Entrez la formule du sortilège"
         />
