@@ -19,6 +19,12 @@ export function WizardSheet() {
   const [wizard, setWizard] = useState<Wizard | undefined>(undefined);
   const [houses, setHouses] = useState<House[] | undefined>(undefined);
 
+  useEffect(() => {
+    if (wizard) {
+      document.title = wizard.displayName ?? wizard.name;
+    }
+  }, [wizard]);
+
   const [isAdvantagesOpen, setIsAdvantagesOpen] = useState(false);
 
   const toggleAdvantages = () => setIsAdvantagesOpen(!isAdvantagesOpen);
