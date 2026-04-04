@@ -132,7 +132,8 @@ const WeddingS: React.FC = () => {
           <HiddenInput
             ref={fileInputRef}
             type="file"
-            accept="image/*;capture=camera"
+            accept="image/*"
+            capture="environment"
             onChange={onPick}
           />
 
