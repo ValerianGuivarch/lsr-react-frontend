@@ -32,6 +32,16 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const WeddingS: React.FC = () => {
+  const openCameraDirect = () => {
+    if (isUploading) return;
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.capture = "environment";
+    input.onchange = onPick as any;
+    input.click();
+  };
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -124,7 +134,7 @@ const WeddingS: React.FC = () => {
             <HeaderText>
               <Title>Photo Selfie</Title>
               <Subtitle>
-                Appuie sur l’image pour prendre (ou refaire) une photo.
+                Prends une photo ou choisis-en une dans ta galerie.
               </Subtitle>
             </HeaderText>
           </Header>
@@ -136,15 +146,7 @@ const WeddingS: React.FC = () => {
             onChange={onPick}
           />
 
-          <PhotoPanel
-            role="button"
-            tabIndex={0}
-            aria-label="Prendre une photo"
-            onClick={openCamera}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") openCamera();
-            }}
-          >
+          <PhotoPanel>
             {previewUrl ? (
               <>
                 <PhotoBg $src={previewUrl} />
@@ -156,8 +158,17 @@ const WeddingS: React.FC = () => {
             ) : (
               <Empty>
                 <EmptyIcon>📷</EmptyIcon>
-                <EmptyTitle>Appuie ici</EmptyTitle>
-                <EmptyText>pour prendre une photo</EmptyText>
+                <EmptyTitle>Ajouter une photo</EmptyTitle>
+
+                <ButtonsRow>
+                  <ActionButton onClick={openCameraDirect}>
+                    📷 Prendre une photo
+                  </ActionButton>
+
+                  <ActionButton onClick={openCamera}>
+                    🖼 Choisir dans la galerie
+                  </ActionButton>
+                </ButtonsRow>
               </Empty>
             )}
 
@@ -555,4 +566,28 @@ const ProgressFill = styled.div`
   background: rgba(255, 255, 255, 0.72);
   width: 0%;
   transition: width 140ms ease;
+`;
+
+const ButtonsRow = styled.div`
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const ActionButton = styled.button`
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:active {
+    transform: scale(0.98);
+  }
 `;
