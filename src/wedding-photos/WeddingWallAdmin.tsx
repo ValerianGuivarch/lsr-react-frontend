@@ -10,6 +10,13 @@ type PhotoItem = {
   thumbUrl: string;
 };
 
+function normalizeUrl(u: string): string {
+  if (!u) return u;
+  if (u.startsWith("http://") || u.startsWith("https://")) return u;
+  if (u.startsWith("/")) return u;
+  return `/${u}`; // 🔥 important
+}
+
 export default function WeddingWallAdmin() {
   const [items, setItems] = useState<PhotoItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +27,16 @@ export default function WeddingWallAdmin() {
       const res = await axios.get(`${API_URL}/latest`, {
         params: { limit: 1000 },
       });
-      setItems(res.data.items ?? []);
+
+      const items = res.data.items ?? [];
+
+      setItems(
+        items.map((it: PhotoItem) => ({
+          ...it,
+          url: normalizeUrl(it.url),
+          thumbUrl: normalizeUrl(it.thumbUrl),
+        })),
+      );
     } catch (e) {
       console.error(e);
     }
