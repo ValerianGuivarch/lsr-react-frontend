@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import config from "../config/config";
 
 const API_URL = `/apil7r/v1/wedding-photos`;
 
@@ -13,8 +14,8 @@ type PhotoItem = {
 function normalizeUrl(u: string): string {
   if (!u) return u;
   if (u.startsWith("http://") || u.startsWith("https://")) return u;
-  if (u.startsWith("/")) return u;
-  return `/${u}`; // 🔥 important
+  if (u.startsWith("/")) return `${config.BASE_URL}${u}`;
+  return u;
 }
 
 export default function WeddingWallAdmin() {
