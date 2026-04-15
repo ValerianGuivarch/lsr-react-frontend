@@ -40,7 +40,7 @@ const WeddingGolf: React.FC = () => {
   const [status, setStatus] = useState<Status>({ kind: "idle", text: "" });
   const [isUploading, setIsUploading] = useState(false);
   const [uploadPct, setUploadPct] = useState<number>(0);
-
+  const [isProcessing, setIsProcessing] = useState(false);
   const openCamera = () => {
     if (!isUploading) fileInputRef.current?.click();
   };
@@ -52,6 +52,11 @@ const WeddingGolf: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // 🔥 preview immédiate
+    setPreviewUrl(URL.createObjectURL(file));
+
+    setIsProcessing(true);
+
     try {
       const { blob, previewDataUrl } = await fileToJpegAndPreview(
         file,
@@ -59,7 +64,10 @@ const WeddingGolf: React.FC = () => {
         JPEG_QUALITY,
         PREVIEW_DIMENSION,
       );
+
       setJpegBlob(blob);
+
+      // optionnel (remplace par version compressée)
       setPreviewUrl(previewDataUrl);
     } catch (err: any) {
       setStatus({
@@ -67,6 +75,8 @@ const WeddingGolf: React.FC = () => {
         text: `Impossible de préparer la photo : ${err?.message ?? err}`,
       });
     }
+
+    setIsProcessing(false);
   };
 
   const upload = async () => {
@@ -172,6 +182,12 @@ const WeddingGolf: React.FC = () => {
                 <OverlaySub>{uploadPct}%</OverlaySub>
               </Overlay>
             )}
+            {isProcessing && (
+              <Overlay onClick={(e) => e.stopPropagation()}>
+                <Spinner />
+                <OverlayTitle>Préparation de la photo…</OverlayTitle>
+              </Overlay>
+            )}
           </PhotoPanel>
 
           {status.text && (
@@ -270,7 +286,8 @@ const Page = styled.div`
   overflow-x: hidden;
   overflow-y: auto;
 
-  background: radial-gradient(
+  background:
+    radial-gradient(
       1100px 520px at 18% -10%,
       rgba(255, 255, 255, 0.18),
       transparent 60%
@@ -497,8 +514,8 @@ const StatusLine = styled.div<{ $kind: StatusKind }>`
     p.$kind === "ok"
       ? `border-color: rgba(0, 255, 120, 0.24);`
       : p.$kind === "err"
-      ? `border-color: rgba(255, 80, 80, 0.26);`
-      : ""}
+        ? `border-color: rgba(255, 80, 80, 0.26);`
+        : ""}
 
   span {
     white-space: pre-wrap;
