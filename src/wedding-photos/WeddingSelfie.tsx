@@ -35,13 +35,12 @@ const WeddingSelfie: React.FC = () => {
   const openCameraDirect = () => {
     if (isUploading) return;
 
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.capture = "environment";
-    input.onchange = onPick as any;
-    input.click();
+    if (fileInputRef.current) {
+      fileInputRef.current.setAttribute("capture", "environment");
+      fileInputRef.current.click();
+    }
   };
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -52,7 +51,13 @@ const WeddingSelfie: React.FC = () => {
   const [uploadPct, setUploadPct] = useState<number>(0);
 
   const openCamera = () => {
-    if (!isUploading) fileInputRef.current?.click();
+    if (isUploading) return;
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // 🔥 CRUCIAL
+      fileInputRef.current.removeAttribute("capture");
+      fileInputRef.current.click();
+    }
   };
   const reset = () => {
     if (isUploading) return;
@@ -68,7 +73,10 @@ const WeddingSelfie: React.FC = () => {
     setUploadPct(0);
 
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log("no file selected");
+      return;
+    }
 
     try {
       const { blob, previewDataUrl } = await fileToJpegAndPreview(
@@ -154,7 +162,14 @@ const WeddingSelfie: React.FC = () => {
             onChange={onPick}
           />
 
-          <PhotoPanel onClick={previewUrl ? reset : undefined}>
+          <PhotoPanel
+            onClick={(e) => {
+              if (previewUrl && !isUploading) {
+                e.stopPropagation();
+                reset();
+              }
+            }}
+          >
             {previewUrl ? (
               <>
                 <PhotoBg $src={previewUrl} />
