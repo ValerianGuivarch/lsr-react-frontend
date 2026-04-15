@@ -74,8 +74,6 @@ export default function WeddingWallSlideshow() {
   const timerRef = useRef<number | null>(null);
   const hideCtlTimerRef = useRef<number | null>(null);
 
-  const isPaused = useMemo(() => !playing, [playing]);
-
   const fetchItems = async (): Promise<PhotoItem[]> => {
     const res = await axios.get<LatestResponse>(`${API_URL}/latest`, {
       params: { limit: 200 },
@@ -270,25 +268,6 @@ export default function WeddingWallSlideshow() {
     void advance();
   };
 
-  const onDelete = async () => {
-    if (!currentRef.current) return;
-    try {
-      // ⬇️ nécessite l’endpoint backend DELETE (voir plus bas)
-      await axios.delete(`${API_URL}/item`, {
-        params: { id: currentRef.current.id },
-        timeout: 20_000,
-      });
-
-      // après suppression, on force la plus récente en priorité
-      setStatus("Supprimée ✅");
-      await advance({ preferLatest: true });
-    } catch (e: any) {
-      setStatus(
-        `Suppression KO: ${e?.response?.data?.message ?? e?.message ?? e}`,
-      );
-    }
-  };
-
   return (
     <>
       <GlobalStyle />
@@ -320,11 +299,6 @@ export default function WeddingWallSlideshow() {
                   <Btn onClick={() => setPlaying((p) => !p)}>
                     {playing ? "Pause" : "Play"}
                   </Btn>
-                  {isPaused && (
-                    <Btn $danger onClick={() => void onDelete()}>
-                      Supprimer
-                    </Btn>
-                  )}
                 </Left>
               )}
 

@@ -26,6 +26,7 @@ import WeddingSelfie from "./wedding-photos/WeddingSelfie";
 import WeddingWallSlideshow from "./wedding-photos/WeddingWallSlideshow";
 import WeddingSoLover from "./wedding-photos/WeddingSoLover";
 import Foussier from "./wedding-photos/Foussier";
+import WeddingWallAdmin from "./wedding-photos/WeddingWallAdmin";
 
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -41,6 +42,7 @@ root.render(
           <Route path="/so-lover" element={<WeddingSoLover />} />
           <Route path="/selfie" element={<WeddingSelfie />} />
           <Route path="/wall" element={<WeddingWallSlideshow />} />
+          <Route path="/admin" element={<WeddingWallAdmin />} />
           <Route path="/hp/:wizardName" element={<WizardSheet />} />
           <Route path="/hp/create" element={<WizardFormCreate />} />
           <Route path="/hp/spell" element={<SpellForm />} />
