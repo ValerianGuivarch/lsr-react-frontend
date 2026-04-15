@@ -78,8 +78,7 @@ export default function WeddingWallSlideshow() {
 
   const fetchItems = async (): Promise<PhotoItem[]> => {
     const res = await axios.get<LatestResponse>(`${API_URL}/latest`, {
-      params: { limit: 200 },
-      timeout: 20_000,
+      params: { all: true },
     });
     const items = res.data?.items ?? [];
     return items.map((it) => ({
