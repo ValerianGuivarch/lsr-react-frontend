@@ -21,8 +21,8 @@ import { WizardFormCreate } from "./pages/Hp/WizardFormCreate";
 import { WizardFormUpdate } from "./pages/Hp/WizardFormUpdate";
 import { SpellForm } from "./pages/Hp/SpellForm";
 import StoreControl from "./components/Store";
-import WeddingP from "./wedding-photos/WeddingP";
-import WeddingS from "./wedding-photos/WeddingS";
+import WeddingGolf from "./wedding-photos/WeddingGolf";
+import WeddingSelfie from "./wedding-photos/WeddingSelfie";
 import WeddingWallSlideshow from "./wedding-photos/WeddingWallSlideshow";
 import WeddingSoLover from "./wedding-photos/WeddingSoLover";
 import Foussier from "./wedding-photos/Foussier";
@@ -36,10 +36,10 @@ root.render(
       <Routes>
         <Route path="/" element={<App />}>
           <Route path="/" element={<CharacterSelection />} />
-          <Route path="/golf" element={<WeddingP />} />
+          <Route path="/golf" element={<WeddingGolf />} />
           <Route path="/foussier" element={<Foussier />} />
           <Route path="/so-lover" element={<WeddingSoLover />} />
-          <Route path="/selfie" element={<WeddingS />} />
+          <Route path="/selfie" element={<WeddingSelfie />} />
           <Route path="/wall" element={<WeddingWallSlideshow />} />
           <Route path="/hp/:wizardName" element={<WizardSheet />} />
           <Route path="/hp/create" element={<WizardFormCreate />} />

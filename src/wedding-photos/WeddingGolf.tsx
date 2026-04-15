@@ -31,7 +31,7 @@ const GlobalStyle = createGlobalStyle`
   *, *::before, *::after { box-sizing: border-box; }
 `;
 
-const WeddingP: React.FC = () => {
+const WeddingGolf: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -196,7 +196,7 @@ const WeddingP: React.FC = () => {
   );
 };
 
-export default WeddingP;
+export default WeddingGolf;
 
 /* ---------- image utils ---------- */
 

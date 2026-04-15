@@ -31,7 +31,7 @@ const GlobalStyle = createGlobalStyle`
   *, *::before, *::after { box-sizing: border-box; }
 `;
 
-const WeddingS: React.FC = () => {
+const WeddingSelfie: React.FC = () => {
   const openCameraDirect = () => {
     if (isUploading) return;
 
@@ -53,6 +53,14 @@ const WeddingS: React.FC = () => {
 
   const openCamera = () => {
     if (!isUploading) fileInputRef.current?.click();
+  };
+  const reset = () => {
+    if (isUploading) return;
+
+    setPreviewUrl(null);
+    setJpegBlob(null);
+    setStatus({ kind: "idle", text: "" });
+    setUploadPct(0);
   };
 
   const onPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,7 +154,7 @@ const WeddingS: React.FC = () => {
             onChange={onPick}
           />
 
-          <PhotoPanel>
+          <PhotoPanel onClick={previewUrl ? reset : undefined}>
             {previewUrl ? (
               <>
                 <PhotoBg $src={previewUrl} />
@@ -206,7 +214,7 @@ const WeddingS: React.FC = () => {
   );
 };
 
-export default WeddingS;
+export default WeddingSelfie;
 
 /* ---------- image utils ---------- */
 
